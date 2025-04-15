@@ -1,0 +1,30 @@
+# Core Python Libraries
+python-dotenv==1.0.1
+
+# Data Validation & Modeling
+pydantic==2.6.1
+
+# AI/LLM Interaction & Orchestration
+langchain==0.1.4
+langchain-openai==0.0.5
+langchain-community==0.0.19
+langgraph==0.0.23
+langsmith==0.0.77
+
+# Database
+supabase==2.3.5
+psycopg2-binary==2.9.9
+
+# Frontend/API
+fastapi==0.109.2
+uvicorn==0.27.1
+streamlit==1.30.0
+
+# Data Extraction (For Future Use)
+beautifulsoup4==4.12.3
+requests==2.31.0
+pytesseract==0.3.10
+
+# Testing
+pytest==7.4.3
+cypress  # Note: Cypress is a JavaScript library, to be installed separately with npm
