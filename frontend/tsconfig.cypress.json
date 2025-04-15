@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "target": "es2022",
+    "lib": ["es2023", "dom"],
+    "types": ["cypress"],
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "module": "ESNext",
+    "skipLibCheck": true,
+    "isolatedModules": true,
+    "strict": true,
+    "noEmit": true
+  },
+  "include": ["cypress", "cypress.config.ts"]
+}
