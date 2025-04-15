@@ -9,7 +9,7 @@ function App() {
       <div className="counter-card">
         <h1>Smart Grocery Budget Assistant</h1>
         <p>Test Counter: {count}</p>
-        <button onClick={() => setCount(count + 1)}>Click me</button>
+        <button onClick={() => setCount(count + 1)}>Increment</button>
       </div>
     </div>
   );
