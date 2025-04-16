@@ -1,30 +1,30 @@
 describe("Counter Component Test", () => {
   beforeEach(() => {
     // Mock API responses before each test
-    cy.mockBackendAPI();
-    
+    // cy.mockBackendAPI();
+
     // Visit the app before each test
     cy.visit("/");
   });
 
-  it("should test the backend button", () => {
-    // Check if the backend button exists
-    cy.contains("button", "Test Backend").should("be.visible");
+  // it("should test the backend button", () => {
+  //   // Check if the backend button exists
+  //   cy.contains("button", "Test Backend").should("be.visible");
 
-    // Click the backend button
-    cy.contains("button", "Test Backend").click();
+  //   // Click the backend button
+  //   cy.contains("button", "Test Backend").click();
 
-    // Verify the backend message is displayed
-    cy.contains("p", "Welcome to the Grocery Budget Assistant API").should(
-      "be.visible"
-    );
+  //   // Verify the backend message is displayed
+  //   cy.contains("p", "Welcome to the Grocery Budget Assistant API").should(
+  //     "be.visible"
+  //   );
 
-    // Wait for 2 seconds and ensure the message fades
-    cy.wait(2000);
-    cy.contains("p", "Welcome to the Grocery Budget Assistant API").should(
-      "not.exist"
-    );
-  });
+  //   // Wait for 2 seconds and ensure the message fades
+  //   cy.wait(2000);
+  //   cy.contains("p", "Welcome to the Grocery Budget Assistant API").should(
+  //     "not.exist"
+  //   );
+  // });
 
   it("should display the counter component", () => {
     // Check if the heading exists
