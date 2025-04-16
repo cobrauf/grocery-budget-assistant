@@ -1,5 +1,8 @@
 describe("Counter Component Test", () => {
   beforeEach(() => {
+    // Mock API responses before each test
+    cy.mockBackendAPI();
+    
     // Visit the app before each test
     cy.visit("/");
   });

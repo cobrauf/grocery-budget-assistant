@@ -1,5 +1,6 @@
 import { useState } from "react";
 import "./App.css";
+import { api } from "./services/api";
 
 function App() {
   const [count, setCount] = useState(0);
@@ -8,13 +9,17 @@ function App() {
 
   const fetchBackendMessage = async () => {
     try {
-      const response = await fetch("http://localhost:8000/");
-      const data = await response.json();
+      const response = await api.get("/");
+      const data = response.data;
       setBackendMessage(data.message);
       setShowMessage(true);
-      setTimeout(() => setShowMessage(false), 2000); // Fade message after 1 second
+      setTimeout(() => setShowMessage(false), 2000); // Fade message after 2 seconds
     } catch (error) {
       console.error("Error fetching backend message:", error);
+      // Show error message to user for better debugging
+      setBackendMessage("Error connecting to backend");
+      setShowMessage(true);
+      setTimeout(() => setShowMessage(false), 2000);
     }
   };
 

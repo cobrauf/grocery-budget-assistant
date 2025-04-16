@@ -8,30 +8,30 @@
 // commands please read more here:
 // https://on.cypress.io/custom-commands
 // ***********************************************
-//
-//
-// -- This is a parent command --
-// Cypress.Commands.add('login', (email, password) => { ... })
-//
-//
-// -- This is a child command --
-// Cypress.Commands.add('drag', { prevSubject: 'element'}, (subject, options) => { ... })
-//
-//
-// -- This is a dual command --
-// Cypress.Commands.add('dismiss', { prevSubject: 'optional'}, (subject, options) => { ... })
-//
-//
-// -- This will overwrite an existing command --
-// Cypress.Commands.overwrite('visit', (originalFn, url, options) => { ... })
-//
-// declare global {
-//   namespace Cypress {
-//     interface Chainable {
-//       login(email: string, password: string): Chainable<void>
-//       drag(subject: string, options?: Partial<TypeOptions>): Chainable<Element>
-//       dismiss(subject: string, options?: Partial<TypeOptions>): Chainable<Element>
-//       visit(originalFn: CommandOriginalFn, url: string, options: Partial<VisitOptions>): Chainable<Element>
-//     }
-//   }
-// }
+
+Cypress.Commands.add('mockBackendAPI', () => {
+  cy.intercept('GET', '**/api/**', {
+    statusCode: 200,
+    body: { message: 'Welcome to the Grocery Budget Assistant API' }
+  }).as('backendAPI');
+
+  // Also intercept direct calls to the root path
+  cy.intercept('GET', 'http://localhost:8000/', {
+    statusCode: 200,
+    body: { message: 'Welcome to the Grocery Budget Assistant API' }
+  }).as('directBackendAPI');
+
+  // Intercept calls using relative paths
+  cy.intercept('GET', '/', {
+    statusCode: 200,
+    body: { message: 'Welcome to the Grocery Budget Assistant API' }
+  }).as('relativeBackendAPI');
+})
+
+declare global {
+  namespace Cypress {
+    interface Chainable {
+      mockBackendAPI(): Chainable<void>
+    }
+  }
+}
