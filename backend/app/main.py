@@ -19,6 +19,7 @@ frontend_url = os.getenv("FRONTEND_URL", "http://localhost:5173")
 allowed_origins = [
     "http://localhost:5173",  # Vite dev server
     frontend_url,  # Production frontend URL
+    "*",  # Allow requests from any origin during development
 ]
 
 app.add_middleware(
@@ -28,6 +29,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
 
 @app.get("/")
 async def root():
