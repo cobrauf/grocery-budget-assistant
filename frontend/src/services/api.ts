@@ -11,16 +11,3 @@ export const api = axios.create({
     "Content-Type": "application/json",
   },
 });
-
-// Example API functions
-export const fetchSampleData = async () => {
-  try {
-    const response = await api.get("/");
-    return response.data;
-  } catch (error) {
-    console.error("Error fetching data:", error);
-    throw error;
-  }
-};
-
-// Add more API functions here based on your backend endpoints

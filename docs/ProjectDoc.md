@@ -1,4 +1,4 @@
-# Project Structure
+# Project Documentation
 
 grocery-budget-assistant/
 ├── backend/
