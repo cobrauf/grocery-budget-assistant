@@ -15,11 +15,10 @@ function App() {
       setShowMessage(true);
       setTimeout(() => setShowMessage(false), 2000); // Fade message after 2 seconds
     } catch (error) {
-      console.error("Error fetching backend message:", error);
-      // Show error message to user for better debugging
-      setBackendMessage("Error connecting to backend");
+      setBackendMessage("Error connecting to backend, error: " + error);
       setShowMessage(true);
       setTimeout(() => setShowMessage(false), 2000);
+      console.error("Error fetching backend message:", error);
     }
   };
 
