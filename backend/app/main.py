@@ -51,6 +51,11 @@ async def upload_pdf(file: UploadFile = File(...)):
             status_code=400, detail="Invalid file type. Only PDF files are allowed.")
 
     # Define the path to save the file
+    # Ensure filename is not None (add type check)
+    if file.filename is None:
+        raise HTTPException(
+            status_code=400, detail="File name cannot be empty")
+    
     file_path = os.path.join(UPLOAD_DIR, file.filename)
 
     try:
@@ -58,9 +63,9 @@ async def upload_pdf(file: UploadFile = File(...)):
         with open(file_path, "wb") as buffer:
             shutil.copyfileobj(file.file, buffer)
     except Exception as e:
-        # Handle potential file saving errors
+        # Handle potential file saving errors with proper exception chaining
         raise HTTPException(
-            status_code=500, detail=f"Could not save file: {e}")
+            status_code=500, detail=f"Could not save file: {e}") from e
     finally:
         # Ensure the file pointer is closed
         file.file.close()
@@ -68,10 +73,27 @@ async def upload_pdf(file: UploadFile = File(...)):
     # Return success response
     return JSONResponse(status_code=200, content={"message": "File uploaded successfully", "filename": file.filename})
 
+
+@app.get("/list-pdfs")
+async def list_pdfs():
+    """Endpoint to list all PDF files in the uploads directory"""
+    try:
+        # List all files in the uploads directory
+        files = os.listdir(UPLOAD_DIR)
+        # Filter for only PDF files
+        pdf_files = [file for file in files if file.lower().endswith('.pdf')]
+        return {"pdf_files": pdf_files}
+    except Exception as e:
+        raise HTTPException(
+            status_code=500, detail=f"Error listing PDF files: {e}"
+        ) from e
+
 # Add API routes here
 
 if __name__ == "__main__":
     import uvicorn
     # Use PORT environment variable for production (Render will set this)
-    port = int(os.getenv("PORT", 8000))
+    # Fix the type issue by explicitly converting to string first
+    port_str = os.getenv("PORT", "8000")
+    port = int(port_str)
     uvicorn.run("main:app", host="0.0.0.0", port=port, reload=True)
