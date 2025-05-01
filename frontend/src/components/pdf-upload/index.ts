@@ -1,1 +1,1 @@
-export { default as PdfUpload } from './PdfUpload';
+export { default as PdfUpload } from "./PdfUpload";

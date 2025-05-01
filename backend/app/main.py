@@ -5,6 +5,11 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 import shutil
 
+# List of endpoints-------------------------
+# GET /: Returns a simple JSON welcome message.
+# POST / upload-pdf: Accepts a PDF file upload.
+# GET / list-pdfs: Retrieves a JSON list of all filenames ending with .pdf found in the "uploads" directory.
+
 # Load environment variables
 load_dotenv()
 
@@ -55,7 +60,7 @@ async def upload_pdf(file: UploadFile = File(...)):
     if file.filename is None:
         raise HTTPException(
             status_code=400, detail="File name cannot be empty")
-    
+
     file_path = os.path.join(UPLOAD_DIR, file.filename)
 
     try:
