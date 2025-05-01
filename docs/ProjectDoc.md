@@ -3,14 +3,24 @@
 grocery-budget-assistant/
 ├── backend/
 │ ├── app/ # FastAPI application code
-│ │ ├── main.py # Main application file with API endpoints [core file]
+│ │ ├── **init**.py # Marks 'app' as a Python package
+│ │ ├── main.py # Main application file with API endpoints
+│ │ ├── database.py # Database connection setup (SQLAlchemy)
+│ │ ├── models.py # SQLAlchemy ORM models (database table definitions)
+│ │ ├── crud.py # Database interaction functions (Create, Read, Update, Delete)
+│ │ └── uploads/ # Directory for uploaded files (e.g., PDFs)
 │ │ └── ...
+│ ├── sql/ # SQL specific files
+│ │ └── schema.sql # Database schema definition (PostgreSQL)
+│ ├── .env.example # Example environment variables template
 │ ├── requirements.txt # Python dependencies
-│ └── Procfile # Deployment configuration for hosting platforms
+│ └── Procfile # Deployment configuration for hosting platforms (e.g., Heroku)
 |---------------------------------------------------------------
 ├── docs/
 │ ├── PRD.md # Product Requirements Document
-│ └── ProjectDoc.md # This file - project documentation
+│ ├── Feature_PostgresDB # Feature-specific details for Postgres integration
+│ ├── ProjectDoc.md # This file - high-level project structure and technologies
+│ └── ProjectFiles.md # Detailed descriptions of key project files
 |---------------------------------------------------------------
 ├── frontend/
 │ ├── public/ # Static assets
@@ -19,11 +29,11 @@ grocery-budget-assistant/
 │ │ ├── assets/ # Frontend assets
 │ │ │ └── react.svg # React logo
 │ │ ├── services/ # API and service layer
-│ │ │ └── api.ts # API client configuration [core file]
+│ │ │ └── api.ts # API client configuration
 │ │ ├── App.css # Main component styling
-│ │ ├── App.tsx # Main React component [core file]
+│ │ ├── App.tsx # Main React component
 │ │ ├── index.css # Global styles
-│ │ ├── main.tsx # Application entry point [core file]
+│ │ ├── main.tsx # Application entry point
 │ │ └── vite-env.d.ts # TypeScript environment declarations
 | |=====================================
 │ ├── cypress/ # End-to-end testing
@@ -50,10 +60,13 @@ grocery-budget-assistant/
 ## Backend
 
 - **FastAPI**: Modern, high-performance web framework for building APIs with Python
+- **SQLAlchemy**: Python SQL toolkit and Object Relational Mapper (ORM)
 - **Supabase**: Open source Firebase alternative (PostgreSQL-based backend)
 - **LangChain & LangGraph**: Framework for building LLM-powered applications
 - **Pydantic**: Data validation and settings management
 - **Uvicorn**: ASGI server for running the FastAPI application
+- **Psycopg2**: PostgreSQL database adapter for Python
+- **python-dotenv**: Reads key-value pairs from `.env` file
 - **Pytest**: Testing framework for Python
 
 ## Frontend
@@ -67,76 +80,6 @@ grocery-budget-assistant/
 - **Axios**: Promise-based HTTP client
 - **Cypress**: End-to-end testing framework
 
-# Key Files and Their Functions
+# File Descriptions
 
-## Backend
-
-### app/main.py
-
-The main FastAPI application file that defines API routes and handles HTTP requests. This serves as the entry point for our backend service.
-
-### requirements.txt
-
-Defines all Python dependencies required for the backend, including FastAPI, LangChain, and Supabase client libraries.
-
-### Procfile
-
-Configuration file used for deployment to hosting platforms (like Heroku).
-
-## Frontend
-
-### src/main.tsx
-
-Entry point for the React application. Sets up the React root and renders the main App component.
-
-### src/App.tsx
-
-The main React component that serves as the container for our application. It handles routing and includes the primary layout of the application.
-
-### src/services/api.ts
-
-Handles API communication between the frontend and backend services.
-
-### src/App.css
-
-Contains styling specific to the App component.
-
-### src/index.css
-
-Global CSS styles that apply to the entire application.
-
-### index.html
-
-The HTML template that serves as the entry point for the frontend application. The built JavaScript gets injected here.
-
-### package.json
-
-Defines the project's npm dependencies, scripts, and configuration.
-
-## Testing
-
-### cypress/e2e/\*.cy.ts
-
-Cypress end-to-end test files that simulate user interactions to test application functionality.
-
-### cypress/support/
-
-Contains utilities and commands to support Cypress testing, including custom commands and global test setup.
-
-### cypress.config.js
-
-Configuration file for Cypress testing framework.
-
-## Configuration Files
-
-### tsconfig.json (and variants)
-
-TypeScript configuration files that determine how TypeScript is compiled for different parts of the application.
-
-### vite.config.ts
-
-Configuration for the Vite build tool, including plugins and build settings.
-
-### eslint.config.js
-
-ESLint configuration for code linting and style enforcement.
+For detailed descriptions of key files and their functions, please see [docs/ProjectFiles.md](./ProjectFiles.md).
