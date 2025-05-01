@@ -1,6 +1,7 @@
 import { useState } from "react";
 import "./App.css";
 import { api } from "./services/api";
+import { PdfUpload } from "./components/pdf-upload";
 
 function App() {
   const [count, setCount] = useState(0);
@@ -31,6 +32,8 @@ function App() {
         <button onClick={fetchBackendMessage}>Test Backend</button>
         {showMessage && <p className="backend-message">{backendMessage}</p>}
       </div>
+
+      <PdfUpload />
     </div>
   );
 }
