@@ -28,3 +28,7 @@ pytesseract==0.3.10
 
 # Testing
 pytest==7.4.3
+
+# Additional packages
+sqlalchemy
+asyncpg # If using async SQLAlchemy

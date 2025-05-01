@@ -1,14 +1,29 @@
 import os
 from dotenv import load_dotenv
-from fastapi import FastAPI, File, UploadFile, HTTPException
+from fastapi import FastAPI, File, UploadFile, HTTPException, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 import shutil
+from sqlalchemy.orm import Session
 
-# List of endpoints-------------------------
-# GET /: Returns a simple JSON welcome message.
-# POST / upload-pdf: Accepts a PDF file upload.
-# GET / list-pdfs: Retrieves a JSON list of all filenames ending with .pdf found in the "uploads" directory.
+from . import crud, models, database
+
+'''
+Acts as the main entry point for the FastAPI web application.
+Defines the API endpoints (routes) such as /, /retailers/, and /upload-pdf.
+Manages database sessions by utilizing the get_db_session dependency.
+Calls functions from crud.py to perform database operations.
+Returns HTTP responses back to the clients.
+Configures Cross-Origin Resource Sharing (CORS).
+
+List of endpoints-------------------------
+GET /: Returns a welcome message to indicate the API is running.
+POST /retailers/: Creates a new retailer entry in the database, checking for name uniqueness.
+GET /retailers/{retailer_id}: Retrieves details for a specific retailer by their ID.
+POST /upload-pdf: Accepts a PDF file, validates its type, and saves it to the local 'uploads' directory.
+GET /list-pdfs: Lists the filenames of all PDF files currently stored in the 'uploads' directory.
+'''
+
 
 # Load environment variables
 load_dotenv()
@@ -16,8 +31,8 @@ load_dotenv()
 # Create FastAPI app
 app = FastAPI(
     title="Grocery Budget Assistant API",
-    description="Backend API for the Grocery Budget Assistant application",
-    version="1.0.0"
+    description="API for managing weekly grocery ad data.",
+    version="0.1.0",
 )
 
 # Configure CORS
@@ -42,11 +57,47 @@ UPLOAD_DIR = os.path.join(os.path.dirname(__file__), "uploads")
 # Ensure the upload directory exists
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
+# Dependency
+def get_db_session():
+    db = database.SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
 
 @app.get("/")
-async def root():
+def read_root():
     return {"message": "Welcome to the Grocery Budget Assistant API"}
 
+# Example endpoint to create a retailer (adjust schema/model as needed)
+# You would typically use Pydantic models for request/response validation
+@app.post("/retailers/") # Define response_model later with Pydantic
+def create_new_retailer(name: str, website: str | None = None, db: Session = Depends(get_db_session)):
+    db_retailer = db.query(models.Retailer).filter(models.Retailer.name == name).first()
+    if db_retailer:
+        raise HTTPException(status_code=400, detail="Retailer name already registered")
+    return crud.create_retailer(db=db, name=name, website=website)
+
+@app.get("/retailers/{retailer_id}") # Define response_model later
+def read_retailer(retailer_id: int, db: Session = Depends(get_db_session)):
+    db_retailer = crud.get_retailer(db, retailer_id=retailer_id)
+    if db_retailer is None:
+        raise HTTPException(status_code=404, detail="Retailer not found")
+    return db_retailer
+
+# --- Add more endpoints here for WeeklyAds and Products --- 
+
+# Example: Get products from a specific ad
+# @app.get("/weekly_ads/{ad_id}/products/")
+# def read_ad_products(ad_id: int, db: Session = Depends(get_db_session)):
+#     # Implement logic in crud.py
+#     pass
+
+# Example: Search products
+# @app.get("/products/search/")
+# def search_products(query: str, db: Session = Depends(get_db_session)):
+#     # Implement full-text search logic in crud.py
+#     pass
 
 @app.post("/upload-pdf")
 async def upload_pdf(file: UploadFile = File(...)):
@@ -77,7 +128,6 @@ async def upload_pdf(file: UploadFile = File(...)):
 
     # Return success response
     return JSONResponse(status_code=200, content={"message": "File uploaded successfully", "filename": file.filename})
-
 
 @app.get("/list-pdfs")
 async def list_pdfs():
