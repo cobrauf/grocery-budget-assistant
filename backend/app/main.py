@@ -18,8 +18,10 @@ Configures Cross-Origin Resource Sharing (CORS).
 
 List of endpoints-------------------------
 GET /: Returns a welcome message to indicate the API is running.
+
 POST /retailers/: Creates a new retailer entry in the database, checking for name uniqueness.
 GET /retailers/{retailer_id}: Retrieves details for a specific retailer by their ID.
+
 POST /upload-pdf: Accepts a PDF file, validates its type, and saves it to the local 'uploads' directory.
 GET /list-pdfs: Lists the filenames of all PDF files currently stored in the 'uploads' directory.
 '''
