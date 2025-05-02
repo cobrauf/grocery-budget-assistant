@@ -5,6 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 import shutil
 from sqlalchemy.orm import Session
+from pydantic import BaseModel
 
 from . import crud, models, database
 
@@ -59,6 +60,11 @@ UPLOAD_DIR = os.path.join(os.path.dirname(__file__), "uploads")
 # Ensure the upload directory exists
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
+# --- Define Pydantic models for request validation ---
+class RetailerCreate(BaseModel):
+    name: str
+    website: str | None = None
+
 # Dependency
 def get_db_session():
     db = database.SessionLocal()
@@ -71,14 +77,13 @@ def get_db_session():
 def read_root():
     return {"message": "Welcome to the Grocery Budget Assistant API"}
 
-# Example endpoint to create a retailer (adjust schema/model as needed)
-# You would typically use Pydantic models for request/response validation
-@app.post("/retailers/") # Define response_model later with Pydantic
-def create_new_retailer(name: str, website: str | None = None, db: Session = Depends(get_db_session)):
-    db_retailer = db.query(models.Retailer).filter(models.Retailer.name == name).first()
+# use Pydantic model for request body
+@app.post("/retailers/") 
+def create_new_retailer(retailer: RetailerCreate, db: Session = Depends(get_db_session)):
+    db_retailer = db.query(models.Retailer).filter(models.Retailer.name == retailer.name).first()
     if db_retailer:
         raise HTTPException(status_code=400, detail="Retailer name already registered")
-    return crud.create_retailer(db=db, name=name, website=website)
+    return crud.create_retailer(db=db, name=retailer.name, website=retailer.website)
 
 @app.get("/retailers/{retailer_id}") # Define response_model later
 def read_retailer(retailer_id: int, db: Session = Depends(get_db_session)):
