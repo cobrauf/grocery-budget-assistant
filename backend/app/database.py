@@ -4,7 +4,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from dotenv import load_dotenv
 
-load_dotenv(dotenv_path='../.env') # Load environment variables from .env file in the parent directory
+load_dotenv()  # Load environment variables from .env file in the backend directory
 
 '''
 Purpose: Handles the connection to your PostgreSQL database using SQLAlchemy, the Object-Relational Mapper (ORM). 
@@ -32,6 +32,8 @@ SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
 
 # Dependency to get DB session
+
+
 def get_db():
     db = SessionLocal()
     try:
@@ -39,4 +41,6 @@ def get_db():
     finally:
         db.close()
 
-print(f"Database URL: {DATABASE_URL[:15]}...") # Print part of the URL for confirmation 
+
+# Print part of the URL for confirmation
+print(f"Database URL: {DATABASE_URL[:15]}...")
