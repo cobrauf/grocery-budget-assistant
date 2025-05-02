@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from . import models # Assuming you have models.py with SQLAlchemy models
+from . import models, schemas # Import schemas
 
 '''
 Purpose: This file is intended to hold the functions that perform database operations. 
@@ -13,14 +13,31 @@ def get_retailer(db: Session, retailer_id: int):
     return db.query(models.Retailer).filter(models.Retailer.id == retailer_id).first()
 
 # Example function to create a retailer
-def create_retailer(db: Session, name: str, website: str | None = None):
-    db_retailer = models.Retailer(name=name, website=website)
+def create_retailer(db: Session, retailer: schemas.RetailerCreate):
+    db_retailer = models.Retailer(name=retailer.name, website=retailer.website)
     db.add(db_retailer)
     db.commit()
     db.refresh(db_retailer)
     return db_retailer
 
+# --- WeeklyAd CRUD ---
+def create_weekly_ad(db: Session, weekly_ad: schemas.WeeklyAdCreate):
+    # Convert Pydantic schema to SQLAlchemy model instance
+    db_weekly_ad = models.WeeklyAd(**weekly_ad.model_dump())
+    db.add(db_weekly_ad)
+    db.commit()
+    db.refresh(db_weekly_ad)
+    return db_weekly_ad
+
+# --- Product CRUD ---
+def create_product(db: Session, product: schemas.ProductCreate):
+    # Convert Pydantic schema to SQLAlchemy model instance
+    db_product = models.Product(**product.model_dump())
+    db.add(db_product)
+    db.commit()
+    db.refresh(db_product)
+    return db_product
+
 # Add more functions here for:
-# - Getting/Creating Weekly Ads
-# - Getting/Creating Products
+# - Getting Weekly Ads/Products
 # - Querying products based on criteria (dates, retailer, keywords, etc.) 
