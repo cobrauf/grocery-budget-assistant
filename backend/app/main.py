@@ -8,7 +8,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy.sql import select
 from pydantic import BaseModel
 
-from . import crud, models, database
+from . import crud, models, database, schemas
 
 '''
 Acts as the main entry point for the FastAPI web application.
@@ -61,11 +61,6 @@ UPLOAD_DIR = os.path.join(os.path.dirname(__file__), "uploads")
 # Ensure the upload directory exists
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
-# --- Define Pydantic models for request validation ---
-class RetailerCreate(BaseModel):
-    name: str
-    website: str | None = None
-
 # Dependency
 def get_db_session():
     db = database.SessionLocal()
@@ -79,15 +74,16 @@ def read_root():
     return {"message": "Welcome to the Grocery Budget Assistant API"}
 
 
-# use Pydantic model for request body
-@app.post("/retailers/") 
-def create_new_retailer(retailer: RetailerCreate, db: Session = Depends(get_db_session)):
+# use Pydantic model for request body and response
+@app.post("/retailers/", response_model=schemas.Retailer)
+def create_new_retailer(retailer: schemas.RetailerCreate, db: Session = Depends(get_db_session)):
     db_retailer = db.query(models.Retailer).filter(models.Retailer.name == retailer.name).first()
     if db_retailer:
         raise HTTPException(status_code=400, detail="Retailer name already registered")
-    return crud.create_retailer(db=db, name=retailer.name, website=retailer.website)
+    # Use the CRUD function which now also expects the schema
+    return crud.create_retailer(db=db, retailer=retailer)
 
-@app.get("/retailers/{retailer_id}") # Define response_model later
+@app.get("/retailers/{retailer_id}", response_model=schemas.Retailer) # Define response_model
 def read_retailer(retailer_id: int, db: Session = Depends(get_db_session)):
     db_retailer = crud.get_retailer(db, retailer_id=retailer_id)
     if db_retailer is None:
@@ -95,6 +91,24 @@ def read_retailer(retailer_id: int, db: Session = Depends(get_db_session)):
     return db_retailer
 
 # --- Add more endpoints here for WeeklyAds and Products --- 
+
+# Endpoint to create a Weekly Ad
+@app.post("/weekly_ads/", response_model=schemas.WeeklyAd)
+def create_new_weekly_ad(weekly_ad: schemas.WeeklyAdCreate, db: Session = Depends(get_db_session)):
+    # Optional: Add check if retailer_id exists
+    db_retailer = crud.get_retailer(db, retailer_id=weekly_ad.retailer_id)
+    if db_retailer is None:
+        raise HTTPException(status_code=404, detail=f"Retailer with id {weekly_ad.retailer_id} not found")
+    return crud.create_weekly_ad(db=db, weekly_ad=weekly_ad)
+
+# Endpoint to create a Product
+@app.post("/products/", response_model=schemas.Product)
+def create_new_product(product: schemas.ProductCreate, db: Session = Depends(get_db_session)):
+    # Optional: Add check if weekly_ad_id exists (implementation needed in crud.py)
+    # db_weekly_ad = crud.get_weekly_ad(db, weekly_ad_id=product.weekly_ad_id) # Example check
+    # if db_weekly_ad is None:
+    #     raise HTTPException(status_code=404, detail=f"WeeklyAd with id {product.weekly_ad_id} not found")
+    return crud.create_product(db=db, product=product)
 
 # Example: Get products from a specific ad
 # @app.get("/weekly_ads/{ad_id}/products/")
