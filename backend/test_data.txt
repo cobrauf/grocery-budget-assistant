@@ -1,0 +1,33 @@
+{
+  "name": "Safeway",
+  "website": "https://www.safeway.com"
+}
+
+{
+  "publication_date": "2024-05-01",
+  "valid_from": "2024-05-01",
+  "valid_to": "2024-05-07",
+  "filename": "safeway_weekly_may1.pdf",
+  "source_url": "https://www.safeway.com/weekly-ad/may1",
+  "retailer_id": 1 // ID from step 1
+}
+
+{
+  "name": "Organic Bananas",
+  "price": 0.69,
+  "unit": "lb",
+  "description": "Fresh organic bananas",
+  "category": "Produce",
+  "promotion_details": "Save 30¢ per pound",
+  "weekly_ad_id": 55 // ID from step 2
+}
+
+{
+  "name": "Chicken Breast",
+  "price": 2.99,
+  "unit": "lb",
+  "description": "Fresh boneless skinless chicken breast",
+  "category": "Meat",
+  "promotion_details": "Save $2.00 per pound",
+  "weekly_ad_id": 55 // ID from step 2
+}
