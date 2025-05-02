@@ -43,4 +43,4 @@ def get_db():
 
 
 # Print part of the URL for confirmation
-print(f"Database URL: {DATABASE_URL[:15]}...")
+print(f"Database URL: {DATABASE_URL[:]}...")
