@@ -5,6 +5,7 @@ grocery-budget-assistant/
 │ ├── app/ # FastAPI application code
 │ │ ├── **init**.py # Marks 'app' as a Python package
 │ │ ├── main.py # Main application file with API endpoints
+│ │ ├── schemas.py # Pydantic models for request/response validation
 │ │ ├── database.py # Database connection setup (SQLAlchemy)
 │ │ ├── models.py # SQLAlchemy ORM models (database table definitions)
 │ │ ├── crud.py # Database interaction functions (Create, Read, Update, Delete)
@@ -63,7 +64,7 @@ grocery-budget-assistant/
 - **SQLAlchemy**: Python SQL toolkit and Object Relational Mapper (ORM)
 - **Supabase**: Open source Firebase alternative (PostgreSQL-based backend)
 - **LangChain & LangGraph**: Framework for building LLM-powered applications
-- **Pydantic**: Data validation and settings management
+- **Pydantic**: Data validation and settings management using schemas (defined in `schemas.py`)
 - **Uvicorn**: ASGI server for running the FastAPI application
 - **Psycopg2**: PostgreSQL database adapter for Python
 - **python-dotenv**: Reads key-value pairs from `.env` file

@@ -15,7 +15,11 @@ Marks the `app` directory as a Python package, enabling relative imports.
 
 #### `main.py`
 
-Main FastAPI application file. Defines API routes and handles HTTP requests. Serves as the backend service entry point.
+Main FastAPI application file. Defines API routes (including `/`, `/retailers/`, `/weekly_ads/`, `/products/`, `/upload-pdf`, etc.) and handles HTTP requests by calling CRUD functions. Serves as the backend service entry point.
+
+#### `schemas.py`
+
+Defines Pydantic models used for data validation and serialization in API requests and responses (RetailerCreate, WeeklyAdCreate, ProductCreate, Retailer, WeeklyAd, Product).
 
 #### `database.py`
 
@@ -27,7 +31,7 @@ Defines SQLAlchemy ORM classes mapping Python objects to database tables (Retail
 
 #### `crud.py`
 
-Contains functions for database operations (Create, Read, Update, Delete) using SQLAlchemy models. Separates database logic.
+Contains functions for database operations (Create, Read, Update, Delete) using SQLAlchemy models. Includes functions like `create_retailer`, `create_weekly_ad`, `create_product`, `get_retailer`. Separates database logic.
 
 ### `sql/`
 
