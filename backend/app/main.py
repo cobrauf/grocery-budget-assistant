@@ -5,6 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 import shutil
 from sqlalchemy.orm import Session
+from sqlalchemy.sql import select
 from pydantic import BaseModel
 
 from . import crud, models, database
@@ -76,6 +77,7 @@ def get_db_session():
 @app.get("/")
 def read_root():
     return {"message": "Welcome to the Grocery Budget Assistant API"}
+
 
 # use Pydantic model for request body
 @app.post("/retailers/") 
@@ -159,3 +161,21 @@ if __name__ == "__main__":
     port_str = os.getenv("PORT", "8000")
     port = int(port_str)
     uvicorn.run("main:app", host="0.0.0.0", port=port, reload=True)
+    
+# @app.get("/test-db") # Renamed path slightly for clarity, or use /test-db
+# def test_database_connection_simple(db: Session = Depends(get_db_session)):
+#     """Endpoint to test the database connection."""
+#     try:
+#         db.scalar(select(1))
+#         return {
+#             "status": "success",
+#             "message": "Successfully connected to database."
+#         }
+#     except Exception as e:
+#         # If any exception occurred, the connection failed
+#         print(f"Database connection test failed: {e}") # Optional: log error
+#         raise HTTPException(
+#             status_code=500,
+#             detail=f"Database connection failed: Could not establish connection."
+#         )
+
