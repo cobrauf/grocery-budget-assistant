@@ -1,6 +1,8 @@
 import os
+import uuid # Added for unique filenames
+import asyncio # Added for potential cleanup task delay
 from dotenv import load_dotenv
-from fastapi import FastAPI, File, UploadFile, HTTPException, Depends
+from fastapi import FastAPI, File, UploadFile, HTTPException, Depends, BackgroundTasks # Added BackgroundTasks
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 import shutil
@@ -9,6 +11,7 @@ from sqlalchemy.sql import select
 from pydantic import BaseModel
 
 from . import crud, models, database, schemas
+from .services.pdf_processor import GroceryAdProcessor # Added PDF Processor import
 
 '''
 Acts as the main entry point for the FastAPI web application.
@@ -58,8 +61,12 @@ app.add_middleware(
 
 # Define the upload directory relative to the script location
 UPLOAD_DIR = os.path.join(os.path.dirname(__file__), "uploads")
-# Ensure the upload directory exists
+# Define a separate directory for temporary processing files
+TEMP_PDF_DIR = os.path.join(os.path.dirname(__file__), "temp_pdfs")
+
+# Ensure the directories exist
 os.makedirs(UPLOAD_DIR, exist_ok=True)
+os.makedirs(TEMP_PDF_DIR, exist_ok=True)
 
 # Dependency
 def get_db_session():
@@ -122,6 +129,83 @@ def create_new_product(product: schemas.ProductCreate, db: Session = Depends(get
 #     # Implement full-text search logic in crud.py
 #     pass
 
+# --- PDF Processing Endpoint --- #
+
+async def cleanup_temp_file(file_path: str):
+    """Removes a temporary file after a delay."""
+    # Add a small delay in case processing finishes extremely quickly
+    await asyncio.sleep(5)
+    try:
+        if os.path.exists(file_path):
+            os.remove(file_path)
+            print(f"Cleaned up temp file: {file_path}")
+    except Exception as e:
+        print(f"Error cleaning up temp file {file_path}: {e}")
+        # Log this error appropriately
+
+@app.post("/process-pdf/")
+async def process_pdf_endpoint(
+    background_tasks: BackgroundTasks,
+    file: UploadFile = File(...)
+):
+    # Validate file type
+    if file.content_type != "application/pdf":
+        raise HTTPException(
+            status_code=400, detail="Invalid file type. Only PDF files are allowed.")
+
+    # Ensure filename is provided
+    if not file.filename:
+        raise HTTPException(
+            status_code=400, detail="File name cannot be empty")
+
+    # Generate a unique filename to avoid collisions
+    unique_id = uuid.uuid4()
+    # Keep original extension, ensure it's pdf
+    file_ext = os.path.splitext(file.filename)[1].lower()
+    if file_ext != ".pdf":
+         raise HTTPException(status_code=400, detail="Invalid file extension. Only PDF files are allowed.")
+
+    temp_filename = f"{unique_id}{file_ext}"
+    temp_file_path = os.path.join(TEMP_PDF_DIR, temp_filename)
+
+    try:
+        # Save the uploaded file to the temporary directory
+        with open(temp_file_path, "wb") as buffer:
+            shutil.copyfileobj(file.file, buffer)
+        print(f"Temporarily saved PDF: {temp_file_path}")
+    except Exception as e:
+        raise HTTPException(
+            status_code=500, detail=f"Could not save temporary file: {e}") from e
+    finally:
+        # Ensure the file pointer is closed if not already handled by copyfileobj
+        if hasattr(file.file, 'close'):
+             file.file.close()
+
+    # Instantiate the processor
+    # Note: If GroceryAdProcessor needs dependencies (like db session),
+    # they need to be managed carefully in background tasks.
+    # For simplicity, we assume it initializes its own resources for now.
+    processor = GroceryAdProcessor()
+
+    # Add the processing task to background tasks
+    background_tasks.add_task(processor.process_pdf, temp_file_path)
+
+    # Add a separate background task for cleanup
+    background_tasks.add_task(cleanup_temp_file, temp_file_path)
+
+    # Return immediately, indicating processing has started
+    return JSONResponse(
+        status_code=202, # 202 Accepted is suitable for background tasks
+        content={
+            "message": "PDF processing started in the background.",
+            "original_filename": file.filename,
+            "processing_id": str(unique_id) # Optionally return the ID for status tracking later
+        }
+    )
+
+# --- Deprecate or Modify Old Upload Endpoint --- #
+# The old /upload-pdf might be deprecated or modified if /process-pdf replaces its function.
+# For now, we leave it, but consider its purpose.
 @app.post("/upload-pdf")
 async def upload_pdf(file: UploadFile = File(...)):
     # Validate file type
@@ -135,7 +219,7 @@ async def upload_pdf(file: UploadFile = File(...)):
         raise HTTPException(
             status_code=400, detail="File name cannot be empty")
 
-    file_path = os.path.join(UPLOAD_DIR, file.filename)
+    file_path = os.path.join(UPLOAD_DIR, file.filename) # Saves to permanent UPLOAD_DIR
 
     try:
         # Save the uploaded file
@@ -147,10 +231,11 @@ async def upload_pdf(file: UploadFile = File(...)):
             status_code=500, detail=f"Could not save file: {e}") from e
     finally:
         # Ensure the file pointer is closed
-        file.file.close()
+        if hasattr(file.file, 'close'):
+             file.file.close()
 
     # Return success response
-    return JSONResponse(status_code=200, content={"message": "File uploaded successfully", "filename": file.filename})
+    return JSONResponse(status_code=200, content={"message": "File uploaded successfully to uploads directory", "filename": file.filename})
 
 @app.get("/list-pdfs")
 async def list_pdfs():
