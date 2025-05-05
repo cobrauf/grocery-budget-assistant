@@ -15,23 +15,71 @@ Marks the `app` directory as a Python package, enabling relative imports.
 
 #### `main.py`
 
-Main FastAPI application file. Defines API routes (including `/`, `/retailers/`, `/weekly_ads/`, `/products/`, `/upload-pdf`, etc.) and handles HTTP requests by calling CRUD functions. Serves as the backend service entry point.
+Main FastAPI application entry point. Initializes the FastAPI app and includes routers from the `app/routers` directory.
 
-#### `schemas.py`
+#### `routers/`
 
-Defines Pydantic models used for data validation and serialization in API requests and responses (RetailerCreate, WeeklyAdCreate, ProductCreate, Retailer, WeeklyAd, Product).
+Directory containing APIRouter modules for grouping related endpoints.
+
+##### `__init__.py`
+
+Marks `routers` as a Python package.
+
+##### `data.py`
+
+Defines API endpoints under the `/data` prefix, primarily for retrieving data (retailers, products) and allowing direct single-product upserts for testing/manual entry (`POST /products/`).
+
+##### `pdf.py`
+
+Defines API endpoints under the `/pdf` prefix for managing the PDF processing workflow. Includes `POST /process-uploads` to trigger extraction for files in the `uploads` directory and `GET /processing-status`.
+
+#### `services/`
+
+Directory containing business logic and interactions with external services.
+
+##### `__init__.py`
+
+Marks `services` as a Python package.
+
+##### `pdf_processor.py`
+
+Contains the `GroceryAdProcessor` class responsible for orchestrating PDF data extraction. It uses the Google Generative AI SDK (Files API) to upload PDFs, prompts Gemini for structured JSON data, validates the response, and saves the output to the `extractions` directory.
+
+#### `schemas/`
+
+Directory containing Pydantic models for data validation and serialization.
+
+##### `__init__.py`
+
+Marks `schemas` as a Python package.
+
+##### `data_schemas.py`
+
+Defines Pydantic models representing the structure of data stored in the database (e.g., `Retailer`, `WeeklyAd`, `Product` and their `Create`/`Base` variants).
+
+##### `pdf_schema.py`
+
+Defines Pydantic models (`PDFProduct`, `PDFWeeklyAd`, `ExtractedPDFData`) representing the expected structure of data extracted from PDFs by the Gemini model.
 
 #### `database.py`
 
-Configures and manages the SQLAlchemy database connection using environment variables. Provides database session dependency.
+Configures and manages the SQLAlchemy database connection using environment variables. Provides database session dependency (`get_db`).
 
 #### `models.py`
 
-Defines SQLAlchemy ORM classes mapping Python objects to database tables (Retailer, WeeklyAd, Product).
+Defines SQLAlchemy ORM classes mapping Python objects to database tables (`Retailer`, `WeeklyAd`, `Product`), including relationships and constraints.
 
 #### `crud.py`
 
-Contains functions for database operations (Create, Read, Update, Delete) using SQLAlchemy models. Includes functions like `create_retailer`, `create_weekly_ad`, `create_product`, `get_retailer`. Separates database logic.
+Contains functions for database operations (Create, Read, Update, Delete) using SQLAlchemy models and sessions. Includes specific functions tailored for different data sources/workflows like `find_or_create_retailer`, `create_weekly_ad` (from PDF data), `upsert_products` (batch from PDF data), `upsert_single_product` (direct API), and retrieval functions like `get_retailer_by_id`.
+
+### `uploads/`
+
+Directory designated as the input location for PDF weekly ad files that need processing. The `/pdf/process-uploads` endpoint scans this directory.
+
+### `extractions/`
+
+Directory where the structured JSON data, extracted from PDFs by the `pdf_processor` service, is saved. Each output JSON file corresponds to an input PDF file.
 
 ### `sql/`
 
@@ -39,15 +87,15 @@ Directory holding database schema related SQL files.
 
 #### `schema.sql`
 
-Contains raw SQL statements to create PostgreSQL database tables, indexes, and functions.
+Contains raw SQL statements to create PostgreSQL database tables, indexes, and functions (potentially used for initial setup or reference).
 
 ### `.env.example`
 
-Template file showing required environment variables (e.g., database URL, API keys). Copy to `.env`.
+Template file showing required environment variables (e.g., `DATABASE_URL`, `GEMINI_API_KEY`, optional `PDF_UPLOADS_DIR`, `PDF_EXTRACTIONS_DIR`). Copy to `.env` and populate.
 
 ### `requirements.txt`
 
-Lists all Python dependencies required for the backend service. Ensures reproducible environment.
+Lists all Python dependencies required for the backend service, including `fastapi`, `sqlalchemy`, `uvicorn`, `psycopg2-binary`, `python-dotenv`, `google-generativeai`, `aiofiles`. Ensures reproducible environment.
 
 ### `Procfile`
 

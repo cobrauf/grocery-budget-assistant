@@ -17,6 +17,13 @@ from .. import crud
 # from ..database import get_db_session # Example
 
 
+'''
+Configures and initializes the Google Gemini API service for handling PDF file processing tasks.
+Uploads the source PDF files securely to the Gemini Files API for remote processing and analysis.
+Sends a specific extraction prompt along with the uploaded file reference to the Gemini API.
+Strictly validates the extracted JSON data received from the Gemini API using Pydantic schemas.
+Persists the successfully validated, structured data by saving it into local JSON files.
+'''
 
 # Placeholder for actual Gemini API Key loading
 # Consider using environment variables and a config file/service
