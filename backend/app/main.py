@@ -41,10 +41,10 @@ app.add_middleware(
 )
 
 # Define and ensure directories exist at startup
-APP_ROOT_DIR = os.path.dirname(__file__)
+APP_ROOT_DIR = os.path.dirname(__file__) # assigns the path of this file to APP_ROOT_DIR
 UPLOAD_DIR = os.path.join(APP_ROOT_DIR, "uploads")
 TEMP_PDF_DIR = os.path.join(APP_ROOT_DIR, "temp_pdfs")
-os.makedirs(UPLOAD_DIR, exist_ok=True)
+os.makedirs(UPLOAD_DIR, exist_ok=True) # the 2nd arg means if directory already exists, don't throw an error
 os.makedirs(TEMP_PDF_DIR, exist_ok=True)
 
 # Optional: Define dependency here if routers import it, or define in each router
@@ -72,5 +72,5 @@ if __name__ == "__main__":
     # Point uvicorn to the app instance in this file
     uvicorn.run("backend.app.main:app", host="0.0.0.0", port=port, reload=True)
 
-# Removed test-db endpoint example
+
 
