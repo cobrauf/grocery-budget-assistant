@@ -1,5 +1,3 @@
-# Placeholder for PDF router 
-
 import os
 import uuid
 import asyncio

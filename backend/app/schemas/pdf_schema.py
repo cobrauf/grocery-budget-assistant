@@ -1,5 +1,5 @@
-from pydantic import BaseModel, Field, conlist
-from typing import List, Optional
+from pydantic import BaseModel, conlist
+from typing import Optional
 from datetime import date
 
 class PDFProduct(BaseModel):

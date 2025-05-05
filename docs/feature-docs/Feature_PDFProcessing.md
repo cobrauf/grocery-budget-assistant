@@ -78,6 +78,7 @@ class GroceryAdProcessor:
             # Placeholder for the actual API call
             raw_results = await self.gemini_client.process_document(
                 file_path=pdf_file_path,
+
                 prompt="Extract grocery ad data according to the provided schema."
                 # Potentially pass schema definition here
             )

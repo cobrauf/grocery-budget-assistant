@@ -1,5 +1,3 @@
-# Placeholder for Data router (Retailers, Ads, Products) 
-
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
@@ -7,6 +5,13 @@ from sqlalchemy.orm import Session
 from .. import crud, models
 from ..schemas import data_schemas # Changed to import from new location
 from ..database import SessionLocal
+
+'''
+Defines core API endpoints for Retailers, Weekly Ads, and Products.
+Uses FastAPI's APIRouter to group these data-related routes.
+Handles database operations using SQLAlchemy sessions and CRUD functions.
+Validates and formats data using Pydantic schemas.
+'''
 
 # Dependency to get DB session (can be defined here or imported if defined centrally)
 def get_db():
