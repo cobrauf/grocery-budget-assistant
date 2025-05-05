@@ -9,6 +9,12 @@ from .schemas.pdf_schema import PDFWeeklyAd, PDFProduct # Update to pdf_schema
 '''
 Purpose: This file is intended to hold the functions that perform database operations based on data extracted from PDFs.
 Functions interact with the database using SQLAlchemy models defined in models.py.
+
+The mixed CRUD patterns are because: 
+"Find or create" for Retailers avoids duplicate static entries by name.
+"Create" for WeeklyAds as each ad is a distinct new publication.
+"Upsert" for Products handles potential duplicates or updates within a single ad.
+The logic matches the expected behavior of each entity type.
 '''
 
 # --- Retailer CRUD ---
