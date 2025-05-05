@@ -7,8 +7,8 @@ from .database import Base
 
 
 '''
-Purpose: Defines Python classes (Retailer, WeeklyAd, Product) 
-that map directly to your database tables (retailers, weekly_ads, products). 
+Purpose: Defines Python classes (Retailer, WeeklyAd, Product) that
+map directly to your database tables (retailers, weekly_ads, products). 
 These are SQLAlchemy ORM models. Each class attribute corresponds to a table column. 
 It also defines the relationships between tables (e.g., a WeeklyAd belongs to a Retailer and has many Products).
 Product table includes a field specifically for full-text search (TSVECTOR).

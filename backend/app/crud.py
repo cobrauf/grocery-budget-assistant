@@ -1,10 +1,10 @@
 from sqlalchemy.orm import Session, joinedload
 from sqlalchemy import func
 from sqlalchemy.exc import IntegrityError
-from typing import List # Added for type hinting
-from . import models # Remove schemas from here
-from .schemas import data_schemas # Import the renamed data_schemas
-from .schemas.pdf_schema import PDFWeeklyAd, PDFProduct # Update to pdf_schema
+from typing import List  # Added for type hinting
+from . import models  # Remove schemas from here
+from .schemas import data_schemas  # Import the renamed data_schemas
+from .schemas.pdf_schema import PDFWeeklyAd, PDFProduct  # Update to pdf_schema
 
 '''
 Purpose: This file is intended to hold the functions that perform database operations based on data extracted from PDFs.
@@ -18,10 +18,10 @@ The logic matches the expected behavior of each entity type.
 '''
 
 # --- Retailer CRUD ---
-# Function to find an existing retailer or create a new one if not found
 def find_or_create_retailer(db: Session, name: str) -> models.Retailer:
     # Try to get the retailer first
-    db_retailer = db.query(models.Retailer).filter(func.lower(models.Retailer.name) == func.lower(name)).first()
+    db_retailer = db.query(models.Retailer).filter(
+        func.lower(models.Retailer.name) == func.lower(name)).first()
     if db_retailer:
         print(f"Found existing retailer: {name} (ID: {db_retailer.id})")
         return db_retailer
@@ -30,25 +30,45 @@ def find_or_create_retailer(db: Session, name: str) -> models.Retailer:
         print(f"Creating new retailer: {name}")
         # Assuming website is optional or not available from PDF extraction
         # Use a default or leave null if the model allows
-        db_retailer = models.Retailer(name=name) # Simplified creation
+        db_retailer = models.Retailer(name=name)  # Simplified creation
         db.add(db_retailer)
         try:
-            db.flush() # Flush to get the ID and check for potential constraint violations early
+            db.flush()  # Flush to get the ID and check for potential constraint violations early
             db.refresh(db_retailer)
             print(f"Created new retailer: {name} (ID: {db_retailer.id})")
         except IntegrityError:
-            db.rollback() # Rollback if creation fails (e.g., concurrent creation attempt)
-            print(f"Error creating retailer {name}, likely already exists. Querying again.")
-            db_retailer = db.query(models.Retailer).filter(func.lower(models.Retailer.name) == func.lower(name)).first()
+            db.rollback()  # Rollback if creation fails (e.g., concurrent creation attempt)
+            print(
+                f"Error creating retailer {name}, likely already exists. Querying again.")
+            db_retailer = db.query(models.Retailer).filter(
+                func.lower(models.Retailer.name) == func.lower(name)).first()
             if not db_retailer:
-                 # Handle the rare case where it still doesn't exist after rollback and retry
-                 raise Exception(f"Failed to find or create retailer '{name}' after integrity error.")
+                # Handle the rare case where it still doesn't exist after rollback and retry
+                raise Exception(
+                    f"Failed to find or create retailer '{name}' after integrity error.")
         return db_retailer
 
 
+def create_retailer(db: Session, retailer: data_schemas.RetailerCreate) -> models.Retailer:
+    """
+    Creates a new retailer using the RetailerCreate schema.
+    """
+    db_retailer = models.Retailer(
+        name=retailer.name,
+        website=retailer.website
+    )
+    db.add(db_retailer)
+    db.flush()
+    db.refresh(db_retailer)
+    return db_retailer
+
+
+def get_retailer(db: Session, retailer_id: int) -> models.Retailer:
+    return db.query(models.Retailer).filter(models.Retailer.id == retailer_id).first()
+
+
 # --- WeeklyAd CRUD ---
-# Function to create a weekly ad from extracted PDF data
-def create_weekly_ad(db: Session, ad_data: PDFWeeklyAd, retailer_id: int) -> models.WeeklyAd:
+def create_weekly_ad_from_pdf(db: Session, ad_data: PDFWeeklyAd, retailer_id: int) -> models.WeeklyAd:
     # Map PDF schema fields to model fields
     db_weekly_ad = models.WeeklyAd(
         retailer_id=retailer_id,
@@ -60,16 +80,92 @@ def create_weekly_ad(db: Session, ad_data: PDFWeeklyAd, retailer_id: int) -> mod
     # Flush to get the ID, commit might happen in the service layer
     db.flush()
     db.refresh(db_weekly_ad)
-    print(f"Created WeeklyAd ID: {db_weekly_ad.id} for Retailer ID: {retailer_id}, Valid: {ad_data.start_date} to {ad_data.end_date}")
+    print(
+        f"Created WeeklyAd ID: {db_weekly_ad.id} for Retailer ID: {retailer_id}, Valid: {ad_data.start_date} to {ad_data.end_date}")
     return db_weekly_ad
 
 
+def create_weekly_ad(db: Session, weekly_ad: data_schemas.WeeklyAdCreate) -> models.WeeklyAd:
+    db_weekly_ad = models.WeeklyAd(
+        retailer_id=weekly_ad.retailer_id,
+        valid_from=weekly_ad.valid_from,
+        valid_to=weekly_ad.valid_to
+    )
+    db.add(db_weekly_ad)
+    db.flush()
+    db.refresh(db_weekly_ad)
+    return db_weekly_ad
+
+
+def create_product(db: Session, product: data_schemas.ProductCreate) -> models.Product:
+    db_product = models.Product(
+        weekly_ad_id=product.weekly_ad_id,
+        name=product.name,
+        price=product.price,
+        description=product.description
+    )
+    db.add(db_product)
+    db.flush()
+    db.refresh(db_product)
+    return db_product
+
 # --- Product CRUD ---
+
+# Function to upsert (update or insert) a single product via API
+def upsert_single_product(db: Session, product_data: data_schemas.ProductCreate) -> models.Product:
+    """
+    Updates an existing product or inserts a new one for a specific weekly ad,
+    based on the product name and weekly_ad_id provided in product_data.
+    Designed for use with direct API calls using ProductCreate schema.
+    Does NOT commit the transaction.
+    """
+    # Attempt to find an existing product by name within the same weekly ad
+    existing_product = db.query(models.Product).filter(
+        models.Product.weekly_ad_id == product_data.weekly_ad_id,
+        func.lower(models.Product.name) == func.lower(product_data.name) # Case-insensitive comparison
+    ).first()
+
+    if existing_product:
+        # Update existing product
+        print(f"Updating existing product '{product_data.name}' (ID: {existing_product.id}) for WeeklyAd ID: {product_data.weekly_ad_id}")
+        update_data = product_data.model_dump(exclude_unset=True) # Get fields present in input
+        # Don't update weekly_ad_id or name typically, focus on other fields
+        update_data.pop('weekly_ad_id', None)
+        update_data.pop('name', None)
+
+        # Check if there are actual changes before updating
+        changed = False
+        for key, value in update_data.items():
+            if getattr(existing_product, key) != value:
+                setattr(existing_product, key, value)
+                changed = True
+
+        if changed:
+            print(f"Changes detected. Applying update for product '{existing_product.name}'.")
+            db.add(existing_product) # Add to session to mark for update
+            # Flush to ensure data is sent to DB before potential subsequent reads/refreshes
+            db.flush()
+            db.refresh(existing_product)
+        else:
+            print(f"No changes detected for product '{existing_product.name}'. Skipping update.")
+        return existing_product
+    else:
+        # Create new product
+        print(f"Creating new product '{product_data.name}' for WeeklyAd ID: {product_data.weekly_ad_id}")
+        db_product = models.Product(**product_data.model_dump())
+        db.add(db_product)
+        # Flush to get the ID
+        db.flush()
+        db.refresh(db_product)
+        print(f"Created new product '{db_product.name}' with ID: {db_product.id}")
+        return db_product
+
 # Function to upsert (update or insert) products from PDF data
 def upsert_products(db: Session, products_data: List[PDFProduct], weekly_ad_id: int):
     """
     Updates existing products or inserts new ones for a specific weekly ad based on product name.
-    Accepts a list of PDFProduct objects. Can handle single or multiple products.
+    Accepts a list of PDFProduct objects (from PDF extraction).
+    Does NOT commit the transaction.
     """
     upserted_count = 0
     created_count = 0
@@ -87,21 +183,25 @@ def upsert_products(db: Session, products_data: List[PDFProduct], weekly_ad_id: 
         ).first()
 
         if existing_product:
-            # Update existing product
-            # Check if data has actually changed to avoid unnecessary updates
-            if (existing_product.price != prod_data.price or
-                existing_product.description != prod_data.description):
+            # Update existing product - Only update price and description from PDFProduct
+            # Assume other fields (unit, category, etc.) are better managed manually or via direct API
+            changed = False
+            if existing_product.price != prod_data.price:
                 existing_product.price = prod_data.price
+                changed = True
+            if existing_product.description != prod_data.description:
                 existing_product.description = prod_data.description
-                # Update other fields as needed
+                changed = True
+
+            if changed:
+                print(f"Updating product '{prod_data.name}' (Price/Desc) for WeeklyAd ID: {weekly_ad_id}")
                 db.add(existing_product) # Add to session to mark for update
                 upserted_count += 1
-                print(f"Updating product '{prod_data.name}' for WeeklyAd ID: {weekly_ad_id}")
             else:
-                 print(f"No changes detected for product '{prod_data.name}'. Skipping update.")
+                 print(f"No price/desc changes detected for product '{prod_data.name}'. Skipping update.")
 
         else:
-            # Create new product
+            # Create new product - Map only fields available in PDFProduct
             db_product = models.Product(
                 weekly_ad_id=weekly_ad_id,
                 name=prod_data.name,
@@ -111,7 +211,7 @@ def upsert_products(db: Session, products_data: List[PDFProduct], weekly_ad_id: 
             )
             db.add(db_product)
             created_count += 1
-            print(f"Creating new product '{prod_data.name}' for WeeklyAd ID: {weekly_ad_id}")
+            print(f"Creating new product '{prod_data.name}' from PDF data for WeeklyAd ID: {weekly_ad_id}")
 
         processed_names.add(prod_data.name)
 
@@ -119,16 +219,16 @@ def upsert_products(db: Session, products_data: List[PDFProduct], weekly_ad_id: 
         # Flush changes within the function, commit might happen outside
         try:
             db.flush()
-            print(f"Upsert operation flushed for WeeklyAd ID: {weekly_ad_id}. Updated: {upserted_count}, Created: {created_count}")
+            print(f"Upsert (PDF) operation flushed for WeeklyAd ID: {weekly_ad_id}. Updated: {upserted_count}, Created: {created_count}")
         except IntegrityError as e:
             db.rollback()
-            print(f"Error during upsert flush for WeeklyAd ID: {weekly_ad_id}. Rolled back changes. Error: {e}")
+            print(f"Error during upsert (PDF) flush for WeeklyAd ID: {weekly_ad_id}. Rolled back changes. Error: {e}")
             # Depending on requirements, you might want to raise the exception
             # raise e
     else:
-        print(f"No products needed updating or creating for WeeklyAd ID: {weekly_ad_id}")
+        print(f"No products needed updating or creating from PDF data for WeeklyAd ID: {weekly_ad_id}")
 
 # TODO: Add functions for querying/retrieving data as needed.
 # Examples:
 # - get_weekly_ads_by_retailer(db: Session, retailer_id: int, start_date: date, end_date: date)
-# - search_products(db: Session, query: str, retailer_id: Optional[int] = None, ...) 
+# - search_products(db: Session, query: str, retailer_id: Optional[int] = None, ...)
