@@ -1,36 +1,18 @@
 import os
-import uuid # Added for unique filenames
-import asyncio # Added for potential cleanup task delay
 from dotenv import load_dotenv
-from fastapi import FastAPI, File, UploadFile, HTTPException, Depends, BackgroundTasks # Added BackgroundTasks
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
-import shutil
-from sqlalchemy.orm import Session
-from sqlalchemy.sql import select
-from pydantic import BaseModel
 
-from . import crud, models, database, schemas
-from .services.pdf_processor import GroceryAdProcessor # Added PDF Processor import
+# Import routers
+from .routers import data, pdf
+from . import database # Keep for SessionLocal usage if get_db_session remains here (or move get_db_session too)
+
 
 '''
-Acts as the main entry point for the FastAPI web application.
-Defines the API endpoints (routes) such as /, /retailers/, and /upload-pdf.
-Manages database sessions by utilizing the get_db_session dependency.
-Calls functions from crud.py to perform database operations.
-Returns HTTP responses back to the clients.
-Configures Cross-Origin Resource Sharing (CORS).
-
-List of endpoints-------------------------
-GET /: Returns a welcome message to indicate the API is running.
-
-POST /retailers/: Creates a new retailer entry in the database, checking for name uniqueness.
-GET /retailers/{retailer_id}: Retrieves details for a specific retailer by their ID.
-
-POST /upload-pdf: Accepts a PDF file, validates its type, and saves it to the local 'uploads' directory.
-GET /list-pdfs: Lists the filenames of all PDF files currently stored in the 'uploads' directory.
+Main FastAPI application entry point.
+Initializes the FastAPI app, configures CORS, includes API routers,
+and handles application startup tasks like creating directories.
 '''
-
 
 # Load environment variables
 load_dotenv()
@@ -38,17 +20,16 @@ load_dotenv()
 # Create FastAPI app
 app = FastAPI(
     title="Grocery Budget Assistant API",
-    description="API for managing weekly grocery ad data.",
+    description="API for managing weekly grocery ad data, including PDF processing.",
     version="0.1.0",
 )
 
 # Configure CORS
-# Get the frontend URL from environment variables
 frontend_url = os.getenv("FRONTEND_URL", "http://localhost:5173")
 allowed_origins = [
-    "http://localhost:5173",  # Vite dev server
-    frontend_url,  # Production frontend URL
-    "*",  # Allow requests from any origin during development //TODO
+    "http://localhost:5173",
+    frontend_url,
+    "*", # TODO: Restrict in production
 ]
 
 app.add_middleware(
@@ -59,222 +40,37 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Define the upload directory relative to the script location
-UPLOAD_DIR = os.path.join(os.path.dirname(__file__), "uploads")
-# Define a separate directory for temporary processing files
-TEMP_PDF_DIR = os.path.join(os.path.dirname(__file__), "temp_pdfs")
-
-# Ensure the directories exist
+# Define and ensure directories exist at startup
+APP_ROOT_DIR = os.path.dirname(__file__)
+UPLOAD_DIR = os.path.join(APP_ROOT_DIR, "uploads")
+TEMP_PDF_DIR = os.path.join(APP_ROOT_DIR, "temp_pdfs")
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 os.makedirs(TEMP_PDF_DIR, exist_ok=True)
 
-# Dependency
-def get_db_session():
-    db = database.SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
+# Optional: Define dependency here if routers import it, or define in each router
+# def get_db_session():
+#     db = database.SessionLocal()
+#     try:
+#         yield db
+#     finally:
+#         db.close()
 
 @app.get("/")
 def read_root():
     return {"message": "Welcome to the Grocery Budget Assistant API"}
 
+# Include routers
+app.include_router(data.router)
+app.include_router(pdf.router)
 
-# use Pydantic model for request body and response
-@app.post("/retailers/", response_model=schemas.Retailer)
-def create_new_retailer(retailer: schemas.RetailerCreate, db: Session = Depends(get_db_session)):
-    db_retailer = db.query(models.Retailer).filter(models.Retailer.name == retailer.name).first()
-    if db_retailer:
-        raise HTTPException(status_code=400, detail="Retailer name already registered")
-    # Use the CRUD function which now also expects the schema
-    return crud.create_retailer(db=db, retailer=retailer)
 
-@app.get("/retailers/{retailer_id}", response_model=schemas.Retailer) # Define response_model
-def read_retailer(retailer_id: int, db: Session = Depends(get_db_session)):
-    db_retailer = crud.get_retailer(db, retailer_id=retailer_id)
-    if db_retailer is None:
-        raise HTTPException(status_code=404, detail="Retailer not found")
-    return db_retailer
-
-# --- Add more endpoints here for WeeklyAds and Products --- 
-
-# Endpoint to create a Weekly Ad
-@app.post("/weekly_ads/", response_model=schemas.WeeklyAd)
-def create_new_weekly_ad(weekly_ad: schemas.WeeklyAdCreate, db: Session = Depends(get_db_session)):
-    # Optional: Add check if retailer_id exists
-    db_retailer = crud.get_retailer(db, retailer_id=weekly_ad.retailer_id)
-    if db_retailer is None:
-        raise HTTPException(status_code=404, detail=f"Retailer with id {weekly_ad.retailer_id} not found")
-    return crud.create_weekly_ad(db=db, weekly_ad=weekly_ad)
-
-# Endpoint to create a Product
-@app.post("/products/", response_model=schemas.Product)
-def create_new_product(product: schemas.ProductCreate, db: Session = Depends(get_db_session)):
-    # Optional: Add check if weekly_ad_id exists (implementation needed in crud.py)
-    # db_weekly_ad = crud.get_weekly_ad(db, weekly_ad_id=product.weekly_ad_id) # Example check
-    # if db_weekly_ad is None:
-    #     raise HTTPException(status_code=404, detail=f"WeeklyAd with id {product.weekly_ad_id} not found")
-    return crud.create_product(db=db, product=product)
-
-# Example: Get products from a specific ad
-# @app.get("/weekly_ads/{ad_id}/products/")
-# def read_ad_products(ad_id: int, db: Session = Depends(get_db_session)):
-#     # Implement logic in crud.py
-#     pass
-
-# Example: Search products
-# @app.get("/products/search/")
-# def search_products(query: str, db: Session = Depends(get_db_session)):
-#     # Implement full-text search logic in crud.py
-#     pass
-
-# --- PDF Processing Endpoint --- #
-
-async def cleanup_temp_file(file_path: str):
-    """Removes a temporary file after a delay."""
-    # Add a small delay in case processing finishes extremely quickly
-    await asyncio.sleep(5)
-    try:
-        if os.path.exists(file_path):
-            os.remove(file_path)
-            print(f"Cleaned up temp file: {file_path}")
-    except Exception as e:
-        print(f"Error cleaning up temp file {file_path}: {e}")
-        # Log this error appropriately
-
-@app.post("/process-pdf/")
-async def process_pdf_endpoint(
-    background_tasks: BackgroundTasks,
-    file: UploadFile = File(...)
-):
-    # Validate file type
-    if file.content_type != "application/pdf":
-        raise HTTPException(
-            status_code=400, detail="Invalid file type. Only PDF files are allowed.")
-
-    # Ensure filename is provided
-    if not file.filename:
-        raise HTTPException(
-            status_code=400, detail="File name cannot be empty")
-
-    # Generate a unique filename to avoid collisions
-    unique_id = uuid.uuid4()
-    # Keep original extension, ensure it's pdf
-    file_ext = os.path.splitext(file.filename)[1].lower()
-    if file_ext != ".pdf":
-         raise HTTPException(status_code=400, detail="Invalid file extension. Only PDF files are allowed.")
-
-    temp_filename = f"{unique_id}{file_ext}"
-    temp_file_path = os.path.join(TEMP_PDF_DIR, temp_filename)
-
-    try:
-        # Save the uploaded file to the temporary directory
-        with open(temp_file_path, "wb") as buffer:
-            shutil.copyfileobj(file.file, buffer)
-        print(f"Temporarily saved PDF: {temp_file_path}")
-    except Exception as e:
-        raise HTTPException(
-            status_code=500, detail=f"Could not save temporary file: {e}") from e
-    finally:
-        # Ensure the file pointer is closed if not already handled by copyfileobj
-        if hasattr(file.file, 'close'):
-             file.file.close()
-
-    # Instantiate the processor
-    # Note: If GroceryAdProcessor needs dependencies (like db session),
-    # they need to be managed carefully in background tasks.
-    # For simplicity, we assume it initializes its own resources for now.
-    processor = GroceryAdProcessor()
-
-    # Add the processing task to background tasks
-    background_tasks.add_task(processor.process_pdf, temp_file_path)
-
-    # Add a separate background task for cleanup
-    background_tasks.add_task(cleanup_temp_file, temp_file_path)
-
-    # Return immediately, indicating processing has started
-    return JSONResponse(
-        status_code=202, # 202 Accepted is suitable for background tasks
-        content={
-            "message": "PDF processing started in the background.",
-            "original_filename": file.filename,
-            "processing_id": str(unique_id) # Optionally return the ID for status tracking later
-        }
-    )
-
-# --- Deprecate or Modify Old Upload Endpoint --- #
-# The old /upload-pdf might be deprecated or modified if /process-pdf replaces its function.
-# For now, we leave it, but consider its purpose.
-@app.post("/upload-pdf")
-async def upload_pdf(file: UploadFile = File(...)):
-    # Validate file type
-    if file.content_type != "application/pdf":
-        raise HTTPException(
-            status_code=400, detail="Invalid file type. Only PDF files are allowed.")
-
-    # Define the path to save the file
-    # Ensure filename is not None (add type check)
-    if file.filename is None:
-        raise HTTPException(
-            status_code=400, detail="File name cannot be empty")
-
-    file_path = os.path.join(UPLOAD_DIR, file.filename) # Saves to permanent UPLOAD_DIR
-
-    try:
-        # Save the uploaded file
-        with open(file_path, "wb") as buffer:
-            shutil.copyfileobj(file.file, buffer)
-    except Exception as e:
-        # Handle potential file saving errors with proper exception chaining
-        raise HTTPException(
-            status_code=500, detail=f"Could not save file: {e}") from e
-    finally:
-        # Ensure the file pointer is closed
-        if hasattr(file.file, 'close'):
-             file.file.close()
-
-    # Return success response
-    return JSONResponse(status_code=200, content={"message": "File uploaded successfully to uploads directory", "filename": file.filename})
-
-@app.get("/list-pdfs")
-async def list_pdfs():
-    """Endpoint to list all PDF files in the uploads directory"""
-    try:
-        # List all files in the uploads directory
-        files = os.listdir(UPLOAD_DIR)
-        # Filter for only PDF files
-        pdf_files = [file for file in files if file.lower().endswith('.pdf')]
-        return {"pdf_files": pdf_files}
-    except Exception as e:
-        raise HTTPException(
-            status_code=500, detail=f"Error listing PDF files: {e}"
-        ) from e
-
-# Add API routes here
-
+# Keep the run block
 if __name__ == "__main__":
     import uvicorn
-    # Use PORT environment variable for production (Render will set this)
-    # Fix the type issue by explicitly converting to string first
     port_str = os.getenv("PORT", "8000")
     port = int(port_str)
-    uvicorn.run("main:app", host="0.0.0.0", port=port, reload=True)
-    
-# @app.get("/test-db") # Renamed path slightly for clarity, or use /test-db
-# def test_database_connection_simple(db: Session = Depends(get_db_session)):
-#     """Endpoint to test the database connection."""
-#     try:
-#         db.scalar(select(1))
-#         return {
-#             "status": "success",
-#             "message": "Successfully connected to database."
-#         }
-#     except Exception as e:
-#         # If any exception occurred, the connection failed
-#         print(f"Database connection test failed: {e}") # Optional: log error
-#         raise HTTPException(
-#             status_code=500,
-#             detail=f"Database connection failed: Could not establish connection."
-#         )
+    # Point uvicorn to the app instance in this file
+    uvicorn.run("backend.app.main:app", host="0.0.0.0", port=port, reload=True)
+
+# Removed test-db endpoint example
 
