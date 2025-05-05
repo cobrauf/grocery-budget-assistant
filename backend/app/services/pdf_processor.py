@@ -1,8 +1,11 @@
 import os
+import json
 import google.generativeai as genai
+from google.api_core import exceptions as google_exceptions # For specific google exceptions
 from pydantic import ValidationError
-from sqlalchemy.orm import Session
-from sqlalchemy.exc import SQLAlchemyError
+import asyncio
+import aiofiles # For async file operations
+from pathlib import Path
 
 from ..schemas.pdf_schema import ExtractedPDFData
 # Use the get_db_session context manager/dependency
@@ -13,20 +16,14 @@ from .. import crud
 # from .. import crud, models # Example
 # from ..database import get_db_session # Example
 
+
+
 # Placeholder for actual Gemini API Key loading
 # Consider using environment variables and a config file/service
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
-if not GEMINI_API_KEY:
-    # In a real app, raise a more specific configuration error or log
-    print("Warning: GEMINI_API_KEY environment variable not set.")
-else:
-    genai.configure(api_key=GEMINI_API_KEY)
-
-# Define the Gemini model to use
-# Choose a model capable of handling PDF input, e.g., 'gemini-pro-vision' might need adjustment
-# For direct PDF processing, a future model or specific API endpoint might be needed.
-# Refer to the latest Google AI documentation for the correct model.
-GEMINI_MODEL_NAME = "gemini-1.5-flash" # Example: Use the appropriate model
+UPLOADS_DIR = Path(os.getenv("PDF_UPLOADS_DIR", "backend/uploads"))
+EXTRACTIONS_DIR = Path(os.getenv("PDF_EXTRACTIONS_DIR", "backend/extractions"))
+GEMINI_MODEL_NAME = "gemini-1.5-flash" # Ensure this model supports File API and JSON output
 
 # Context manager for database sessions in background tasks
 def get_db() -> Session:
@@ -36,155 +33,189 @@ def get_db() -> Session:
     finally:
         db.close()
 
+# --- Initialization ---
+if not GEMINI_API_KEY:
+    print("Warning: GEMINI_API_KEY environment variable not set.")
+    # Consider raising an error in a real application
+    # raise ConfigurationError("GEMINI_API_KEY must be set")
+else:
+    try:
+        genai.configure(api_key=GEMINI_API_KEY)
+    except Exception as e:
+        print(f"Error configuring Gemini API: {e}")
+        # Handle configuration error appropriately
+
+# Ensure output directory exists
+EXTRACTIONS_DIR.mkdir(parents=True, exist_ok=True)
+
+# --- PDF Processor Service ---
 class GroceryAdProcessor:
     def __init__(self):
-        # Initialize Gemini client
-        # The genai.configure call might be sufficient, or a specific client setup is needed
-        # depending on the library version and usage pattern.
-        self.model = genai.GenerativeModel(GEMINI_MODEL_NAME)
-        # No db client needed here, will be obtained per-request/task
-
-    async def process_pdf(self, pdf_file_path: str):
-        print(f"Processing PDF: {pdf_file_path}")
-        validated_data = None # Initialize
-        # 1. Prepare PDF for Gemini API
-        # The 'google-generativeai' library might require uploading the file first
-        # or passing bytes directly. Check the documentation for PDF handling.
-        # Example using hypothetical file upload:
         try:
-            print("Uploading PDF to Gemini...")
-            # This is a placeholder - actual PDF handling depends on the Gemini API/SDK
-            # It might involve genai.upload_file or similar.
-            # uploaded_file = genai.upload_file(path=pdf_file_path)
-            # Or read bytes:
-            with open(pdf_file_path, 'rb') as f:
-                pdf_bytes = f.read()
+            self.model = genai.GenerativeModel(GEMINI_MODEL_NAME)
+            print(f"Gemini model '{GEMINI_MODEL_NAME}' initialized.")
+        except Exception as e:
+            print(f"Failed to initialize Gemini model: {e}")
+            self.model = None # Mark as unusable
 
-            # Placeholder for the actual API call with PDF content
-            # Construct the prompt carefully, potentially including the schema definition
-            # or instructions on the expected JSON format.
+    async def process_pdf_to_json(self, pdf_path: Path) -> str | None:
+        """
+        Processes a single PDF file using the Gemini Files API, extracts data,
+        validates it, and saves it as a JSON file in the EXTRACTIONS_DIR.
+
+        Args:
+            pdf_path: Path object pointing to the input PDF file.
+
+        Returns:
+            The path to the created JSON file if successful, otherwise None.
+        """
+        if not self.model:
+            print("Processor not initialized correctly. Skipping processing.")
+            return None
+
+        output_json_path = EXTRACTIONS_DIR / f"{pdf_path.stem}.json"
+        print(f"Starting processing for: {pdf_path.name}")
+        print(f"Target output file: {output_json_path}")
+
+        uploaded_file = None # To keep track for potential deletion
+        try:
+            # 1. Upload PDF using Files API
+            print(f"Uploading {pdf_path.name} to Gemini Files API...")
+            # Use display_name for easier identification in list() if needed
+            uploaded_file = await asyncio.to_thread(
+                genai.upload_file, path=pdf_path, display_name=pdf_path.name
+            )
+            print(f"File uploaded successfully: {uploaded_file.name} ({uploaded_file.uri})")
+
+            # --- Check file state (optional but recommended) ---
+            # Wait briefly for processing if needed, check documentation
+            # file_info = genai.get_file(name=uploaded_file.name)
+            # while file_info.state.name == "PROCESSING":
+            #     await asyncio.sleep(5) # Check every 5 seconds
+            #     file_info = genai.get_file(name=uploaded_file.name)
+            # if file_info.state.name != "ACTIVE":
+            #     raise Exception(f"Uploaded file {uploaded_file.name} failed processing. State: {file_info.state.name}")
+            # print(f"Uploaded file '{uploaded_file.name}' is ACTIVE.")
+            # --- End optional check ---
+
+
+            # 2. Generate content using the uploaded file
             prompt = """
-            Extract grocery ad data from the provided PDF file.
-            Identify the retailer name, the weekly ad start and end dates, and a list of products.
-            For each product, extract its name, price, and any description (like unit size or quantity).
+            Extract grocery ad data from the provided PDF file ({file_display_name}).
+            Identify the retailer name, the weekly ad start and end dates (YYYY-MM-DD format),
+            and a list of products.
+            For each product, extract its name, price (as a float/number), and any descriptive text
+            (like unit size, quantity, brand, or specific offer details).
             Respond ONLY with a valid JSON object matching the following structure:
-            { "retailer": "string",
-              "weekly_ad": { "start_date": "YYYY-MM-DD", "end_date": "YYYY-MM-DD" },
-              "products": [ { "name": "string", "price": float, "description": "string|null" } ]
-            }
-            Do not include any introductory text, explanations, or markdown formatting around the JSON.
-            """
+            {{
+              "retailer": "string",
+              "weekly_ad": {{
+                "start_date": "YYYY-MM-DD",
+                "end_date": "YYYY-MM-DD"
+              }},
+              "products": [
+                {{
+                  "name": "string",
+                  "price": float,
+                  "description": "string | null"
+                }}
+              ]
+            }}
+            Ensure the response contains only the JSON object, with no surrounding text, explanations, or markdown formatting like ```json.
+            """.format(file_display_name=pdf_path.name) # Include filename in prompt for context
 
-            print("Sending request to Gemini...")
-            # The specific method to send PDF content + prompt might vary.
-            # This assumes the model can directly take bytes or a reference to an uploaded file.
+            print(f"Sending request to Gemini model '{GEMINI_MODEL_NAME}'...")
             response = await self.model.generate_content_async(
-                [
-                    prompt,
-                    # Hypothetical: Pass the uploaded file object or bytes directly
-                    # uploaded_file # If using file upload
-                    # {'mime_type': 'application/pdf', 'data': pdf_bytes} # If passing bytes
-                     {
-                         "mime_type": "application/pdf",
-                         "data": pdf_bytes
-                     }
-                ],
-                # Add generation_config if needed (temperature, max tokens, etc.)
-                # generation_config=genai.types.GenerationConfig(...)
+                [prompt, uploaded_file],
+                # Consider adding generation_config if needed (e.g., response_mime_type="application/json")
+                # Check documentation for explicit JSON mode if available for the model
+                # generation_config=genai.types.GenerationConfig(
+                #     response_mime_type="application/json"
+                # )
             )
 
-            # Clean the response text: Gemini might add markdown ```json ... ```
-            raw_results = response.text.strip().replace('```json', '').replace('```', '').strip()
-            print("Received response from Gemini.")
-            # print(f"Raw response: {raw_results}")
+            # Check for blocked prompts or safety issues
+            if not response.candidates:
+                 # Check prompt_feedback for block reason
+                 block_reason = response.prompt_feedback.block_reason if response.prompt_feedback else "Unknown"
+                 print(f"Request blocked or failed. Reason: {block_reason}. PDF: {pdf_path.name}")
+                 # Potentially log response.prompt_feedback details
+                 return None
 
+            # Clean the response text: Gemini might still add markdown ```json ... ```
+            # Access text safely, check if parts exist
+            if not response.candidates[0].content.parts:
+                print(f"Gemini response has no parts. PDF: {pdf_path.name}")
+                return None
+            raw_results = response.candidates[0].content.parts[0].text
+            cleaned_results = raw_results.strip().removeprefix('```json').removesuffix('```').strip()
+            print(f"Received response from Gemini for {pdf_path.name}.")
+            # print(f"Cleaned response: {cleaned_results[:200]}...") # Log snippet
+
+        except google_exceptions.GoogleAPIError as e:
+            print(f"Gemini API Error processing {pdf_path.name}: {e}")
+            return None
         except Exception as e:
-            # Handle API errors (network, authentication, rate limits, invalid requests etc.)
-            print(f"Error calling Gemini API: {e}")
-            # TODO: Implement retry logic or more specific failure handling
-            # Consider raising an exception to be caught by the background task runner
-            return None # Indicate failure
+            print(f"Unexpected error during Gemini interaction for {pdf_path.name}: {e}")
+            return None
+        # --- Files API Cleanup (Optional) ---
+        # Uncomment if you want explicit deletion, otherwise rely on 48h auto-delete
+        # finally:
+        #     if uploaded_file:
+        #         try:
+        #             print(f"Deleting uploaded file: {uploaded_file.name}")
+        #             await asyncio.to_thread(genai.delete_file, name=uploaded_file.name)
+        #             print(f"Successfully deleted {uploaded_file.name}")
+        #         except Exception as e:
+        #             print(f"Error deleting uploaded file {uploaded_file.name}: {e}")
+        # --- End Cleanup ---
 
-        # 2. Parse and validate results from Gemini
+
+        # 3. Parse, Validate, and Save JSON
         try:
-            print("Parsing and validating Gemini response...")
-            # The OutputParser concept from the plan is integrated here via Pydantic
-            validated_data = ExtractedPDFData.model_validate_json(raw_results)
-            print("Validation successful.")
-            # print(f"Validated data: {validated_data.model_dump_json(indent=2)}")
+            print(f"Validating response for {pdf_path.name}...")
+            validated_data = ExtractedPDFData.model_validate_json(cleaned_results)
+            print(f"Validation successful for {pdf_path.name}.")
+
+            print(f"Saving extracted data to {output_json_path}...")
+            async with aiofiles.open(output_json_path, mode='w', encoding='utf-8') as f:
+                # Use model_dump_json for proper Pydantic serialization
+                await f.write(validated_data.model_dump_json(indent=2))
+            print(f"Successfully saved JSON for {pdf_path.name}.")
+            return str(output_json_path)
+
         except ValidationError as e:
-            # Handle Pydantic validation errors (schema mismatch)
-            print(f"Error validating Gemini response against schema: {e}")
-            print(f"Invalid Raw Data: {raw_results}") # Log the problematic data
-            # TODO: Implement handling for validation failures (e.g., log, move to error queue)
-            return None # Indicate failure
+            print(f"Validation Error for {pdf_path.name}: {e}")
+            print(f"Invalid Raw Data: {cleaned_results}")
+             # Optionally save the invalid JSON to a separate errors directory
+            # error_path = EXTRACTIONS_DIR / f"{pdf_path.stem}_error.json"
+            # try:
+            #     async with aiofiles.open(error_path, mode='w', encoding='utf-8') as f:
+            #         await f.write(json.dumps({"error": "Validation Failed", "details": str(e), "raw_data": cleaned_results}, indent=2))
+            # except Exception as file_e:
+            #      print(f"Could not save error file {error_path}: {file_e}")
+            return None
+        except json.JSONDecodeError as e:
+            print(f"JSON Decode Error for {pdf_path.name}: {e}")
+            print(f"Raw Data causing decode error: {cleaned_results}")
+            # Optionally save error file as above
+            return None
         except Exception as e:
-            # Handle other potential errors during parsing (e.g., invalid JSON format)
-            print(f"Error parsing Gemini response: {e}")
-            print(f"Raw Data causing parse error: {raw_results}")
-            return None # Indicate failure
+            print(f"Error saving JSON file {output_json_path}: {e}")
+            return None
 
-        # 3. Upload to database if validation succeeded
-        if validated_data:
-            try:
-                print("Uploading data to database...")
-                # Use the context manager to get a session
-                with get_db() as db:
-                    await self.upload_to_supabase(db, validated_data)
-                print("Database upload transaction successful.")
-            except SQLAlchemyError as e:
-                print(f"Database transaction failed: {e}")
-                # The transaction would have been rolled back automatically by SQLAlchemy
-                # if using standard session management with context manager/dependency
-                return None # Indicate failure
-            except Exception as e:
-                print(f"Unexpected error during database upload: {e}")
-                return None # Indicate failure
-        else:
-             print("Skipping database upload due to previous errors.")
-             return None # Indicate failure
-
-        print(f"Successfully processed and stored data from: {pdf_file_path}")
-        return validated_data # Return successful data
-
-    async def upload_to_supabase(self, db: Session, data: ExtractedPDFData):
-        """Handles the database transaction for inserting extracted PDF data."""
-        try:
-            # 1. Get or create retailer
-            # Note: CRUD functions are synchronous, run them in a threadpool
-            # if the main process_pdf remains async AND db operations are blocking.
-            # For simplicity here, we assume crud functions or the db driver
-            # handle async context appropriately or are fast enough.
-            # If using asyncpg with SQLAlchemy, operations might be awaitable.
-            # Let's assume sync CRUD for now.
-
-            # Use the synchronous db session directly with sync CRUD functions
-            retailer = crud.get_or_create_retailer(db, name=data.retailer)
-
-            if not retailer or not retailer.id:
-                 raise ValueError(f"Failed to get or create retailer: {data.retailer}")
-
-            # 2. Create weekly ad linked to retailer
-            weekly_ad = crud.create_weekly_ad_from_pdf(db, ad_data=data.weekly_ad, retailer_id=retailer.id)
-
-            if not weekly_ad or not weekly_ad.id:
-                raise ValueError(f"Failed to create weekly ad for retailer ID: {retailer.id}")
-
-            # 3. Batch insert products linked to weekly ad
-            if data.products:
-                crud.create_products_batch(db, products_data=data.products, weekly_ad_id=weekly_ad.id)
-            else:
-                print(f"No products found in extracted data for WeeklyAd ID: {weekly_ad.id}")
-
-            # 4. Commit the transaction
-            db.commit()
-            print(f"Transaction committed for retailer: {data.retailer}, Ad ID: {weekly_ad.id}")
-
-        except Exception as e:
-            print(f"Error during database transaction: {e}. Rolling back...")
-            db.rollback()
-            # Re-raise the exception to be caught by the caller (process_pdf)
-            raise
+# Example usage (typically called from the router's background task)
+# async def run_processor_for_file(pdf_file_path_str: str):
+#     processor = GroceryAdProcessor()
+#     pdf_path = Path(pdf_file_path_str)
+#     if pdf_path.exists():
+#         result_path = await processor.process_pdf_to_json(pdf_path)
+#         if result_path:
+#             print(f"Processing complete. Output: {result_path}")
+#         else:
+#             print(f"Processing failed for {pdf_path.name}")
+#     else:
+#         print(f"PDF file not found: {pdf_file_path_str}")
 
 # Example of how you might initialize and use the processor elsewhere
 # async def main_example(pdf_path):
