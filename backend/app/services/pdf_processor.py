@@ -4,7 +4,7 @@ from pydantic import ValidationError
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import SQLAlchemyError
 
-from ..schemas.pdf_data import ExtractedPDFData
+from ..schemas.pdf_schema import ExtractedPDFData
 # Use the get_db_session context manager/dependency
 from ..database import SessionLocal # Assuming SessionLocal is the factory
 # Import the specific CRUD functions we need

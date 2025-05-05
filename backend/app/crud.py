@@ -1,8 +1,10 @@
 from sqlalchemy.orm import Session, joinedload
+from sqlalchemy import func
 from sqlalchemy.exc import IntegrityError
 from typing import List # Added for type hinting
-from . import models, schemas # Import schemas
-from .schemas.pdf_data import PDFWeeklyAd, PDFProduct # Import PDF specific schemas
+from . import models # Remove schemas from here
+from .schemas import data_schemas # Import the renamed data_schemas
+from .schemas.pdf_schema import PDFWeeklyAd, PDFProduct # Update to pdf_schema
 
 '''
 Purpose: This file is intended to hold the functions that perform database operations. 
@@ -16,7 +18,7 @@ def get_retailer(db: Session, retailer_id: int):
     return db.query(models.Retailer).filter(models.Retailer.id == retailer_id).first()
 
 # Example function to create a retailer
-def create_retailer(db: Session, retailer: schemas.RetailerCreate):
+def create_retailer(db: Session, retailer: data_schemas.RetailerCreate):
     db_retailer = models.Retailer(name=retailer.name, website=retailer.website)
     db.add(db_retailer)
     db.commit()
@@ -33,11 +35,11 @@ def get_or_create_retailer(db: Session, name: str) -> models.Retailer:
     else:
         print(f"Creating new retailer: {name}")
         # Assuming website is optional or not available from PDF extraction
-        retailer_schema = schemas.RetailerCreate(name=name)
+        retailer_schema = data_schemas.RetailerCreate(name=name)
         return create_retailer(db, retailer=retailer_schema)
 
 # --- WeeklyAd CRUD ---
-def create_weekly_ad(db: Session, weekly_ad: schemas.WeeklyAdCreate):
+def create_weekly_ad(db: Session, weekly_ad: data_schemas.WeeklyAdCreate):
     # Convert Pydantic schema to SQLAlchemy model instance
     db_weekly_ad = models.WeeklyAd(**weekly_ad.model_dump())
     db.add(db_weekly_ad)
@@ -68,7 +70,7 @@ def create_weekly_ad_from_pdf(db: Session, ad_data: PDFWeeklyAd, retailer_id: in
     return db_weekly_ad
 
 # --- Product CRUD ---
-def create_product(db: Session, product: schemas.ProductCreate):
+def create_product(db: Session, product: data_schemas.ProductCreate):
     # Convert Pydantic schema to SQLAlchemy model instance
     db_product = models.Product(**product.model_dump())
     db.add(db_product)
