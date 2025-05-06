@@ -7,7 +7,8 @@ from fastapi.responses import JSONResponse
 from pathlib import Path
 
 # Import necessary components from parent directories or app modules
-from ..services.pdf_processor import GroceryAdProcessor, UPLOADS_DIR, EXTRACTIONS_DIR
+from ..services.pdf_processor import GroceryAdProcessor
+from ..utils.utils import find_project_root
 
 '''
 Defines API endpoints specifically for handling PDF files.
@@ -20,16 +21,11 @@ POST /pdf/process-uploads/: Queues background processing for all PDF files found
 GET /pdf/processing-status/: Provides a basic status check of PDF processing based on file counts.
 '''
 
-# Go up one level to app/, then specify the target directories
-APP_DIR = os.path.dirname(os.path.dirname(__file__))
-UPLOAD_DIR = os.path.join(APP_DIR, "..", "pdf", "uploads")
-TEMP_PDF_DIR = os.path.join(APP_DIR, "..", "pdf", "temp_pdfs")
-
-# Ensure directories exist (this might ideally be done once at app startup in main.py)
-# but including here for router self-containment for now.
-os.makedirs(UPLOAD_DIR, exist_ok=True)
-os.makedirs(TEMP_PDF_DIR, exist_ok=True)
-
+# Define paths relative to project root using utils.find_project_root()
+PROJECT_ROOT = find_project_root()
+UPLOADS_DIR = PROJECT_ROOT / "backend" / "pdf" / "uploads"
+EXTRACTIONS_DIR = PROJECT_ROOT / "backend" / "pdf" / "extractions"
+TEMP_PDF_DIR = PROJECT_ROOT / "backend" / "pdf" / "temp_pdfs"
 
 router = APIRouter(
     prefix="/pdf", # Prefix for PDF related routes
@@ -95,7 +91,7 @@ async def upload_pdf(file: UploadFile = File(...)):
     if file.filename is None:
         raise HTTPException(status_code=400, detail="File name cannot be empty")
 
-    file_path = os.path.join(UPLOAD_DIR, file.filename)
+    file_path = os.path.join(UPLOADS_DIR, file.filename)
 
     try:
         with open(file_path, "wb") as buffer:
@@ -111,7 +107,7 @@ async def upload_pdf(file: UploadFile = File(...)):
 @router.get("/list") # Route path: /pdf/list
 async def list_pdfs():
     try:
-        files = os.listdir(UPLOAD_DIR)
+        files = os.listdir(UPLOADS_DIR)
         pdf_files = [file for file in files if file.lower().endswith('.pdf')]
         return {"pdf_files": pdf_files}
     except Exception as e:
@@ -190,4 +186,4 @@ async def check_processing_status():
             "output_directory": str(EXTRACTIONS_DIR),
         }
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error checking status: {e}") 
+        raise HTTPException(status_code=500, detail=f"Error checking status: {e}")

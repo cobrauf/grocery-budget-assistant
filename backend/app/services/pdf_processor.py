@@ -11,6 +11,7 @@ from sqlalchemy.orm import Session # Added import
 from ..schemas.pdf_schema import ExtractedPDFData
 # Use the get_db_session context manager/dependency
 from ..database import SessionLocal # Assuming SessionLocal is the factory
+from ..utils.utils import find_project_root
 
 '''
 Configures and initializes the Google Gemini API service for handling PDF file processing tasks.
@@ -23,9 +24,12 @@ Persists the successfully validated, structured data by saving it into local JSO
 # Placeholder for actual Gemini API Key loading
 # Consider using environment variables and a config file/service
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
-UPLOADS_DIR = Path("backend/pdf/uploads")
-EXTRACTIONS_DIR = Path("backend/pdf/extractions")
 GEMINI_MODEL = os.getenv("GEMINI_MODEL") # Ensure this model supports File API and JSON output
+
+# Define paths relative to project root using utils.find_project_root()
+PROJECT_ROOT = find_project_root()
+UPLOADS_DIR = PROJECT_ROOT / "backend" / "pdf" / "uploads"
+EXTRACTIONS_DIR = PROJECT_ROOT / "backend" / "pdf" / "extractions"
 
 # Context manager for database sessions in background tasks
 def get_db() -> Session:
@@ -43,9 +47,6 @@ else:
         genai.configure(api_key=GEMINI_API_KEY)
     except Exception as e:
         print(f"Error configuring Gemini API: {e}")
-
-# Ensure output directory exists
-EXTRACTIONS_DIR.mkdir(parents=True, exist_ok=True)
 
 # --- PDF Processor Service ---
 class GroceryAdProcessor:

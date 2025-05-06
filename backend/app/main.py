@@ -6,7 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 # Import routers
 from .routers import data, pdf
 from . import database # Keep for SessionLocal usage if get_db_session remains here (or move get_db_session too)
-
+from .utils.utils import find_project_root
 
 '''
 Main FastAPI application entry point.
@@ -40,27 +40,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Define and ensure directories exist at startup
-APP_ROOT_DIR = os.path.dirname(__file__) # assigns the path of this file to APP_ROOT_DIR
-# Construct paths relative to the project root (backend/)
-PROJECT_ROOT_DIR = os.path.dirname(APP_ROOT_DIR) # This should be backend/
-
-UPLOAD_DIR = os.path.join(PROJECT_ROOT_DIR, "pdf", "uploads")
-TEMP_PDF_DIR = os.path.join(PROJECT_ROOT_DIR, "pdf", "temp_pdfs")
-# EXTRACTIONS_DIR is managed by pdf_processor.py, but ensure it exists if needed here
-# EXTRACTIONS_DIR_MAIN = os.path.join(PROJECT_ROOT_DIR, "pdf", "extractions") 
-
-os.makedirs(UPLOAD_DIR, exist_ok=True) # the 2nd arg means if directory already exists, don't throw an error
-os.makedirs(TEMP_PDF_DIR, exist_ok=True)
-# os.makedirs(EXTRACTIONS_DIR_MAIN, exist_ok=True) # If main needs to ensure it exists too
-
-# Optional: Define dependency here if routers import it, or define in each router
-# def get_db_session():
-#     db = database.SessionLocal()
-#     try:
-#         yield db
-#     finally:
-#         db.close()
+# Define paths relative to project root using utils.find_project_root()
+PROJECT_ROOT = find_project_root()
+UPLOAD_DIR = PROJECT_ROOT / "backend" / "pdf" / "uploads"
+TEMP_PDF_DIR = PROJECT_ROOT / "backend" / "pdf" / "temp_pdfs"
 
 @app.get("/")
 def read_root():
