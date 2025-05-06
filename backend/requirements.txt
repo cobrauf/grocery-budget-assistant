@@ -1,5 +1,6 @@
 # Core Python Libraries
 python-dotenv==1.0.1
+aiofiles==24.1.0
 
 # Data Validation & Modeling
 pydantic==2.6.1

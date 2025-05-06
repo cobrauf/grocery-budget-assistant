@@ -11,12 +11,6 @@ from sqlalchemy.orm import Session # Added import
 from ..schemas.pdf_schema import ExtractedPDFData
 # Use the get_db_session context manager/dependency
 from ..database import SessionLocal # Assuming SessionLocal is the factory
-# Import the specific CRUD functions we need
-from .. import crud
-# Add necessary imports for database interaction (e.g., Supabase client, CRUD functions)
-# from .. import crud, models # Example
-# from ..database import get_db_session # Example
-
 
 '''
 Configures and initializes the Google Gemini API service for handling PDF file processing tasks.
@@ -189,41 +183,14 @@ class GroceryAdProcessor:
         except ValidationError as e:
             print(f"Validation Error for {pdf_path.name}: {e}")
             print(f"Invalid Raw Data: {cleaned_results}")
-             # Optionally save the invalid JSON to a separate errors directory
-            # error_path = EXTRACTIONS_DIR / f"{pdf_path.stem}_error.json"
-            # try:
-            #     async with aiofiles.open(error_path, mode='w', encoding='utf-8') as f:
-            #         await f.write(json.dumps({"error": "Validation Failed", "details": str(e), "raw_data": cleaned_results}, indent=2))
-            # except Exception as file_e:
-            #      print(f"Could not save error file {error_path}: {file_e}")
             return None
+        
         except json.JSONDecodeError as e:
             print(f"JSON Decode Error for {pdf_path.name}: {e}")
             print(f"Raw Data causing decode error: {cleaned_results}")
             # Optionally save error file as above
             return None
+        
         except Exception as e:
             print(f"Error saving JSON file {output_json_path}: {e}")
             return None
-
-# Example usage (typically called from the router's background task)
-# async def run_processor_for_file(pdf_file_path_str: str):
-#     processor = GroceryAdProcessor()
-#     pdf_path = Path(pdf_file_path_str)
-#     if pdf_path.exists():
-#         result_path = await processor.process_pdf_to_json(pdf_path)
-#         if result_path:
-#             print(f"Processing complete. Output: {result_path}")
-#         else:
-#             print(f"Processing failed for {pdf_path.name}")
-#     else:
-#         print(f"PDF file not found: {pdf_file_path_str}")
-
-# Example of how you might initialize and use the processor elsewhere
-# async def main_example(pdf_path):
-#     processor = GroceryAdProcessor()
-#     result = await processor.process_pdf(pdf_path)
-#     if result:
-#         print("PDF processed successfully.")
-#     else:
-#         print("PDF processing failed.") 
