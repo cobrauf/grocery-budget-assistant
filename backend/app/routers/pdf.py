@@ -22,8 +22,8 @@ GET /pdf/processing-status/: Provides a basic status check of PDF processing bas
 
 # Go up one level to app/, then specify the target directories
 APP_DIR = os.path.dirname(os.path.dirname(__file__))
-UPLOAD_DIR = os.path.join(APP_DIR, "uploads")
-TEMP_PDF_DIR = os.path.join(APP_DIR, "temp_pdfs")
+UPLOAD_DIR = os.path.join(APP_DIR, "..", "pdf", "uploads")
+TEMP_PDF_DIR = os.path.join(APP_DIR, "..", "pdf", "temp_pdfs")
 
 # Ensure directories exist (this might ideally be done once at app startup in main.py)
 # but including here for router self-containment for now.

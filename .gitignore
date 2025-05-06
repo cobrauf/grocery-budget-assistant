@@ -1,6 +1,6 @@
 # Folders
-backend/app/uploads/
-backend/app/temp_pdfs/
+backend/pdf/
+
 
 # Python
 __pycache__/

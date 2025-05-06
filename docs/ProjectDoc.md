@@ -49,8 +49,8 @@ Ensure a `.env` file is created based on `.env.example`, including:
 
 - `DATABASE_URL`: Connection string for PostgreSQL.
 - `GEMINI_API_KEY`: API key for Google Gemini.
-- `PDF_UPLOADS_DIR` (Optional): Path to the PDF uploads directory (defaults to `backend/uploads`).
-- `PDF_EXTRACTIONS_DIR` (Optional): Path to the JSON extractions directory (defaults to `backend/extractions`).
+- `PDF_UPLOADS_DIR` (Optional): Path to the PDF uploads directory (defaults to `backend/pdf/uploads`).
+- `PDF_EXTRACTIONS_DIR` (Optional): Path to the JSON extractions directory (defaults to `backend/pdf/extractions`).
 
 # File Descriptions
 

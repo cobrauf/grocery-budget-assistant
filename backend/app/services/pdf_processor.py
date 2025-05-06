@@ -23,8 +23,8 @@ Persists the successfully validated, structured data by saving it into local JSO
 # Placeholder for actual Gemini API Key loading
 # Consider using environment variables and a config file/service
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
-UPLOADS_DIR = Path(os.getenv("PDF_UPLOADS_DIR", "backend/uploads"))
-EXTRACTIONS_DIR = Path(os.getenv("PDF_EXTRACTIONS_DIR", "backend/extractions"))
+UPLOADS_DIR = Path("backend/pdf/uploads")
+EXTRACTIONS_DIR = Path("backend/pdf/extractions")
 GEMINI_MODEL = os.getenv("GEMINI_MODEL") # Ensure this model supports File API and JSON output
 
 # Context manager for database sessions in background tasks
