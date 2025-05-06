@@ -1,11 +1,12 @@
 import os
 import json
-import google.generativeai as genai
-from google.api_core import exceptions as google_exceptions # For specific google exceptions
+import google.generativeai as genai # type: ignore
+from google.api_core import exceptions as google_exceptions # type: ignore # For specific google exceptions
 from pydantic import ValidationError
 import asyncio
 import aiofiles # For async file operations
 from pathlib import Path
+from sqlalchemy.orm import Session # Added import
 
 from ..schemas.pdf_schema import ExtractedPDFData
 # Use the get_db_session context manager/dependency
@@ -30,7 +31,7 @@ Persists the successfully validated, structured data by saving it into local JSO
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 UPLOADS_DIR = Path(os.getenv("PDF_UPLOADS_DIR", "backend/uploads"))
 EXTRACTIONS_DIR = Path(os.getenv("PDF_EXTRACTIONS_DIR", "backend/extractions"))
-GEMINI_MODEL_NAME = "gemini-1.5-flash" # Ensure this model supports File API and JSON output
+GEMINI_MODEL = os.getenv("GEMINI_MODEL") # Ensure this model supports File API and JSON output
 
 # Context manager for database sessions in background tasks
 def get_db() -> Session:
@@ -43,14 +44,11 @@ def get_db() -> Session:
 # --- Initialization ---
 if not GEMINI_API_KEY:
     print("Warning: GEMINI_API_KEY environment variable not set.")
-    # Consider raising an error in a real application
-    # raise ConfigurationError("GEMINI_API_KEY must be set")
 else:
     try:
         genai.configure(api_key=GEMINI_API_KEY)
     except Exception as e:
         print(f"Error configuring Gemini API: {e}")
-        # Handle configuration error appropriately
 
 # Ensure output directory exists
 EXTRACTIONS_DIR.mkdir(parents=True, exist_ok=True)
@@ -59,20 +57,17 @@ EXTRACTIONS_DIR.mkdir(parents=True, exist_ok=True)
 class GroceryAdProcessor:
     def __init__(self):
         try:
-            self.model = genai.GenerativeModel(GEMINI_MODEL_NAME)
-            print(f"Gemini model '{GEMINI_MODEL_NAME}' initialized.")
+            self.model = genai.GenerativeModel(GEMINI_MODEL)
+            print(f"Gemini model '{GEMINI_MODEL}' initialized.")
         except Exception as e:
             print(f"Failed to initialize Gemini model: {e}")
             self.model = None # Mark as unusable
 
     async def process_pdf_to_json(self, pdf_path: Path) -> str | None:
         """
-        Processes a single PDF file using the Gemini Files API, extracts data,
-        validates it, and saves it as a JSON file in the EXTRACTIONS_DIR.
-
+        Processes a single PDF file using the Gemini Files API, and saves it as a JSON file in the EXTRACTIONS_DIR.
         Args:
             pdf_path: Path object pointing to the input PDF file.
-
         Returns:
             The path to the created JSON file if successful, otherwise None.
         """
@@ -131,7 +126,7 @@ class GroceryAdProcessor:
             Ensure the response contains only the JSON object, with no surrounding text, explanations, or markdown formatting like ```json.
             """.format(file_display_name=pdf_path.name) # Include filename in prompt for context
 
-            print(f"Sending request to Gemini model '{GEMINI_MODEL_NAME}'...")
+            print(f"Sending request to Gemini model '{GEMINI_MODEL}'...")
             response = await self.model.generate_content_async(
                 [prompt, uploaded_file],
                 # Consider adding generation_config if needed (e.g., response_mime_type="application/json")
