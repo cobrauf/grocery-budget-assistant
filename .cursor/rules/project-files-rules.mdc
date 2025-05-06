@@ -1,0 +1,6 @@
+---
+description: 
+globs: ProjectFiles.md
+alwaysApply: false
+---
+Update the ProjectFiles.md if files/folders structure changes or are added/removed.

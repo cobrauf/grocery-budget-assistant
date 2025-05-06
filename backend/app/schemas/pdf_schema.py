@@ -6,10 +6,16 @@ class PDFProduct(BaseModel):
     name: str
     price: float
     description: Optional[str] = None
+    unit: Optional[str] = None
+    category: Optional[str] = None
+    promotion_details: Optional[str] = None
 
 class PDFWeeklyAd(BaseModel):
-    start_date: date
-    end_date: date
+    valid_from: date
+    valid_to: date
+    publication_date: Optional[date] = None
+    filename: Optional[str] = None
+    source_url: Optional[str] = None
 
 class ExtractedPDFData(BaseModel):
     retailer: str
