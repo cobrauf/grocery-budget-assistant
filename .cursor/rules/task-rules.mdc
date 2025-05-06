@@ -1,0 +1,37 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Task List Management and creation
+
+Guidelines for creating and managing task lists in Tasks.md to track project progress.
+
+Update the Tasks.md file with these guidelines:
+Create new tasks using the below formatting and a brief description of the feature and its purpose.
+Keep tasks in these 3 sections, move the tasks among these sections as they are worked on.
+Create/manage subtasks only during in Progress, remove them when the parent task is done.
+Add subtasks as needed to stay organized (no more than 5 per parent task).
+
+
+## In Progress Tasks
+
+- [ ] Task 3 Brief description, keep to 15-20 words.
+    - [x] Subtask 3a Brief description, keep to 15-20 words.
+    - [ ] Subtask 3b Brief description, keep to 15-20 words.
+
+- [ ] Task 4 Brief description, keep to 15-20 words.
+    - [x] Subtask 4a Brief description, keep to 15-20 words.
+    - [ ] Subtask 4b Brief description, keep to 15-20 words.
+
+## Completed Tasks
+
+- [x] Task 1 Brief description, keep to 15-20 words.
+- [x] Task 2 Brief description, keep to 15-20 words.
+
+
+## Future Tasks
+
+- [ ] Task 5 Brief description, keep to 15-20 words.
+- [ ] Task 6 Brief description, keep to 15-20 words.
+
