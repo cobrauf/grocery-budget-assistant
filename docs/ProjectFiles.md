@@ -23,8 +23,9 @@ grocery-budget-assistant/
 │ │ ├── models.py ── Defines SQLAlchemy ORM classes mapping Python objects to database tables.
 │ │ └── crud.py ── Contains database operations (CRUD) functions using SQLAlchemy models, sessions. Tailored for different data sources, workflows.
 | |=====================================
-│ ├── uploads/ ── Directory is input location for PDF weekly ad files needing processing.
-│ ├── extractions/ ── Directory saves structured JSON data extracted from PDFs by pdf_processor service.
+│ ├── pdf/ ── Directory contains PDF-related data files.
+│ │ ├── uploads/ ── Directory is input location for PDF weekly ad files needing processing.
+│ │ └── extractions/ ── Directory saves structured JSON data extracted from PDFs by pdf_processor service.
 │ ├── sql/ Directory holds database schema related SQL files.
 │ │ └── schema.sql ── Contains raw SQL statements to create database tables, indexes, functions.
 │ ├── .env.example ── Template file showing required environment variables.
