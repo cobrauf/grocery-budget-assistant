@@ -20,12 +20,12 @@ Check after each user request if any tasks have been completed and mark them (if
 ## In Progress Tasks
 
 - [ ] Task 3 Brief description, keep to 15-20 words.
-        - [x] Subtask 3a Brief description, keep to 15-20 words.
-        - [ ] Subtask 3b Brief description, keep to 15-20 words.
+    (Subtask) - [x] Subtask 3a Brief description, keep to 15-20 words.
+    (Subtask) - [ ] Subtask 3b Brief description, keep to 15-20 words.
 
 - [ ] Task 4 Brief description, keep to 15-20 words.
-    - [x] Subtask 4a Brief description, keep to 15-20 words.
-    - [ ] Subtask 4b Brief description, keep to 15-20 words.
+    (Subtask) - [x] Subtask 4a Brief description, keep to 15-20 words.
+    (Subtask) - [ ] Subtask 4b Brief description, keep to 15-20 words.
 
 ## Completed Tasks
 

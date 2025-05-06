@@ -99,22 +99,32 @@ class GroceryAdProcessor:
             # 2. Generate content using the uploaded file
             prompt = """
             Extract grocery ad data from the provided PDF file ({file_display_name}).
-            Identify the retailer name, the weekly ad start and end dates (YYYY-MM-DD format),
-            and a list of products.
-            For each product, extract its name, price (as a float/number), and any descriptive text
-            (like unit size, quantity, brand, or specific offer details).
+            Identify the retailer name.
+            For the weekly ad, extract the valid_from date, valid_to date (YYYY-MM-DD format),
+            and optionally the publication_date (YYYY-MM-DD format), the original PDF filename, and a source_url if available.
+            For each product, extract its name, price (as a float/number),
+            its unit (e.g., "per LB", "Each", "18 oz Package"),
+            its category (e.g., "Produce", "Meat", "Beverage", "Snacks", "Dairy & Eggs", "Pantry"),
+            any descriptive text (like brand, specific offer details, size, or quantity not covered by unit),
+            and any promotion_details (e.g., "With Digital Coupon", "Must Buy 4 Final Price").
             Respond ONLY with a valid JSON object matching the following structure:
             {{
               "retailer": "string",
               "weekly_ad": {{
-                "start_date": "YYYY-MM-DD",
-                "end_date": "YYYY-MM-DD"
+                "valid_from": "YYYY-MM-DD",
+                "valid_to": "YYYY-MM-DD",
+                "publication_date": "YYYY-MM-DD | null",
+                "filename": "string | null",
+                "source_url": "string | null"
               }},
               "products": [
                 {{
                   "name": "string",
                   "price": float,
-                  "description": "string | null"
+                  "description": "string | null",
+                  "unit": "string | null",
+                  "category": "string | null",
+                  "promotion_details": "string | null"
                 }}
               ]
             }}
