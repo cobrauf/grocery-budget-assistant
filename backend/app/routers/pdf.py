@@ -11,15 +11,15 @@ from ..services.pdf_processor import GroceryAdProcessor, UPLOADS_DIR, EXTRACTION
 
 '''
 Defines API endpoints specifically for handling PDF files.
-Uses FastAPI's APIRouter to group PDF-related routes under /pdf.
-Provides endpoints to upload individual PDF files.
-Includes an endpoint to list previously uploaded PDF files.
-Offers an endpoint to initiate processing for a single uploaded PDF.
-Contains an endpoint to queue processing for all files in the upload directory.
 Manages temporary file cleanup and provides a basic status check.
+
+POST /pdf/process: Initiates background processing for a single uploaded PDF file.
+POST /pdf/upload: Allows uploading a single PDF file to the server's uploads directory.
+GET /pdf/list: Lists the names of all PDF files currently in the uploads directory.
+POST /pdf/process-uploads/: Queues background processing for all PDF files found in the uploads directory.
+GET /pdf/processing-status/: Provides a basic status check of PDF processing based on file counts.
 '''
 
-# Define directories relative to the location of *this* file (routers/pdf.py)
 # Go up one level to app/, then specify the target directories
 APP_DIR = os.path.dirname(os.path.dirname(__file__))
 UPLOAD_DIR = os.path.join(APP_DIR, "uploads")
@@ -89,6 +89,7 @@ async def process_pdf_endpoint(
 
 @router.post("/upload") # Route path: /pdf/upload
 async def upload_pdf(file: UploadFile = File(...)):
+    """Uploads a PDF file to the configured permanent upload directory."""
     if file.content_type != "application/pdf":
         raise HTTPException(status_code=400, detail="Invalid file type. Only PDF files are allowed.")
     if file.filename is None:
