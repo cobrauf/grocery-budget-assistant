@@ -1,0 +1,64 @@
+GENERAL_PROMPT_TEMPLATE = """
+Extract grocery ad data from the provided PDF file ({file_display_name}).
+Identify the retailer name. Consider the following known retailers: {retailers_list_str}. If the retailer is not in this list, use the name found in the PDF.
+For the weekly ad, extract the valid_from date, valid_to date (YYYY-MM-DD format),
+and optionally the publication_date (YYYY-MM-DD format), the original PDF filename, and a source_url if available.
+For each product, extract its name, price (as a float/number),
+its unit (e.g., "per LB", "Each", "18 oz Package"),
+its category (choose from the provided list: {categories_list_str}),
+any descriptive text (like brand, specific offer details, size, or quantity not covered by unit),
+and any promotion_details (e.g., "With Digital Coupon", "Must Buy 4 Final Price").
+
+Respond ONLY with a valid JSON object matching the following structure:
+{{
+  "retailer": "string",
+  "weekly_ad": {{
+    "valid_from": "YYYY-MM-DD",
+    "valid_to": "YYYY-MM-DD",
+    "publication_date": "YYYY-MM-DD | null",
+    "filename": "string | null",
+    "source_url": "string | null"
+  }},
+  "products": [
+    {{
+      "name": "string",
+      "price": float,
+      "description": "string | null",
+      "unit": "string | null",
+      "category": "string | null",
+      "promotion_details": "string | null"
+    }}
+  ]
+}}
+Ensure the response contains only the JSON object, with no surrounding text, explanations, or markdown formatting like ```json.
+"""
+
+PRODUCT_CATEGORIES = [
+    "Fresh Produce (Fruits and Vegetables)",
+    "Dairy (Milk, Cheese, Yogurt)",
+    "Meats (Beef, Pork, Chicken, Lamb)",
+    "Seafood (Fish)",
+    "Baked Goods (Bread, Pastries, In-store Bakery)",
+    "Snack Foods (Chips, Pretzels, Crackers)",
+    "Beverages (Water, Juice, Soda)",
+    "Frozen Foods (Meals, Vegetables, Ice Cream)",
+    "Dry Goods (Pasta, Rice, Cereal)",
+    "Deli (Meats, Prepared Foods)",
+    "Alcoholic Beverages (Beer, Wine, Liquor)",
+    "Breakfast Foods",
+    "Canned Goods (Soups, Beans, Vegetables)",
+    "Condiments",
+    "Baking",
+    "Household Products (Cleaning Supplies, Paper Goods)",
+    "Personal Care (Toiletries, Medicine)",
+    "Pet Products",
+    "Candy",
+    "Other" # Added an 'Other' category as a fallback
+]
+
+# This can be updated with a list of known retailer names.
+# For now, it's an empty list, meaning the LLM will try to determine it from the PDF.
+KNOWN_RETAILERS = [
+    # "Example Retailer 1",
+    # "Example Retailer 2"
+] 

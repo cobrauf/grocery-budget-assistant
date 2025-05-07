@@ -12,6 +12,7 @@ from ..schemas.pdf_schema import ExtractedPDFData
 # Use the get_db_session context manager/dependency
 from ..database import SessionLocal # Assuming SessionLocal is the factory
 from ..utils.utils import find_project_root
+from .pdf_prompts import GENERAL_PROMPT_TEMPLATE, PRODUCT_CATEGORIES, KNOWN_RETAILERS # Added import
 
 '''
 Configures and initializes the Google Gemini API service for handling PDF file processing tasks.
@@ -97,39 +98,17 @@ class GroceryAdProcessor:
 
 
             # 2. Generate content using the uploaded file
-            prompt = """
-            Extract grocery ad data from the provided PDF file ({file_display_name}).
-            Identify the retailer name.
-            For the weekly ad, extract the valid_from date, valid_to date (YYYY-MM-DD format),
-            and optionally the publication_date (YYYY-MM-DD format), the original PDF filename, and a source_url if available.
-            For each product, extract its name, price (as a float/number),
-            its unit (e.g., "per LB", "Each", "18 oz Package"),
-            its category (e.g., "Produce", "Meat", "Beverage", "Snacks", "Dairy & Eggs", "Pantry"),
-            any descriptive text (like brand, specific offer details, size, or quantity not covered by unit),
-            and any promotion_details (e.g., "With Digital Coupon", "Must Buy 4 Final Price").
-            Respond ONLY with a valid JSON object matching the following structure:
-            {{
-              "retailer": "string",
-              "weekly_ad": {{
-                "valid_from": "YYYY-MM-DD",
-                "valid_to": "YYYY-MM-DD",
-                "publication_date": "YYYY-MM-DD | null",
-                "filename": "string | null",
-                "source_url": "string | null"
-              }},
-              "products": [
-                {{
-                  "name": "string",
-                  "price": float,
-                  "description": "string | null",
-                  "unit": "string | null",
-                  "category": "string | null",
-                  "promotion_details": "string | null"
-                }}
-              ]
-            }}
-            Ensure the response contains only the JSON object, with no surrounding text, explanations, or markdown formatting like ```json.
-            """.format(file_display_name=pdf_path.name) # Include filename in prompt for context
+            # Format the categories and retailers lists for inclusion in the prompt
+            categories_str = ", ".join([f'"{cat}"' for cat in PRODUCT_CATEGORIES])
+            retailers_str = ", ".join([f'"{ret}"' for ret in KNOWN_RETAILERS]) if KNOWN_RETAILERS else "any specified retailer"
+            
+            print(f"=========== Generated Prompt:\n{prompt}")
+            
+            prompt = GENERAL_PROMPT_TEMPLATE.format(
+                file_display_name=pdf_path.name,
+                categories_list_str=categories_str,
+                retailers_list_str=retailers_str
+            )
 
             print(f"Sending request to Gemini model '{GEMINI_MODEL}'...")
             response = await self.model.generate_content_async(
