@@ -97,12 +97,9 @@ class GroceryAdProcessor:
             print(f"Sending request to Gemini model '{GEMINI_MODEL}'...")
             response = await self.model.generate_content_async(
                 [prompt, uploaded_file],
-                # Consider adding generation_config if needed (e.g., response_mime_type="application/json")
-                # Check documentation for explicit JSON mode if available for the model
-                # generation_config=genai.types.GenerationConfig(
-                #     response_mime_type="application/json"
-                # ) //TODO
-                # timeout defaults to google's side
+                generation_config=genai.types.GenerationConfig(
+                    response_mime_type="application/json"
+                )
             )
 
             # Log token usage
