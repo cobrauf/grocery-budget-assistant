@@ -3,4 +3,4 @@ description:
 globs: ProjectFiles.md
 alwaysApply: false
 ---
-Update the ProjectFiles.md if files/folders structure changes or are added/removed.
+Update the ProjectFiles.md if files or folders have been changes or are added/removed.

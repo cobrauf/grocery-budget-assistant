@@ -5,16 +5,15 @@ alwaysApply: true
 ---
 # Task List Management and creation
 
-Guidelines for creating and managing task lists in Tasks.md to track project progress.
+Guidelines for creating and managing task lists in docs/Tasks.md to track project progress.
 
 Update the Tasks.md file with these guidelines:
 Increment the "Number of times.." line.
 As the user make requests, decide whether the Tasks.md file should be updated.
-Create new tasks using the below formatting and a brief description of the feature and its purpose.
+Create new tasks/subtasks as needed using the below formatting and a brief description of the feature and its purpose.
 Keep tasks in these 3 sections, tasks should move from Future to In progress to Completed.
-Create/manage subtasks only during in Progress, remove them when the parent task is done.
 Add subtasks as needed to stay organized (no more than 5 per parent task).
-Check after each user request if any tasks have been completed and mark them (if subtask) or mark + move them (parent task).
+Check after each user request if any tasks have been completed and mark them/move them as needed.
 
 
 ## In Progress Tasks
@@ -30,6 +29,7 @@ Check after each user request if any tasks have been completed and mark them (if
 ## Completed Tasks
 
 - [x] Task 1 Brief description, keep to 15-20 words.
+    (Subtask) - [x] Subtask 1a Brief description, keep to 15-20 words.
 - [x] Task 2 Brief description, keep to 15-20 words.
 
 
