@@ -141,6 +141,12 @@ class GroceryAdProcessor:
                 # )
             )
 
+            # Log token usage
+            if hasattr(response, 'usage_metadata') and response.usage_metadata:
+                print(f"Token usage for {pdf_path.name}: Prompt tokens: {response.usage_metadata.prompt_token_count}, Candidates tokens: {response.usage_metadata.candidates_token_count}, Total tokens: {response.usage_metadata.total_token_count}")
+            else:
+                print(f"Token usage data not available for {pdf_path.name}.")
+
             # Check for blocked prompts or safety issues
             if not response.candidates:
                  # Check prompt_feedback for block reason
