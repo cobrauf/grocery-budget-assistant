@@ -72,16 +72,17 @@ def create_weekly_ad_from_pdf(db: Session, ad_data: PDFWeeklyAd, retailer_id: in
     # Map PDF schema fields to model fields
     db_weekly_ad = models.WeeklyAd(
         retailer_id=retailer_id,
-        valid_from=ad_data.start_date,
-        valid_to=ad_data.end_date,
-        # Add defaults or nulls for other fields if necessary
+        valid_from=ad_data.valid_from,
+        valid_to=ad_data.valid_to,
+        date_processed=ad_data.date_processed,
+        filename=ad_data.filename
     )
     db.add(db_weekly_ad)
     # Flush to get the ID, commit might happen in the service layer
     db.flush()
     db.refresh(db_weekly_ad)
     print(
-        f"Created WeeklyAd ID: {db_weekly_ad.id} for Retailer ID: {retailer_id}, Valid: {ad_data.start_date} to {ad_data.end_date}")
+        f"Created WeeklyAd ID: {db_weekly_ad.id} for Retailer ID: {retailer_id}, Valid: {ad_data.valid_from} to {ad_data.valid_to}")
     return db_weekly_ad
 
 
@@ -89,7 +90,9 @@ def create_weekly_ad(db: Session, weekly_ad: data_schemas.WeeklyAdCreate) -> mod
     db_weekly_ad = models.WeeklyAd(
         retailer_id=weekly_ad.retailer_id,
         valid_from=weekly_ad.valid_from,
-        valid_to=weekly_ad.valid_to
+        valid_to=weekly_ad.valid_to,
+        date_processed=weekly_ad.date_processed,
+        filename=weekly_ad.filename
     )
     db.add(db_weekly_ad)
     db.flush()
@@ -102,7 +105,13 @@ def create_product(db: Session, product: data_schemas.ProductCreate) -> models.P
         weekly_ad_id=product.weekly_ad_id,
         name=product.name,
         price=product.price,
-        description=product.description
+        original_price=product.original_price,
+        unit=product.unit,
+        description=product.description,
+        category=product.category,
+        promotion_details=product.promotion_details,
+        promotion_from=product.promotion_from,
+        promotion_to=product.promotion_to
     )
     db.add(db_product)
     db.flush()
@@ -183,8 +192,7 @@ def upsert_products(db: Session, products_data: List[PDFProduct], weekly_ad_id: 
         ).first()
 
         if existing_product:
-            # Update existing product - Only update price and description from PDFProduct
-            # Assume other fields (unit, category, etc.) are better managed manually or via direct API
+            # Update existing product - PDFProduct now has more fields via inheritance
             changed = False
             if existing_product.price != prod_data.price:
                 existing_product.price = prod_data.price
@@ -192,22 +200,46 @@ def upsert_products(db: Session, products_data: List[PDFProduct], weekly_ad_id: 
             if existing_product.description != prod_data.description:
                 existing_product.description = prod_data.description
                 changed = True
+            if existing_product.unit != prod_data.unit:
+                existing_product.unit = prod_data.unit
+                changed = True
+            if existing_product.category != prod_data.category:
+                existing_product.category = prod_data.category
+                changed = True
+            if existing_product.promotion_details != prod_data.promotion_details:
+                existing_product.promotion_details = prod_data.promotion_details
+                changed = True
+            # Potentially map new optional fields if they are in PDFProduct and extracted
+            if hasattr(prod_data, 'original_price') and prod_data.original_price is not None and existing_product.original_price != prod_data.original_price:
+                existing_product.original_price = prod_data.original_price
+                changed = True
+            if hasattr(prod_data, 'promotion_from') and prod_data.promotion_from is not None and existing_product.promotion_from != prod_data.promotion_from:
+                existing_product.promotion_from = prod_data.promotion_from
+                changed = True
+            if hasattr(prod_data, 'promotion_to') and prod_data.promotion_to is not None and existing_product.promotion_to != prod_data.promotion_to:
+                existing_product.promotion_to = prod_data.promotion_to
+                changed = True
 
             if changed:
-                print(f"Updating product '{prod_data.name}' (Price/Desc) for WeeklyAd ID: {weekly_ad_id}")
+                print(f"Updating product '{prod_data.name}' for WeeklyAd ID: {weekly_ad_id}")
                 db.add(existing_product) # Add to session to mark for update
                 upserted_count += 1
             else:
                  print(f"No price/desc changes detected for product '{prod_data.name}'. Skipping update.")
 
         else:
-            # Create new product - Map only fields available in PDFProduct
+            # Create new product - Map fields available in PDFProduct
             db_product = models.Product(
                 weekly_ad_id=weekly_ad_id,
                 name=prod_data.name,
                 price=prod_data.price,
-                description=prod_data.description
-                # Other fields like unit, category will be null/default
+                description=prod_data.description,
+                unit=prod_data.unit,
+                category=prod_data.category,
+                promotion_details=prod_data.promotion_details,
+                original_price=prod_data.original_price if hasattr(prod_data, 'original_price') else None,
+                promotion_from=prod_data.promotion_from if hasattr(prod_data, 'promotion_from') else None,
+                promotion_to=prod_data.promotion_to if hasattr(prod_data, 'promotion_to') else None
             )
             db.add(db_product)
             created_count += 1

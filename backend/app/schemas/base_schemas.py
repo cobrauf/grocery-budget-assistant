@@ -9,10 +9,13 @@ class ProductBaseSchema(BaseModel):
     unit: Optional[str] = None
     category: Optional[str] = None
     promotion_details: Optional[str] = None
+    original_price: Optional[float] = None
+    promotion_from: Optional[date] = None
+    promotion_to: Optional[date] = None
 
 class WeeklyAdBaseSchema(BaseModel):
     valid_from: date
     valid_to: date
-    publication_date: Optional[date] = None
+    date_processed: Optional[date] = None
     filename: Optional[str] = None
-    source_url: Optional[str] = None 
+    # source_url: Optional[str] = None # Removed 

@@ -15,11 +15,10 @@ CREATE TABLE IF NOT EXISTS retailers (
 CREATE TABLE IF NOT EXISTS weekly_ads (
     id BIGSERIAL PRIMARY KEY,
     retailer_id BIGINT NOT NULL REFERENCES retailers(id) ON DELETE CASCADE,
-    publication_date DATE, 
+    date_processed DATE,
     valid_from DATE NOT NULL,
     valid_to DATE NOT NULL,
     filename VARCHAR(255),
-    source_url VARCHAR(1024), -- Increased length for potentially long URLs
     processed_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
     created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT weekly_ads_valid_dates CHECK (valid_from <= valid_to)
@@ -35,10 +34,13 @@ CREATE TABLE IF NOT EXISTS products (
     weekly_ad_id BIGINT NOT NULL REFERENCES weekly_ads(id) ON DELETE CASCADE,
     name VARCHAR(255) NOT NULL,
     price NUMERIC(10, 2), -- Price per unit
+    original_price NUMERIC(10, 2),
     unit VARCHAR(50), -- e.g., "lb", "each", "pack", "oz", "kg", "g"
     description TEXT,
     category VARCHAR(100), -- e.g., "Produce", "Dairy", "Meat", "Pantry", "Frozen"
     promotion_details TEXT, -- e.g., "Buy One Get One Free", "2 for $5", "Save $1.00"
+    promotion_from DATE,
+    promotion_to DATE,
     original_text_snippet TEXT, -- Useful for debugging/verification
     image_url VARCHAR(1024), -- Optional: URL to an image of the product
     created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP

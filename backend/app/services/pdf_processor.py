@@ -102,15 +102,15 @@ class GroceryAdProcessor:
             categories_str = ", ".join([f'"{cat}"' for cat in PRODUCT_CATEGORIES])
             retailers_str = ", ".join([f'"{ret}"' for ret in KNOWN_RETAILERS]) if KNOWN_RETAILERS else "any specified retailer"
             units_str = ", ".join([f'"{unit}"' for unit in PRODUCT_UNITS]) # Added units_str
-            
-            print(f"=========== Generated Prompt:\n{prompt}")
-            
+
             prompt = GENERAL_PROMPT_TEMPLATE.format(
                 file_display_name=pdf_path.name,
                 categories_list_str=categories_str,
                 retailers_list_str=retailers_str,
                 units_list_str=units_str # Added units_list_str
             )
+
+            print(f"=========== Generated Prompt:\n{prompt}")
 
             print(f"Sending request to Gemini model '{GEMINI_MODEL}'...")
             response = await self.model.generate_content_async(
