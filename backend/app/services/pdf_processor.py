@@ -7,6 +7,8 @@ import asyncio
 import aiofiles # For async file operations
 from pathlib import Path
 from sqlalchemy.orm import Session # Added import
+from datetime import date 
+
 
 from ..schemas.pdf_schema import ExtractedPDFData
 # Use the get_db_session context manager/dependency
@@ -70,6 +72,11 @@ class GroceryAdProcessor:
 
         output_json_path = EXTRACTIONS_DIR / f"{pdf_path.stem}.json"
         print(f"Starting processing for: {pdf_path.name}")
+        
+        # Check if the output JSON file already exists
+        if output_json_path.exists():
+            print(f"Warning: Output JSON file {output_json_path} already exists. Skipping processing for {pdf_path.name}.")
+            return None
 
         uploaded_file = None # To keep track for potential deletion
         try:
@@ -84,12 +91,14 @@ class GroceryAdProcessor:
             categories_str = ", ".join([f'"{cat}"' for cat in PRODUCT_CATEGORIES])
             retailers_str = ", ".join([f'"{ret}"' for ret in KNOWN_RETAILERS]) if KNOWN_RETAILERS else "any specified retailer"
             units_str = ", ".join([f'"{unit}"' for unit in PRODUCT_UNITS])
+            current_processing_date = date.today().strftime("%Y-%m-%d")
 
             prompt = GENERAL_PROMPT_TEMPLATE.format(
                 file_display_name=pdf_path.name,
                 categories_list_str=categories_str,
                 retailers_list_str=retailers_str,
-                units_list_str=units_str
+                units_list_str=units_str,
+                current_date_for_processing=current_processing_date
             )
 
             print(f"=========== Generated Prompt:\n{prompt}")

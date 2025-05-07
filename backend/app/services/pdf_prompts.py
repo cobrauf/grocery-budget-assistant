@@ -2,7 +2,7 @@ GENERAL_PROMPT_TEMPLATE = """
 Extract grocery ad data from the provided PDF file ({file_display_name}).
 Identify the retailer name. Consider the following known retailers: {retailers_list_str}. If the retailer is not in this list, use the name found in the PDF.
 For the weekly ad, extract the valid_from date, valid_to date (YYYY-MM-DD format),
-and the date_processed (YYYY-MM-DD format) which would be today's date, and the original PDF filename.
+and the date_processed={current_date_for_processing}, and the original PDF filename.
 For each product, extract its name (keep it less than 20 characters), price (as a float/number),
 its unit (choose from the provided list: {units_list_str}),
 its category (choose from the provided list: {categories_list_str}),
@@ -12,6 +12,7 @@ Optionally, also extract original_price (often not present), promotion_from and 
 Don't output text within the (), that is meant as hints for you. Your output should not have any parentheses.
 Becareful of prices that are non-standard, like 2/$4, which means 2 items for $4,
 in that case, calculate the price per item, and put the 2/$4 in the promotion_details field.
+Ignore Spanish text. Don't output Spanish text unless it's a product name.
 
 Respond ONLY with a valid JSON object matching the following structure:
 {{
@@ -94,8 +95,6 @@ PRODUCT_UNITS = [
     "Other (if can't find a suitable unit)"
 ]
 
-# This can be updated with a list of known retailer names.
-# For now, it's an empty list, meaning the LLM will try to determine it from the PDF.
 KNOWN_RETAILERS = [
     "Tokyo Central",
     "Albertsons",
