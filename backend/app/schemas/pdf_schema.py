@@ -1,21 +1,15 @@
 from pydantic import BaseModel, conlist
 from typing import Optional
 from datetime import date
+from .base_schemas import ProductBaseSchema, WeeklyAdBaseSchema
 
-class PDFProduct(BaseModel):
-    name: str
-    price: float
-    description: Optional[str] = None
-    unit: Optional[str] = None
-    category: Optional[str] = None
-    promotion_details: Optional[str] = None
+class PDFProduct(ProductBaseSchema):
+    # Fields are inherited, no need to redefine unless overriding
+    pass
 
-class PDFWeeklyAd(BaseModel):
-    valid_from: date
-    valid_to: date
-    publication_date: Optional[date] = None
-    filename: Optional[str] = None
-    source_url: Optional[str] = None
+class PDFWeeklyAd(WeeklyAdBaseSchema):
+    # Fields are inherited
+    pass
 
 class ExtractedPDFData(BaseModel):
     retailer: str

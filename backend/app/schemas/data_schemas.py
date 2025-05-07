@@ -1,5 +1,6 @@
 from pydantic import BaseModel
 from datetime import date
+from .base_schemas import ProductBaseSchema, WeeklyAdBaseSchema # Added import
 
 '''
 Pydantic models define the structure and types for your API's incoming (request) and outgoing (response) data using BaseModel.
@@ -10,13 +11,9 @@ Base models focus on core data attributes, while Create/Read models add details 
 '''
 
 # --- Product Schemas ---
-class ProductBase(BaseModel): # base model for Product
-    name: str
-    price: float
-    unit: str | None = None
-    description: str | None = None
-    category: str | None = None
-    promotion_details: str | None = None
+class ProductBase(ProductBaseSchema): # Inherits from ProductBaseSchema
+    # Fields are inherited
+    pass
 
 class ProductCreate(ProductBase): # create model for Product
     weekly_ad_id: int # <<<< Foreign key
@@ -29,12 +26,9 @@ class Product(ProductBase): # read model for Product
         from_attributes = True # For SQLAlchemy model compatibility
 
 # --- WeeklyAd Schemas ---
-class WeeklyAdBase(BaseModel):
-    publication_date: date | None = None
-    valid_from: date | None = None
-    valid_to: date | None = None
-    filename: str | None = None
-    source_url: str | None = None
+class WeeklyAdBase(WeeklyAdBaseSchema): # Inherits from WeeklyAdBaseSchema
+    # Fields are inherited
+    pass
 
 class WeeklyAdCreate(WeeklyAdBase):
     retailer_id: int # Foreign key

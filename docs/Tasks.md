@@ -1,11 +1,11 @@
-Number of times this file has been updated: 3
+Number of times this file has been updated: 4
 
 ## In Progress Tasks
 
-- [ ] Schemas: Review Pydantic schemas (`pdf_schema.py` and `data_schemas.py`) for consistency and potential refactoring to improve data flow from PDF extraction to database.
+- [ ] Schemas: Review Pydantic schemas (`pdf_schema.py` and `data_schemas.py`) to improve data flow from PDF extraction to database.
   - [x] Update `pdf_schema.py` to include all desired fields for extraction (e.g., unit, category for products).
   - [x] Modify PDF extraction logic in `pdf_processor.py` to populate the new fields in `pdf_schema.py`.
-  - [ ] Explore using inheritance (e.g., `PDFProduct` from `ProductBase`) to link schemas once field alignment is achieved.
+  - [x] Explore using inheritance (e.g., `PDFProduct` from `ProductBase`) to link schemas once field alignment is achieved.
 
 ## Completed Tasks
 
