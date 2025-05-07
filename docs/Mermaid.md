@@ -9,14 +9,20 @@ A --> D[docs]
 
     B --> E[app]
     B --> F[sql]
+    B --> PDFDIR[pdf/]
 
     E --> G[main.py]
     E --> H[models.py]
     E --> I[crud.py]
     E --> J[database.py]
-    E --> K[uploads/]
+    E --> UTILS[utils/]
 
     F --> L[schema.sql]
+
+    PDFDIR --> K[uploads/]
+    PDFDIR --> EXT[extractions/]
+    PDFDIR --> TMP[temp_pdfs/]
+    PDFDIR --> ARC[archived/]
 
     C --> M[src]
     C --> N[public]
@@ -33,10 +39,12 @@ A --> D[docs]
 ```mermaid
 graph TD
     B(backend) --> APP(app)
+    B --> PDFROOT(pdf/)
 
     APP --> ROUTERS(routers/)
     APP --> SERVICES(services/)
     APP --> SCHEMAS(schemas/)
+    APP --> UTILS_APP(utils/)
     APP --> MODELS(models.py)
     APP --> CRUD(crud.py)
     APP --> DBSETUP(database.py)
@@ -46,9 +54,16 @@ graph TD
     ROUTERS --> PPDF(pdf.py)
 
     SERVICES --> PDFPROC(pdf_processor.py)
+    SERVICES --> PDFPROMPTS(pdf_prompts.py)
 
+    SCHEMAS --> SBASE(base_schemas.py)
     SCHEMAS --> SDATA(data_schemas.py)
     SCHEMAS --> SPDF(pdf_schema.py)
+
+    PDFROOT --> PDFUPLOADS(uploads/)
+    PDFROOT --> PDFEXTRACTIONS(extractions/)
+    PDFROOT --> PDFTEMP(temp_pdfs/)
+    PDFROOT --> PDFARCHIVED(archived/)
 ```
 
 ## Database Schema

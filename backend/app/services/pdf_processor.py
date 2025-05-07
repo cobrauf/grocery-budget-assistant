@@ -12,7 +12,7 @@ from ..schemas.pdf_schema import ExtractedPDFData
 # Use the get_db_session context manager/dependency
 from ..database import SessionLocal # Assuming SessionLocal is the factory
 from ..utils.utils import find_project_root
-from .pdf_prompts import GENERAL_PROMPT_TEMPLATE, PRODUCT_CATEGORIES, KNOWN_RETAILERS, PRODUCT_UNITS # Added PRODUCT_UNITS
+from .pdf_prompts import GENERAL_PROMPT_TEMPLATE, PRODUCT_CATEGORIES, KNOWN_RETAILERS, PRODUCT_UNITS # 
 
 '''
 Configures and initializes the Google Gemini API service for handling PDF file processing tasks.
@@ -22,12 +22,9 @@ Strictly validates the extracted JSON data received from the Gemini API using Py
 Persists the successfully validated, structured data by saving it into local JSON files.
 '''
 
-# Placeholder for actual Gemini API Key loading
-# Consider using environment variables and a config file/service
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
-GEMINI_MODEL = os.getenv("GEMINI_MODEL") # Ensure this model supports File API and JSON output
+GEMINI_MODEL = os.getenv("GEMINI_MODEL") 
 
-# Define paths relative to project root using utils.find_project_root()
 PROJECT_ROOT = find_project_root()
 UPLOADS_DIR = PROJECT_ROOT / "backend" / "pdf" / "uploads"
 EXTRACTIONS_DIR = PROJECT_ROOT / "backend" / "pdf" / "extractions"
@@ -67,47 +64,32 @@ class GroceryAdProcessor:
         Returns:
             The path to the created JSON file if successful, otherwise None.
         """
-        if not self.model:
+        if not self.model: # failsafe in case the class has been instantiated but the model is not configured
             print("Processor not initialized correctly. Skipping processing.")
             return None
 
         output_json_path = EXTRACTIONS_DIR / f"{pdf_path.stem}.json"
         print(f"Starting processing for: {pdf_path.name}")
-        print(f"Target output file: {output_json_path}")
 
         uploaded_file = None # To keep track for potential deletion
         try:
             # 1. Upload PDF using Files API
             print(f"Uploading {pdf_path.name} to Gemini Files API...")
-            # Use display_name for easier identification in list() if needed
             uploaded_file = await asyncio.to_thread(
                 genai.upload_file, path=pdf_path, display_name=pdf_path.name
             )
             print(f"File uploaded successfully: {uploaded_file.name} ({uploaded_file.uri})")
 
-            # --- Check file state (optional but recommended) ---
-            # Wait briefly for processing if needed, check documentation
-            # file_info = genai.get_file(name=uploaded_file.name)
-            # while file_info.state.name == "PROCESSING":
-            #     await asyncio.sleep(5) # Check every 5 seconds
-            #     file_info = genai.get_file(name=uploaded_file.name)
-            # if file_info.state.name != "ACTIVE":
-            #     raise Exception(f"Uploaded file {uploaded_file.name} failed processing. State: {file_info.state.name}")
-            # print(f"Uploaded file '{uploaded_file.name}' is ACTIVE.")
-            # --- End optional check ---
-
-
             # 2. Generate content using the uploaded file
-            # Format the categories and retailers lists for inclusion in the prompt
             categories_str = ", ".join([f'"{cat}"' for cat in PRODUCT_CATEGORIES])
             retailers_str = ", ".join([f'"{ret}"' for ret in KNOWN_RETAILERS]) if KNOWN_RETAILERS else "any specified retailer"
-            units_str = ", ".join([f'"{unit}"' for unit in PRODUCT_UNITS]) # Added units_str
+            units_str = ", ".join([f'"{unit}"' for unit in PRODUCT_UNITS])
 
             prompt = GENERAL_PROMPT_TEMPLATE.format(
                 file_display_name=pdf_path.name,
                 categories_list_str=categories_str,
                 retailers_list_str=retailers_str,
-                units_list_str=units_str # Added units_list_str
+                units_list_str=units_str
             )
 
             print(f"=========== Generated Prompt:\n{prompt}")
@@ -119,21 +101,23 @@ class GroceryAdProcessor:
                 # Check documentation for explicit JSON mode if available for the model
                 # generation_config=genai.types.GenerationConfig(
                 #     response_mime_type="application/json"
-                # )
+                # ) //TODO
+                # timeout defaults to google's side
             )
 
             # Log token usage
             if hasattr(response, 'usage_metadata') and response.usage_metadata:
-                print(f"Token usage for {pdf_path.name}: Prompt tokens: {response.usage_metadata.prompt_token_count}, Candidates tokens: {response.usage_metadata.candidates_token_count}, Total tokens: {response.usage_metadata.total_token_count}")
+                print(f"""Token usage for {pdf_path.name}: 
+                      Prompt tokens: {response.usage_metadata.prompt_token_count}, 
+                      Candidates tokens: {response.usage_metadata.candidates_token_count}, 
+                      Total tokens: {response.usage_metadata.total_token_count}""")
             else:
                 print(f"Token usage data not available for {pdf_path.name}.")
 
             # Check for blocked prompts or safety issues
             if not response.candidates:
-                 # Check prompt_feedback for block reason
                  block_reason = response.prompt_feedback.block_reason if response.prompt_feedback else "Unknown"
                  print(f"Request blocked or failed. Reason: {block_reason}. PDF: {pdf_path.name}")
-                 # Potentially log response.prompt_feedback details
                  return None
 
             # Clean the response text: Gemini might still add markdown ```json ... ```
@@ -144,7 +128,6 @@ class GroceryAdProcessor:
             raw_results = response.candidates[0].content.parts[0].text
             cleaned_results = raw_results.strip().removeprefix('```json').removesuffix('```').strip()
             print(f"Received response from Gemini for {pdf_path.name}.")
-            # print(f"Cleaned response: {cleaned_results[:200]}...") # Log snippet
 
         except google_exceptions.GoogleAPIError as e:
             print(f"Gemini API Error processing {pdf_path.name}: {e}")
@@ -152,28 +135,15 @@ class GroceryAdProcessor:
         except Exception as e:
             print(f"Unexpected error during Gemini interaction for {pdf_path.name}: {e}")
             return None
-        # --- Files API Cleanup (Optional) ---
-        # Uncomment if you want explicit deletion, otherwise rely on 48h auto-delete
-        # finally:
-        #     if uploaded_file:
-        #         try:
-        #             print(f"Deleting uploaded file: {uploaded_file.name}")
-        #             await asyncio.to_thread(genai.delete_file, name=uploaded_file.name)
-        #             print(f"Successfully deleted {uploaded_file.name}")
-        #         except Exception as e:
-        #             print(f"Error deleting uploaded file {uploaded_file.name}: {e}")
-        # --- End Cleanup ---
-
 
         # 3. Parse, Validate, and Save JSON
         try:
-            print(f"Validating response for {pdf_path.name}...")
+            # print(f"Validating response for {pdf_path.name}...")
             validated_data = ExtractedPDFData.model_validate_json(cleaned_results)
             print(f"Validation successful for {pdf_path.name}.")
 
-            print(f"Saving extracted data to {output_json_path}...")
+            # print(f"Saving extracted data to {output_json_path}...")
             async with aiofiles.open(output_json_path, mode='w', encoding='utf-8') as f:
-                # Use model_dump_json for proper Pydantic serialization
                 await f.write(validated_data.model_dump_json(indent=2))
             print(f"Successfully saved JSON for {pdf_path.name}.")
             return str(output_json_path)
