@@ -4,7 +4,7 @@ Identify the retailer name. Consider the following known retailers: {retailers_l
 For the weekly ad, extract the valid_from date, valid_to date (YYYY-MM-DD format),
 and optionally the publication_date (YYYY-MM-DD format), the original PDF filename, and a source_url if available.
 For each product, extract its name, price (as a float/number),
-its unit (e.g., "per LB", "Each", "18 oz Package"),
+its unit (choose from the provided list: {units_list_str}),
 its category (choose from the provided list: {categories_list_str}),
 any descriptive text (like brand, specific offer details, size, or quantity not covered by unit),
 and any promotion_details (e.g., "With Digital Coupon", "Must Buy 4 Final Price").
@@ -53,12 +53,46 @@ PRODUCT_CATEGORIES = [
     "Personal Care (Toiletries, Medicine)",
     "Pet Products",
     "Candy",
-    "Other" # Added an 'Other' category as a fallback
+    "Other (if can't find a suitable category)" 
+]
+
+PRODUCT_UNITS = [
+    "Each (Bottle, can, jar, etc)",
+    "Pack",
+    "Count",
+    "Dozen",
+    "Case",
+    "Pound",          # Pound
+    "Ounce",          # Ounce
+    "Kg",          # Kilogram
+    "Gram",
+    "Ml",          # Milliliter
+    "Gallon",
+    "Quart",
+    "Liter",
+    "Pint",
+    "Other (if can't find a suitable unit)"
 ]
 
 # This can be updated with a list of known retailer names.
 # For now, it's an empty list, meaning the LLM will try to determine it from the PDF.
 KNOWN_RETAILERS = [
-    # "Example Retailer 1",
-    # "Example Retailer 2"
-] 
+    "Tokyo Central",
+    "Albertsons",
+    "Food4Less",
+    "Vons",
+    "Ralphs",
+    "Trader Joe's",
+    "Aldi",
+    "Sprouts",
+    "Jons",
+    "Costco",
+    "Sam's Club",
+    "99 Ranch",
+    "Mitsuwa",
+    "Superior",
+    "H-mart",
+    "Hannam Chain",
+    "Northgate",
+    "Vallarta"
+]
