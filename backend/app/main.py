@@ -43,7 +43,6 @@ app.add_middleware(
 # Define paths relative to project root using utils.find_project_root()
 PROJECT_ROOT = find_project_root()
 UPLOAD_DIR = PROJECT_ROOT / "backend" / "pdf" / "uploads"
-TEMP_PDF_DIR = PROJECT_ROOT / "backend" / "pdf" / "temp_pdfs"
 
 @app.get("/")
 def read_root():
