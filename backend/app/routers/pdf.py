@@ -90,8 +90,8 @@ async def check_processing_status():
         return {
             "total_pdfs_found": total_pdfs,
             "json_outputs_found": len(json_stems),
-            "successfully_processed_approx": processed_count,
-            "pending_or_failed_approx": pending_count,
+            "successfully_processed": processed_count,
+            "pending_or_not_processed": pending_count,
             "upload_directory": str(UPLOADS_DIR),
             "output_directory": str(EXTRACTIONS_DIR),
         }
