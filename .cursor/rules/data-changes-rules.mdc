@@ -10,4 +10,5 @@ files in ./backend/app + all subfolders
 [models.py](mdc:backend/app/models.py)
 [main.py](mdc:backend/app/main.py)
 [database.py](mdc:backend/app/database.py)
+[schema.sql](mdc:backend/sql/schema.sql)
 

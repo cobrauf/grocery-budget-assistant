@@ -19,7 +19,7 @@ CREATE TABLE IF NOT EXISTS weekly_ads (
     valid_from DATE NOT NULL,
     valid_to DATE NOT NULL,
     filename VARCHAR(255),
-    processed_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+    ad_period VARCHAR(50) NOT NULL,
     created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT weekly_ads_valid_dates CHECK (valid_from <= valid_to)
 );
@@ -32,6 +32,7 @@ CREATE INDEX IF NOT EXISTS idx_weekly_ads_valid_to ON weekly_ads(valid_to);
 CREATE TABLE IF NOT EXISTS products (
     id BIGSERIAL PRIMARY KEY,
     weekly_ad_id BIGINT NOT NULL REFERENCES weekly_ads(id) ON DELETE CASCADE,
+    retailer_id BIGINT NOT NULL REFERENCES retailers(id) ON DELETE CASCADE,
     name VARCHAR(255) NOT NULL,
     price NUMERIC(10, 2), -- Price per unit
     original_price NUMERIC(10, 2),
@@ -41,8 +42,6 @@ CREATE TABLE IF NOT EXISTS products (
     promotion_details TEXT, -- e.g., "Buy One Get One Free", "2 for $5", "Save $1.00"
     promotion_from DATE,
     promotion_to DATE,
-    original_text_snippet TEXT, -- Useful for debugging/verification
-    image_url VARCHAR(1024), -- Optional: URL to an image of the product
     created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
     -- vector_embedding VECTOR(1536) -- Example placeholder for future pgvector integration (dimension depends on model)
 );
