@@ -34,7 +34,6 @@ class WeeklyAd(Base):
     valid_from = Column(Date, nullable=False)
     valid_to = Column(Date, nullable=False)
     filename = Column(String(255))
-    processed_at = Column(TIMESTAMP(timezone=True), server_default=func.now())
     created_at = Column(TIMESTAMP(timezone=True), server_default=func.now())
     ad_period = Column(String(50), nullable=False)
 
@@ -61,8 +60,6 @@ class Product(Base):
     promotion_details = Column(Text)
     promotion_from = Column(Date, nullable=True)
     promotion_to = Column(Date, nullable=True)
-    original_text_snippet = Column(Text)
-    image_url = Column(String(1024))
     created_at = Column(TIMESTAMP(timezone=True), server_default=func.now())
     fts_vector = Column(TSVECTOR) # For full-text search
     retailer_id = Column(BigInteger, ForeignKey("retailers.id", ondelete="CASCADE"), nullable=False)
