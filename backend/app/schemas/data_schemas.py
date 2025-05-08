@@ -12,8 +12,7 @@ Base models focus on core data attributes, while Create/Read models add details 
 
 # --- Product Schemas ---
 class ProductBase(ProductBaseSchema): # Inherits from ProductBaseSchema
-    # Fields are inherited
-    pass
+    retailer_id: int # Added retailer_id
 
 class ProductCreate(ProductBase): # create model for Product
     weekly_ad_id: int # <<<< Foreign key
@@ -27,8 +26,7 @@ class Product(ProductBase): # read model for Product
 
 # --- WeeklyAd Schemas ---
 class WeeklyAdBase(WeeklyAdBaseSchema): # Inherits from WeeklyAdBaseSchema
-    # Fields are inherited
-    pass
+    ad_period: str # Added ad_period
 
 class WeeklyAdCreate(WeeklyAdBase):
     retailer_id: int # Foreign key

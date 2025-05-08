@@ -36,6 +36,7 @@ class WeeklyAd(Base):
     filename = Column(String(255))
     processed_at = Column(TIMESTAMP(timezone=True), server_default=func.now())
     created_at = Column(TIMESTAMP(timezone=True), server_default=func.now())
+    ad_period = Column(String(50), nullable=False)
 
     retailer = relationship("Retailer", back_populates="weekly_ads")
     products = relationship("Product", back_populates="weekly_ad")
@@ -64,6 +65,8 @@ class Product(Base):
     image_url = Column(String(1024))
     created_at = Column(TIMESTAMP(timezone=True), server_default=func.now())
     fts_vector = Column(TSVECTOR) # For full-text search
+    retailer_id = Column(BigInteger, ForeignKey("retailers.id", ondelete="CASCADE"), nullable=False)
+    retailer = relationship("Retailer")
 
     weekly_ad = relationship("WeeklyAd", back_populates="products")
 

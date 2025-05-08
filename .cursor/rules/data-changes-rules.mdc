@@ -1,0 +1,13 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+When request to change data/schema related code, always include these files for context:
+
+[ProjectFiles.md](mdc:docs/ProjectFiles.md)
+files in ./backend/app + all subfolders
+[models.py](mdc:backend/app/models.py)
+[main.py](mdc:backend/app/main.py)
+[database.py](mdc:backend/app/database.py)
+
