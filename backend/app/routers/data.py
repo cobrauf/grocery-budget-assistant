@@ -1,12 +1,13 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from typing import List
-from sqlalchemy.exc import IntegrityError
+# from sqlalchemy.exc import IntegrityError
 
 # Import necessary components from parent directories or app modules
 from .. import models
 from ..schemas import data_schemas  # Changed to import from new location
 from ..database import SessionLocal
+from ..services import json_to_db_service
 
 '''
 Defines API endpoints for retrieving data (Retailers, Weekly Ads, Products),
@@ -39,6 +40,11 @@ def list_retailers(db: Session = Depends(get_db)):
 def list_weekly_ads(db: Session = Depends(get_db)):
     print("Listing weekly ads")
     return db.query(models.WeeklyAd).all()
+
+@router.post("/json_to_db/")
+def list_upload_jsons(db: Session = Depends(get_db)):
+    print("uploading JSONs to DB")
+    return json_to_db_service.process_json_extractions()
 
 
 

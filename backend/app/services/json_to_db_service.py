@@ -78,16 +78,13 @@ def process_single_json_file(db: Session, file_path: Path):
         ad_period='current'  # New ads are always current
     )
     db.add(new_weekly_ad)
-    db.commit()
-    db.refresh(new_weekly_ad)
-    logger.info(f"Created new weekly ad ID: {new_weekly_ad.id} for retailer {retailer_name}")
 
     # 5. Create new Products
-    products_created_count = 0
+    products_to_add = []
     for pdf_product in parsed_data.products:
         new_product = models.Product(
-            weekly_ad_id=new_weekly_ad.id,
-            retailer_id=db_retailer.id, # Link product directly to retailer
+            weekly_ad=new_weekly_ad,
+            retailer_id=db_retailer.id,
             name=pdf_product.name,
             price=pdf_product.price,
             original_price=pdf_product.original_price,
@@ -97,13 +94,20 @@ def process_single_json_file(db: Session, file_path: Path):
             promotion_details=pdf_product.promotion_details,
             promotion_from=pdf_product.promotion_from,
             promotion_to=pdf_product.promotion_to
-            # original_text_snippet and image_url are not in PDFProduct currently based on schema
         )
-        db.add(new_product)
-        products_created_count += 1
+        products_to_add.append(new_product)
     
-    db.commit()
-    logger.info(f"Added {products_created_count} products for weekly ad ID: {new_weekly_ad.id}")
+    db.add_all(products_to_add)
+
+    try:
+        db.commit()
+        db.refresh(new_weekly_ad)
+        logger.info(f"Successfully committed Weekly Ad ID: {new_weekly_ad.id} and {len(products_to_add)} products for retailer {retailer_name} from file {file_path.name}")
+    except Exception as e:
+        db.rollback()
+        logger.error(f"Error committing weekly ad and products for {file_path.name}: {e}. Rolled back transaction.")
+        raise
+    
     logger.info(f"Successfully processed {file_path.name}")
 
 def process_json_extractions():
