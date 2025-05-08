@@ -32,12 +32,12 @@ router = APIRouter(
     tags=["Data Management"]  # Tag for Swagger UI documentation
 )
 
-@router.get("/retailers/", response_model=List[data_schemas.Retailer])
+@router.get("/retailers/")
 def list_retailers(db: Session = Depends(get_db)):
     print("Listing retailers")
     return db.query(models.Retailer).all()
 
-@router.get("/weekly_ads/", response_model=List[data_schemas.WeeklyAd])
+@router.get("/weekly_ads/")
 def list_weekly_ads(db: Session = Depends(get_db)):
     print("Listing weekly ads")
     return db.query(models.WeeklyAd).all()
