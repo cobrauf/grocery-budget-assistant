@@ -27,6 +27,7 @@ Respond ONLY with a valid JSON object matching the following structure:
     {{
       "name": "string",
       "price": float,
+      "retailer": "string",
       "description": "string | null",
       "unit": "string | null",
       "category": "string | null",
@@ -42,6 +43,7 @@ Here's an example of a product output:
 {{
   "name": "Organic Apple",
   "price": 3.99,
+  "retailer": "Aldi",
   "description": "Organic, Gala, locally grown",
   "unit": "Pound",
   "category": "Fruits", 

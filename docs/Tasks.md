@@ -1,8 +1,10 @@
-Number of times this file has been updated: 4
+Number of times this file has been updated: 6
 
 ## In Progress Tasks
 
-- [ ] Database: Implement process to upload extracted JSON data to PostgreSQL.
+- [x] Database: Implement process to upload extracted JSON data to PostgreSQL.
+      (Subtask) - [x] Define feature requirements and plan in `docs/feature-docs/Feature-json-to-DB.md`.
+      (Subtask) - [x] Create `backend/app/services/json_to_db_service.py` with core logic for: - DB connection - Iterating JSON files in `backend/pdf/extractions/` - Duplicate filename check in `weekly_ads` table - Finding retailer from JSON - Updating `ad_period` for existing ads (previous->archived, current->previous) - Inserting new `WeeklyAd` with `ad_period='current'` - Inserting new `Products` linked to the ad and retailer
 
 ## Completed Tasks
 
