@@ -83,15 +83,29 @@ def search_products(
         
         results_with_details = []
         for product in search_query:
-            results_with_details.append(
-                data_schemas.ProductWithDetails(
-                    **product.__dict__, # Start with product fields
-                    retailer_name=product.retailer.name, # Add retailer name
-                    weekly_ad_valid_from=product.weekly_ad.valid_from,
-                    weekly_ad_valid_to=product.weekly_ad.valid_to,
-                    weekly_ad_ad_period=product.weekly_ad.ad_period
-                )
-            )
+            # Explicitly map fields to avoid conflicts and ensure correct types
+            product_data = {
+                "id": product.id,
+                "weekly_ad_id": product.weekly_ad_id,
+                "name": product.name,
+                "price": product.price,
+                "original_price": product.original_price,
+                "unit": product.unit,
+                "description": product.description,
+                "category": product.category,
+                "promotion_details": product.promotion_details,
+                "promotion_from": product.promotion_from,
+                "promotion_to": product.promotion_to,
+                # Fields for ProductBase & ProductBaseSchema
+                "retailer": product.retailer.name, # This is for ProductBaseSchema.retailer: str
+                "retailer_id": product.retailer_id,
+                # Fields specific to ProductWithDetails
+                "retailer_name": product.retailer.name, # This is for ProductWithDetails.retailer_name: str
+                "weekly_ad_valid_from": product.weekly_ad.valid_from,
+                "weekly_ad_valid_to": product.weekly_ad.valid_to,
+                "weekly_ad_ad_period": product.weekly_ad.ad_period
+            }
+            results_with_details.append(data_schemas.ProductWithDetails(**product_data))
         return results_with_details
         
     except Exception as e:

@@ -30,10 +30,6 @@ class ProductWithDetails(Product): # New schema for search results
     weekly_ad_valid_to: date
     weekly_ad_ad_period: str
 
-    # The Config class with from_attributes = True is inherited from Product
-    # but it's good practice to declare it if you add any other Config options here.
-    # For now, inheriting is sufficient.
-
 # --- WeeklyAd Schemas ---
 class WeeklyAdBase(WeeklyAdBaseSchema): # Inherits from WeeklyAdBaseSchema
     ad_period: str # Added ad_period
