@@ -24,6 +24,16 @@ class Product(ProductBase): # read model for Product
     class Config:
         from_attributes = True # For SQLAlchemy model compatibility
 
+class ProductWithDetails(Product): # New schema for search results
+    retailer_name: str
+    weekly_ad_valid_from: date
+    weekly_ad_valid_to: date
+    weekly_ad_ad_period: str
+
+    # The Config class with from_attributes = True is inherited from Product
+    # but it's good practice to declare it if you add any other Config options here.
+    # For now, inheriting is sufficient.
+
 # --- WeeklyAd Schemas ---
 class WeeklyAdBase(WeeklyAdBaseSchema): # Inherits from WeeklyAdBaseSchema
     ad_period: str # Added ad_period
