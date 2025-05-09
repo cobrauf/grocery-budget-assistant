@@ -4,11 +4,11 @@
   box-sizing: border-box;
 }
 
+/* Import statement will be added by vite */
 body,
 html {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
-    "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
-    sans-serif;
+  /* Font family is controlled by fonts.ts */
+  font-family: var(--current-font-family);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   height: 100%;

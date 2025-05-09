@@ -1,11 +1,15 @@
 import React, { useState, useEffect } from "react";
-import ThemeSelector from "./ThemeSelector"; // Import ThemeSelector
+import ThemeSelector from "./ThemeSelector";
+import FontSelector from "./FontSelector";
+import { availableFonts } from "../../styles/fonts";
 
 interface SideBarProps {
   isOpen: boolean;
   onClose: () => void;
-  currentThemeName: string; // Added for ThemeSelector
-  onSelectTheme: (themeName: string) => void; // Added for ThemeSelector
+  currentThemeName: string;
+  onSelectTheme: (themeName: string) => void;
+  currentFont: (typeof availableFonts)[0];
+  onSelectFont: (font: (typeof availableFonts)[0]) => void;
 }
 
 const SideBar: React.FC<SideBarProps> = ({
@@ -13,13 +17,17 @@ const SideBar: React.FC<SideBarProps> = ({
   onClose,
   currentThemeName,
   onSelectTheme,
+  currentFont,
+  onSelectFont,
 }) => {
   const [isThemesExpanded, setIsThemesExpanded] = useState(false);
+  const [isFontsExpanded, setIsFontsExpanded] = useState(false);
 
   // When sidebar closes, reset themes expansion
   useEffect(() => {
     if (!isOpen) {
       setIsThemesExpanded(false);
+      setIsFontsExpanded(false);
     }
   }, [isOpen]);
 
@@ -110,6 +118,11 @@ const SideBar: React.FC<SideBarProps> = ({
       action: () => setIsThemesExpanded(!isThemesExpanded),
       expandable: true,
     },
+    {
+      name: "Fonts",
+      action: () => setIsFontsExpanded(!isFontsExpanded),
+      expandable: true,
+    },
     { name: "Settings", action: () => console.log("Settings clicked") },
     { name: "User", action: () => console.log("User clicked") },
   ];
@@ -149,13 +162,38 @@ const SideBar: React.FC<SideBarProps> = ({
               onClick={item.action}
             >
               {item.name}
-              {item.expandable && <span>{isThemesExpanded ? "▲" : "▼"}</span>}
+              {item.expandable && (
+                <span>
+                  {(item.name === "Themes" && isThemesExpanded) ||
+                  (item.name === "Fonts" && isFontsExpanded)
+                    ? "▲"
+                    : "▼"}
+                </span>
+              )}
             </div>
             {item.name === "Themes" && (
-              <div style={subMenuContainerStyle}>
+              <div
+                style={{
+                  ...subMenuContainerStyle,
+                  maxHeight: isThemesExpanded ? "500px" : "0",
+                }}
+              >
                 <ThemeSelector
                   currentThemeName={currentThemeName}
                   onSelectTheme={onSelectTheme}
+                />
+              </div>
+            )}
+            {item.name === "Fonts" && (
+              <div
+                style={{
+                  ...subMenuContainerStyle,
+                  maxHeight: isFontsExpanded ? "500px" : "0",
+                }}
+              >
+                <FontSelector
+                  currentFont={currentFont}
+                  onSelectFont={onSelectFont}
                 />
               </div>
             )}

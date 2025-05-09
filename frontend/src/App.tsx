@@ -8,6 +8,7 @@ import BottomNav from "./components/BottomNav";
 import SideBar from "./components/sidebar/SideBar";
 import SearchOverlay from "./components/common/SearchOverlay";
 import { themes, Theme, DEFAULT_THEME_NAME } from "./styles/themes"; // Import themes
+import { availableFonts } from "./styles/fonts"; // Import fonts
 
 // Theme Context
 interface ThemeContextType {
@@ -32,6 +33,20 @@ function App() {
   const [currentThemeName, setCurrentThemeName] = useState<string>(() => {
     return localStorage.getItem("appTheme") || DEFAULT_THEME_NAME;
   });
+
+  const [currentFont, setCurrentFont] = useState(() => {
+    const savedFont = localStorage.getItem("appFont");
+    return savedFont ? JSON.parse(savedFont) : availableFonts[0];
+  });
+
+  // Update font in localStorage and CSS when it changes
+  useEffect(() => {
+    localStorage.setItem("appFont", JSON.stringify(currentFont));
+    document.documentElement.style.setProperty(
+      "--current-font-family",
+      currentFont.family
+    );
+  }, [currentFont]);
 
   // Apply theme colors as CSS variables to body
   useEffect(() => {
@@ -113,6 +128,8 @@ function App() {
           onClose={toggleSidebar}
           currentThemeName={currentThemeName}
           onSelectTheme={setCurrentThemeName}
+          currentFont={currentFont}
+          onSelectFont={setCurrentFont}
         />
         {isSidebarOpen && <SearchOverlay onClick={toggleSidebar} />}
       </div>
