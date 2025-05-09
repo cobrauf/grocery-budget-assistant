@@ -6,9 +6,15 @@ import SearchOverlay from "./common/SearchOverlay"; // Corrected import path
 
 interface HeaderProps {
   onMenuClick: () => void; // To be passed from App.tsx
+  onSearch: (query: string) => Promise<void>; // Added
+  isLoadingSearch: boolean; // Added
 }
 
-const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
+const Header: React.FC<HeaderProps> = ({
+  onMenuClick,
+  onSearch,
+  isLoadingSearch,
+}) => {
   const [isSearchFocused, setIsSearchFocused] = useState(false);
 
   const headerStyle: React.CSSProperties = {
@@ -35,6 +41,8 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
         <SearchBar
           isFocused={isSearchFocused}
           setIsFocused={setIsSearchFocused}
+          onSearch={onSearch}
+          isLoading={isLoadingSearch}
         />
         {/* <DeliveryOptions /> */} {/* User commented out */}
       </header>

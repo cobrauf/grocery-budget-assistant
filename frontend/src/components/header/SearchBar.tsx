@@ -12,9 +12,16 @@ const PLACEHOLDER_TEXTS = [
 interface SearchBarProps {
   isFocused: boolean;
   setIsFocused: (isFocused: boolean) => void;
+  onSearch: (query: string) => Promise<void>;
+  isLoading: boolean;
 }
 
-const SearchBar: React.FC<SearchBarProps> = ({ isFocused, setIsFocused }) => {
+const SearchBar: React.FC<SearchBarProps> = ({
+  isFocused,
+  setIsFocused,
+  onSearch,
+  isLoading,
+}) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [searchHistory, setSearchHistory] = useState<string[]>([]);
   const [currentPlaceholder, setCurrentPlaceholder] = useState("");
@@ -102,26 +109,12 @@ const SearchBar: React.FC<SearchBarProps> = ({ isFocused, setIsFocused }) => {
     updateHistory(newHistory);
   };
 
-  const handleSearch = async () => {
+  const handleSearchInternal = async () => {
     const trimmedSearchTerm = searchTerm.trim();
-    if (trimmedSearchTerm === "") return;
-
-    console.log(`Searching for: ${trimmedSearchTerm}`);
-    try {
-      // Replace with your actual backend search endpoint and params
-      const response = await api.get(
-        `/search?query=${encodeURIComponent(trimmedSearchTerm)}`
-      );
-      console.log("Search results:", response.data);
-      // TODO: Display search results (user explicitly said no need for now)
-    } catch (error) {
-      console.error("Error fetching search results:", error);
-      // TODO: Handle search error display to user
-    }
+    if (trimmedSearchTerm === "" || isLoading) return;
 
     saveSearchTerm(trimmedSearchTerm);
-    inputRef.current?.blur(); // Minimize keyboard
-    setIsFocused(false); // This will hide history and overlay
+    await onSearch(trimmedSearchTerm);
   };
 
   const handleClearSearch = () => {
@@ -135,7 +128,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ isFocused, setIsFocused }) => {
     setSearchTerm(term);
     setIsFocused(true); // Keep focus
     inputRef.current?.focus();
-    // Optionally, trigger search immediately: handleSearch();
+    // Optionally, trigger search immediately: handleSearchInternal();
     // but need to handle async nature if setSearchTerm isn't instant for handleSearch
   };
 
@@ -153,7 +146,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ isFocused, setIsFocused }) => {
   const handleKeyPress = (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.key === "Enter") {
       event.preventDefault(); // Prevent form submission if it's in a form
-      handleSearch();
+      handleSearchInternal();
     }
   };
 
@@ -254,14 +247,23 @@ const SearchBar: React.FC<SearchBarProps> = ({ isFocused, setIsFocused }) => {
         {" "}
         {/* Wrapper for input and icons only */}
         <div style={inputContainerStyle}>
-          {searchTerm && (
+          {isLoading ? (
             <span
-              onClick={handleSearch}
-              style={{ ...iconStyle, color: "#0071dc" }}
-              title="Search"
+              style={{ ...iconStyle, cursor: "default" }}
+              title="Searching..."
             >
-              🔍
+              🔄
             </span>
+          ) : (
+            searchTerm && (
+              <span
+                onClick={handleSearchInternal}
+                style={{ ...iconStyle, color: "var(--theme-primary, #0071dc)" }}
+                title="Search"
+              >
+                🔍
+              </span>
+            )
           )}
           <input
             ref={inputRef}
@@ -272,9 +274,9 @@ const SearchBar: React.FC<SearchBarProps> = ({ isFocused, setIsFocused }) => {
             onChange={handleInputChange}
             onKeyPress={handleKeyPress}
             onFocus={handleFocus}
-            // onBlur is implicitly handled by setIsFocused(false) from overlay or search action
+            disabled={isLoading}
           />
-          {searchTerm && (
+          {searchTerm && !isLoading && (
             <span
               onClick={handleClearSearch}
               style={iconStyle}
@@ -285,7 +287,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ isFocused, setIsFocused }) => {
           )}
         </div>
       </div>
-      {isFocused && searchHistory.length > 0 && (
+      {isFocused && searchHistory.length > 0 && !isLoading && (
         <div style={historyStyle}>
           {searchHistory.map((item, index) => (
             <div key={index} style={historyItemStyle}>

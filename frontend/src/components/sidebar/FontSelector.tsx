@@ -40,7 +40,7 @@ const FontSelector: React.FC<FontSelectorProps> = ({
           onClick={() => onSelectFont(font)}
         >
           <div style={{ fontFamily: font.family }}>{font.name}</div>
-          <div style={{ fontSize: "0.8rem", opacity: 0.8 }}>{font.style}</div>
+          {/* <div style={{ fontSize: "0.8rem", opacity: 0.8 }}>{font.style}</div> */}
         </div>
       ))}
     </div>

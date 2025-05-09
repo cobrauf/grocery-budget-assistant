@@ -17,32 +17,32 @@ export const availableFonts = [
     family: "'Palatino Linotype', 'Book Antiqua', Palatino, serif",
     style: "Elegant Serif",
   },
-  {
-    name: "Garamond",
-    family: "Garamond, serif",
-    style: "Traditional Serif",
-  },
-  {
-    name: "Modern Sans",
-    family: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
-    style: "Modern Sans-Serif",
-  },
+  // {
+  //   name: "Garamond",
+  //   family: "Garamond, serif",
+  //   style: "Traditional Serif",
+  // },
+  // {
+  //   name: "Modern Sans",
+  //   family: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+  //   style: "Modern Sans-Serif",
+  // },
   {
     name: "Arial",
     family: "Arial, Helvetica, sans-serif",
     style: "Clean Sans-Serif",
   },
-  {
-    name: "Trebuchet",
-    family:
-      "'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif",
-    style: "Friendly Sans-Serif",
-  },
-  {
-    name: "Impact",
-    family: "Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif",
-    style: "Bold Display",
-  },
+  // {
+  //   name: "Trebuchet",
+  //   family:
+  //     "'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif",
+  //   style: "Friendly Sans-Serif",
+  // },
+  // {
+  //   name: "Impact",
+  //   family: "Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif",
+  //   style: "Bold Display",
+  // },
   {
     name: "Monospace",
     family: "'Courier New', Courier, monospace",

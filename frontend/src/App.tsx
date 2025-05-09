@@ -9,6 +9,7 @@ import SideBar from "./components/sidebar/SideBar";
 import SearchOverlay from "./components/common/SearchOverlay";
 import { themes, Theme, DEFAULT_THEME_NAME } from "./styles/themes"; // Import themes
 import { availableFonts } from "./styles/fonts"; // Import fonts
+import { Product, SearchResponse } from "./types/product"; // Import product types
 
 // Theme Context
 interface ThemeContextType {
@@ -26,6 +27,15 @@ export const useTheme = () => {
   return context;
 };
 
+// Search Context (Optional - for now pass as props, can refactor later if needed)
+// interface SearchContextType {
+//   searchQuery: string;
+//   searchResults: Product[];
+//   isLoadingSearch: boolean;
+//   searchError: string | null;
+//   performSearch: (query: string, page?: number) => Promise<void>;
+// }
+
 function App() {
   const [backendMessage, setBackendMessage] = useState("");
   const [showMessage, setShowMessage] = useState(false);
@@ -38,6 +48,15 @@ function App() {
     const savedFont = localStorage.getItem("appFont");
     return savedFont ? JSON.parse(savedFont) : availableFonts[0];
   });
+
+  // New state for search
+  const [searchQuery, setSearchQuery] = useState<string>("");
+  const [searchResults, setSearchResults] = useState<Product[]>([]);
+  const [totalResults, setTotalResults] = useState<number>(0);
+  const [isLoadingSearch, setIsLoadingSearch] = useState<boolean>(false);
+  const [searchError, setSearchError] = useState<string | null>(null);
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [hasMoreResults, setHasMoreResults] = useState<boolean>(false);
 
   // Update font in localStorage and CSS when it changes
   useEffect(() => {
@@ -98,28 +117,79 @@ function App() {
     };
   }, [isSidebarOpen]);
 
+  const performSearch = async (query: string, page: number = 1) => {
+    if (!query.trim()) return;
+    setIsLoadingSearch(true);
+    setSearchError(null);
+    if (page === 1) {
+      setSearchResults([]); // Clear previous results for a new search
+      setSearchQuery(query);
+    }
+    setCurrentPage(page);
+
+    try {
+      // Adjust page param name if backend expects something different (e.g., 'offset')
+      const response = await api.get<SearchResponse>(
+        `/search?query=${encodeURIComponent(query)}&page=${page}&limit=10`
+      );
+      const data = response.data;
+
+      setSearchResults((prevResults) =>
+        page === 1 ? data.items : [...prevResults, ...data.items]
+      );
+      setTotalResults(data.total_results);
+      setHasMoreResults(data.has_more);
+      if (data.query_echo) setSearchQuery(data.query_echo); // Update query if backend modifies/confirms it
+    } catch (error: any) {
+      console.error("Error fetching search results:", error);
+      setSearchError(error.message || "Failed to fetch search results.");
+      setSearchResults([]); // Clear results on error
+      setTotalResults(0);
+    } finally {
+      setIsLoadingSearch(false);
+    }
+  };
+
   return (
     <ThemeContext.Provider
       value={{ themeName: currentThemeName, setThemeName: setCurrentThemeName }}
     >
       <div className="app-container">
-        <Header onMenuClick={toggleSidebar} />
-        <MainContent>
-          {/* Content will go here, for now, let's keep the test backend button */}
-          <div style={{ marginTop: "20px", textAlign: "center" }}>
-            <button onClick={fetchBackendMessage}>
-              Test Backend Connection
-            </button>
-            {showMessage && (
-              <p
-                className={`backend-message ${
-                  backendMessage.startsWith("Error") ? "error" : "success"
-                }`}
-              >
-                {backendMessage}
-              </p>
-            )}
-          </div>
+        <Header
+          onMenuClick={toggleSidebar}
+          onSearch={performSearch} // Pass performSearch to Header
+          isLoadingSearch={isLoadingSearch} // Pass loading state
+        />
+        <MainContent
+          searchQuery={searchQuery}
+          searchResults={searchResults}
+          totalResults={totalResults}
+          isLoadingSearch={isLoadingSearch}
+          searchError={searchError}
+          hasMoreResults={hasMoreResults}
+          loadMoreResults={() => {
+            if (!isLoadingSearch && hasMoreResults) {
+              performSearch(searchQuery, currentPage + 1);
+            }
+          }}
+        >
+          {/* Test backend button - this will be conditionally hidden when search results are shown */}
+          {!searchQuery && !searchResults.length && (
+            <div style={{ marginTop: "20px", textAlign: "center" }}>
+              <button onClick={fetchBackendMessage}>
+                Test Backend Connection
+              </button>
+              {showMessage && (
+                <p
+                  className={`backend-message ${
+                    backendMessage.startsWith("Error") ? "error" : "success"
+                  }`}
+                >
+                  {backendMessage}
+                </p>
+              )}
+            </div>
+          )}
           {/* <PdfUpload /> */} {/* Commenting out PdfUpload for now */}
         </MainContent>
         <BottomNav />
