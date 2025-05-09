@@ -38,10 +38,15 @@
 2.  **Data Management API (`/data/*`):**
     - Provides endpoints primarily for retrieving data (retailers, ads, products - GET requests).
     - Includes an endpoint (`POST /data/products/`) for manually upserting single products for testing or direct entry.
-3.  **Database Upload (Future):**
-    - A separate process (to be implemented) will read the JSON files from `backend/extractions`.
-    - It will parse the JSON using `data_schemas.py`.
-    - It will use `crud.py` functions (`find_or_create_retailer`, `create_weekly_ad`, `upsert_products`) to populate the PostgreSQL database.
+3.  **Database Upload Workflow:**
+    - The `json_to_db_service` reads JSON files from `backend/extractions`.
+    - It validates the JSON data using `ExtractedPDFData` schema.
+    - For each valid JSON file:
+      - Checks for existing weekly ad by filename to prevent duplicates
+      - Updates ad periods for the retailer (current -> previous -> archived)
+      - Creates a new weekly ad marked as 'current'
+      - Creates associated products with all extracted details
+      - Commits the changes or rolls back on error
 
 # Environment Variables
 

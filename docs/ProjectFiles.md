@@ -9,8 +9,9 @@ grocery-budget-assistant/
 │ │ │ └── pdf.py ── Defines /pdf API endpoints managing PDF processing workflow.
 | | |=====================================
 │ │ ├── services/ Directory contains business logic, external service interactions.
-│ │ │ ├── pdf_processor.py ── GroceryAdProcessor class orchestrating PDF data extraction via Gemini, saves JSON output.
-│ │ │ └── pdf_prompts.py ── Contains prompt templates and lists for Gemini PDF extraction.
+│ │ │ ├── pdf_processor.py ── PDF data extraction via Gemini, saves JSON output.
+│ │ │ ├── pdf_prompts.py ── Contains prompt templates and lists for Gemini PDF extraction.
+│ │ │ └── json_to_db_service.py ── Processes extracted JSON files into Postgres DB tables.
 | | |=====================================
 │ │ ├── schemas/ Directory contains Pydantic models for data validation, serialization.
 │ │ │ ├── base_schemas.py ── Defines base Pydantic schemas shared by other schema files.
@@ -20,9 +21,9 @@ grocery-budget-assistant/
 │ │ ├── utils/ Directory contains utility functions for the backend application.
 │ │ │ └── utils.py ── Provides utility functions, e.g., finding the project root.
 | | |=====================================
-│ │ ├── database.py ── Configures, manages SQLAlchemy database connection using env vars. Provides session dependency.
+│ │ ├── database.py ── Configures, manages SQLAlchemy database connection. Provides session dependency.
 │ │ ├── models.py ── Defines SQLAlchemy ORM classes mapping Python objects to database tables.
-│ │ └── crud.py ── Contains database operations (CRUD) functions using SQLAlchemy models, sessions. Tailored for different data sources, workflows.
+│ │ └── # crud.py ── (Moved logic to router files)
 | |=====================================
 │ ├── pdf/ ── Directory contains PDF-related data files.
 │ │ ├── uploads/ ── Directory is input location for PDF weekly ad files needing processing.
@@ -31,10 +32,8 @@ grocery-budget-assistant/
 │ │ └── archived/ ── Directory for storing processed PDF files and their extractions.
 │ ├── sql/ Directory holds database schema related SQL files.
 │ │ └── schema.sql ── Contains raw SQL statements to create database tables, indexes, functions.
-│ ├── .env.example ── Template file showing required environment variables for the backend.
 │ ├── requirements.txt ── Lists Python dependencies required for backend service. Ensures reproducible environment.
 │ ├── Procfile ── Configuration file for deployment platforms like Heroku, specifying process types.
-│ └── test_data.txt ── Contains sample data for testing backend functionalities.
 |---------------------------------------------------------------
 ├── docs/ Directory contains documentation files.
 │ ├── PRD.md ── Product Requirements Document.

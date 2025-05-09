@@ -176,6 +176,39 @@ sequenceDiagram
     end
 ```
 
+## JSON to Database Flow
+
+```mermaid
+sequenceDiagram
+    participant JService as JSON to DB Service
+    participant ExtrDir as Extractions Directory
+    participant Validator as Schema Validator
+    participant DB as PostgreSQL DB
+
+    JService->>ExtrDir: Scan for JSON files
+    ExtrDir-->>JService: List of JSON paths
+
+    loop For Each JSON File
+        JService->>ExtrDir: Read JSON file
+        ExtrDir-->>JService: JSON content
+        JService->>Validator: Validate with ExtractedPDFData schema
+
+        alt Validation Success
+            JService->>DB: Check existing weekly ad
+            DB-->>JService: Exists/Not exists
+
+            alt Ad Not Found
+                JService->>DB: Update ad periods for retailer
+                JService->>DB: Create new weekly ad (current)
+                JService->>DB: Batch create products
+                DB-->>JService: Success/Failure
+            end
+        else Validation Fails
+            JService->>JService: Log error & continue
+        end
+    end
+```
+
 ## Data API Flow (Example: Product Upsert)
 
 ```mermaid

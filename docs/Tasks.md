@@ -2,9 +2,8 @@ Number of times this file has been updated: 6
 
 ## In Progress Tasks
 
-- [x] Database: Implement process to upload extracted JSON data to PostgreSQL.
-      (Subtask) - [x] Define feature requirements and plan in `docs/feature-docs/Feature-json-to-DB.md`.
-      (Subtask) - [x] Create `backend/app/services/json_to_db_service.py` with core logic for: - DB connection - Iterating JSON files in `backend/pdf/extractions/` - Duplicate filename check in `weekly_ads` table - Finding retailer from JSON - Updating `ad_period` for existing ads (previous->archived, current->previous) - Inserting new `WeeklyAd` with `ad_period='current'` - Inserting new `Products` linked to the ad and retailer
+- [ ] BACKEND - Search: add search feature
+      (Subtask) - [x] Add endpoint to search in Postman
 
 ## Completed Tasks
 
@@ -20,6 +19,9 @@ Number of times this file has been updated: 6
   - [x] Update `pdf_schema.py` to include all desired fields for extraction (e.g., unit, category for products).
   - [x] Modify PDF extraction logic in `pdf_processor.py` to populate the new fields in `pdf_schema.py`.
   - [x] Explore using inheritance (e.g., `PDFProduct` from `ProductBase`) to link schemas once field alignment is achieved.
+- [x] Database: Implement process to upload extracted JSON data to PostgreSQL.
+      (Subtask) - [x] Define feature requirements and plan in `docs/feature-docs/Feature-json-to-DB.md`.
+      (Subtask) - [x] Create `backend/app/services/json_to_db_service.py` with core logic for: - DB connection - Iterating JSON files in `backend/pdf/extractions/` - Duplicate filename check in `weekly_ads` table - Finding retailer from JSON - Updating `ad_period` for existing ads (previous->archived, current->previous) - Inserting new `WeeklyAd` with `ad_period='current'` - Inserting new `Products` linked to the ad and retailer
 
 ## Future Tasks
 
