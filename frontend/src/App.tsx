@@ -4,7 +4,7 @@ import { api } from "./services/api";
 // import { PdfUpload } from "./components/pdf-upload"; // Commenting out for now
 import Header from "./components/Header";
 import MainContent from "./components/MainContent";
-import BottomNav from "./components/BottomNav";
+// import BottomNav from "./components/BottomNav";
 
 function App() {
   const [backendMessage, setBackendMessage] = useState("");
@@ -44,7 +44,7 @@ function App() {
         </div>
         {/* <PdfUpload /> */} {/* Commenting out PdfUpload for now */}
       </MainContent>
-      <BottomNav />
+      {/* <BottomNav /> */}
     </div>
   );
 }
