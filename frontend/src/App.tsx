@@ -122,28 +122,27 @@ function App() {
     setIsLoadingSearch(true);
     setSearchError(null);
     if (page === 1) {
-      setSearchResults([]); // Clear previous results for a new search
+      setSearchResults([]);
       setSearchQuery(query);
     }
     setCurrentPage(page);
 
     try {
-      // Adjust page param name if backend expects something different (e.g., 'offset')
-      const response = await api.get<SearchResponse>(
-        `/search?query=${encodeURIComponent(query)}&page=${page}&limit=10`
+      const response = await api.get<Product[]>(
+        `/data/products/search?q=${encodeURIComponent(query)}`
       );
-      const data = response.data;
+      const products = response.data;
 
       setSearchResults((prevResults) =>
-        page === 1 ? data.items : [...prevResults, ...data.items]
+        page === 1 ? products : [...prevResults, ...products]
       );
-      setTotalResults(data.total_results);
-      setHasMoreResults(data.has_more);
-      if (data.query_echo) setSearchQuery(data.query_echo); // Update query if backend modifies/confirms it
+      setTotalResults(products.length);
+      setHasMoreResults(false); // Since backend doesn't support pagination yet
+      setSearchQuery(query);
     } catch (error: any) {
       console.error("Error fetching search results:", error);
       setSearchError(error.message || "Failed to fetch search results.");
-      setSearchResults([]); // Clear results on error
+      setSearchResults([]);
       setTotalResults(0);
     } finally {
       setIsLoadingSearch(false);
