@@ -2,8 +2,17 @@ Number of times this file has been updated: 6
 
 ## In Progress Tasks
 
-- [ ] BACKEND - Search: add search feature
-      (Subtask) - [x] Add endpoint to search in Postman
+- [ ] BACKEND - Search: add search feature.
+      (Subtask) - [x] Add endpoint to search in Postman.
+
+- [ ] FRONTEND - Initial UI design.
+      (Subtask) - [ ] Set up basic SPA structure (e.g., App.tsx, basic layout).
+      (Subtask) - [ ] Create Header component (with search bar).
+      (Subtask) - [ ] Create ProductList component (for search results).
+      (Subtask) - [ ] Create FilterModal component placeholder.
+      (Subtask) - [ ] Create NavigationBar component (Shop, My Items, Search, Services, Account).
+      (Subtask) - [ ] Implement initial styling for basic layout and components.
+      (Subtask) - [ ] Relocate existing "test backend button" to the bottom of the main page.
 
 ## Completed Tasks
 
@@ -25,7 +34,6 @@ Number of times this file has been updated: 6
 
 ## Future Tasks
 
-- [ ] FRONTEND - Shopping List: Provide an interface for users to input their desired grocery items.
 - [ ] FRONTEND - User Profile: Allow users to define their budget, add preferences.
 - [ ] FRONTEND - Shopping List Gen: Generate lists prioritizing minimal cost within budget.
 - [ ] FRONTEND - Shopping List Gen: Consider user's preferred stores in list generation.
