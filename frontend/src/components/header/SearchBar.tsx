@@ -2,6 +2,12 @@ import React, { useState, useEffect, useRef } from "react";
 import { api } from "../../services/api"; // Import the api service
 
 const LOCAL_STORAGE_KEY = "searchHistory";
+const PLACEHOLDER_TEXTS = [
+  "Search for weekly sale items",
+  // "What's on sale in bread?",
+  // "Chicken breast offers...",
+  // "Search for your groceries...",
+];
 
 interface SearchBarProps {
   isFocused: boolean;
@@ -11,7 +17,55 @@ interface SearchBarProps {
 const SearchBar: React.FC<SearchBarProps> = ({ isFocused, setIsFocused }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [searchHistory, setSearchHistory] = useState<string[]>([]);
+  const [currentPlaceholder, setCurrentPlaceholder] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
+
+  // Typewriter effect for placeholder
+  useEffect(() => {
+    let currentText = "";
+    let currentIndex = 0;
+    let textArrayIndex = 0;
+    let typingInterval: NodeJS.Timeout;
+
+    const type = () => {
+      if (textArrayIndex >= PLACEHOLDER_TEXTS.length) {
+        // Optional: Loop back or stop after all texts are shown
+        // For now, it stops at the last full placeholder or could default to a fixed one
+        setCurrentPlaceholder(PLACEHOLDER_TEXTS[PLACEHOLDER_TEXTS.length - 1]);
+        return;
+      }
+
+      const fullText = PLACEHOLDER_TEXTS[textArrayIndex];
+      if (currentIndex < fullText.length) {
+        currentText += fullText.charAt(currentIndex);
+        setCurrentPlaceholder(currentText);
+        currentIndex++;
+        typingInterval = setTimeout(type, 100); // Adjust typing speed
+      } else {
+        // Finished typing current text, pause then move to next or erase
+        setTimeout(() => {
+          currentText = ""; // Erase effect (optional)
+          currentIndex = 0;
+          setCurrentPlaceholder(""); // Show blank before next one
+          textArrayIndex++;
+          if (textArrayIndex < PLACEHOLDER_TEXTS.length) {
+            setTimeout(type, 500); // Pause before starting next text
+          } else {
+            setCurrentPlaceholder(
+              PLACEHOLDER_TEXTS[PLACEHOLDER_TEXTS.length - 1]
+            ); // Set a default final placeholder
+          }
+        }, 1500); // Pause after typing a full placeholder
+      }
+    };
+
+    // Start typing only if input is not focused and has no search term
+    if (!isFocused && !searchTerm) {
+      type();
+    }
+
+    return () => clearTimeout(typingInterval);
+  }, []); // Runs once on mount
 
   useEffect(() => {
     const storedHistory = localStorage.getItem(LOCAL_STORAGE_KEY);
@@ -27,6 +81,11 @@ const SearchBar: React.FC<SearchBarProps> = ({ isFocused, setIsFocused }) => {
     }
   }, [isFocused]);
 
+  const updateHistory = (newHistory: string[]) => {
+    setSearchHistory(newHistory);
+    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(newHistory));
+  };
+
   const saveSearchTerm = (term: string) => {
     const trimmedTerm = term.trim();
     if (trimmedTerm === "") return;
@@ -35,8 +94,12 @@ const SearchBar: React.FC<SearchBarProps> = ({ isFocused, setIsFocused }) => {
       trimmedTerm,
       ...searchHistory.filter((t) => t !== trimmedTerm),
     ].slice(0, 10); // Keep latest 10, unique
-    setSearchHistory(newHistory);
-    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(newHistory));
+    updateHistory(newHistory);
+  };
+
+  const handleDeleteHistoryItem = (termToDelete: string) => {
+    const newHistory = searchHistory.filter((term) => term !== termToDelete);
+    updateHistory(newHistory);
   };
 
   const handleSearch = async () => {
@@ -63,6 +126,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ isFocused, setIsFocused }) => {
 
   const handleClearSearch = () => {
     setSearchTerm("");
+    setCurrentPlaceholder(""); // Reset placeholder for typewriter if input is cleared
     inputRef.current?.focus(); // Keep focus to allow new typing or see history
     setIsFocused(true); // Ensure history/overlay stays if it was cleared while focused
   };
@@ -77,6 +141,13 @@ const SearchBar: React.FC<SearchBarProps> = ({ isFocused, setIsFocused }) => {
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(event.target.value);
+    if (event.target.value !== "") {
+      // If user starts typing, use a static placeholder or clear dynamic one
+      setCurrentPlaceholder("Search for weekly sale items");
+    } else if (!isFocused) {
+      // Potentially restart typewriter if cleared and not focused, or set a default
+      // For simplicity, let it be, or set a static default
+    }
   };
 
   const handleKeyPress = (event: React.KeyboardEvent<HTMLInputElement>) => {
@@ -88,7 +159,12 @@ const SearchBar: React.FC<SearchBarProps> = ({ isFocused, setIsFocused }) => {
 
   const handleFocus = () => {
     setIsFocused(true);
+    setCurrentPlaceholder("Search for weekly sale items"); // Static placeholder on focus
   };
+
+  const effectivePlaceholder = searchTerm
+    ? "Search for weekly sale items"
+    : currentPlaceholder || "Search your groceries...";
 
   const searchBarStyle: React.CSSProperties = {
     display: "flex",
@@ -147,10 +223,20 @@ const SearchBar: React.FC<SearchBarProps> = ({ isFocused, setIsFocused }) => {
   };
 
   const historyItemStyle: React.CSSProperties = {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
     padding: "0.75rem 1rem",
     cursor: "pointer",
     borderBottom: "1px solid #eee",
     fontSize: "0.9rem",
+  };
+
+  const deleteIconStyle: React.CSSProperties = {
+    fontSize: "1rem",
+    color: "#aaa",
+    cursor: "pointer",
+    paddingLeft: "0.5rem",
   };
 
   return (
@@ -171,7 +257,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ isFocused, setIsFocused }) => {
           <input
             ref={inputRef}
             type="text"
-            placeholder="Search for weekly sale items"
+            placeholder={effectivePlaceholder}
             style={inputStyle}
             value={searchTerm}
             onChange={handleInputChange}
@@ -193,15 +279,27 @@ const SearchBar: React.FC<SearchBarProps> = ({ isFocused, setIsFocused }) => {
       {isFocused && searchHistory.length > 0 && (
         <div style={historyStyle}>
           {searchHistory.map((item, index) => (
-            <div
-              key={index}
-              style={historyItemStyle}
-              onMouseDown={(e) => {
-                e.preventDefault(); // Prevent input blur before click registers
-                handleHistoryItemClick(item);
-              }}
-            >
-              {item}
+            <div key={index} style={historyItemStyle}>
+              <span
+                style={{ flexGrow: 1 }}
+                onMouseDown={(e) => {
+                  e.preventDefault();
+                  handleHistoryItemClick(item);
+                }}
+              >
+                {item}
+              </span>
+              <span
+                style={deleteIconStyle}
+                title="Remove from history"
+                onMouseDown={(e) => {
+                  e.preventDefault(); // Prevent click on item itself
+                  e.stopPropagation(); // Prevent click on item itself
+                  handleDeleteHistoryItem(item);
+                }}
+              >
+                ✕
+              </span>
             </div>
           ))}
         </div>
