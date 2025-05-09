@@ -1,14 +1,19 @@
 import React from "react";
 import CartIcon from "./CartIcon";
 
-const TopBar = () => {
+interface TopBarProps {
+  onMenuClick: () => void;
+}
+
+const TopBar: React.FC<TopBarProps> = ({ onMenuClick }) => {
   const topBarStyle: React.CSSProperties = {
     display: "flex",
     justifyContent: "space-between",
     alignItems: "center",
     padding: "0.5rem 1rem",
-    backgroundColor: "#0071dc", // Walmart blue
-    color: "white",
+    backgroundColor: "var(--theme-header-background, #0071dc)", // Theming placeholder
+    color: "var(--theme-header-text, white)", // Theming placeholder
+    height: "56px", // Standard app bar height
   };
 
   const logoStyle: React.CSSProperties = {
@@ -20,9 +25,17 @@ const TopBar = () => {
     fontSize: "0.9rem",
   };
 
+  const menuIconStyle: React.CSSProperties = {
+    fontSize: "2rem",
+    cursor: "pointer",
+    padding: "0.5rem",
+  };
+
   return (
     <div style={topBarStyle}>
-      <span style={greetingStyle}>Hello!</span>
+      <span onClick={onMenuClick} style={menuIconStyle} title="Open menu">
+        ☰
+      </span>
       {/* Using a text placeholder for the logo for now */}
       {/* <img src="https://via.placeholder.com/100x30?text=Walmart" alt="Walmart Logo" style={logoStyle} /> */}
       <span style={{ fontWeight: "bold", fontSize: "1.2rem" }}>

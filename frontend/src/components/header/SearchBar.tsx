@@ -183,10 +183,11 @@ const SearchBar: React.FC<SearchBarProps> = ({ isFocused, setIsFocused }) => {
     flexGrow: 1,
     display: "flex",
     alignItems: "center",
-    backgroundColor: "white",
+    backgroundColor: "var(--theme-search-input-background, white)",
     borderRadius: "20px",
     padding: "0 0.5rem",
     height: "40px", // Fixed height for the input area
+    transition: "background-color 0.3s ease",
   };
 
   const inputStyle: React.CSSProperties = {
@@ -197,15 +198,19 @@ const SearchBar: React.FC<SearchBarProps> = ({ isFocused, setIsFocused }) => {
     outline: "none",
     fontSize: "0.9rem",
     height: "100%",
+    backgroundColor: "transparent",
+    color: "var(--theme-search-input-text, #495057)",
+    transition: "color 0.3s ease",
   };
 
   const iconStyle: React.CSSProperties = {
     fontSize: "1.2rem",
-    color: "#555",
+    color: "var(--theme-search-input-placeholder, #555)",
     cursor: "pointer",
     padding: "0 0.5rem",
     display: "flex",
     alignItems: "center",
+    transition: "color 0.3s ease",
   };
 
   const historyStyle: React.CSSProperties = {
@@ -213,13 +218,16 @@ const SearchBar: React.FC<SearchBarProps> = ({ isFocused, setIsFocused }) => {
     top: "calc(100% + 5px)", // Position below the search bar area
     left: "0", // Align with parent (searchBarStyle padding will handle offset)
     right: "0",
-    backgroundColor: "white",
-    border: "1px solid #ddd",
+    backgroundColor: "var(--theme-background, white)",
+    color: "var(--theme-text, #212529)",
+    border: "1px solid var(--theme-sidebar-divider, #ddd)",
     borderRadius: "4px",
     boxShadow: "0 2px 5px rgba(0,0,0,0.1)",
     zIndex: 1000, // Ensure it's above other content within header
     maxHeight: "200px",
     overflowY: "auto",
+    transition:
+      "background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease",
   };
 
   const historyItemStyle: React.CSSProperties = {
@@ -228,8 +236,9 @@ const SearchBar: React.FC<SearchBarProps> = ({ isFocused, setIsFocused }) => {
     alignItems: "center",
     padding: "0.75rem 1rem",
     cursor: "pointer",
-    borderBottom: "1px solid #eee",
+    borderBottom: "1px solid var(--theme-sidebar-divider, #eee)",
     fontSize: "0.9rem",
+    transition: "border-color 0.3s ease",
   };
 
   const deleteIconStyle: React.CSSProperties = {

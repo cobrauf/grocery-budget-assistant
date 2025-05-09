@@ -4,7 +4,11 @@ import SearchBar from "./header/SearchBar";
 // import DeliveryOptions from './header/DeliveryOptions'; // User commented out
 import SearchOverlay from "./common/SearchOverlay"; // Corrected import path
 
-const Header = () => {
+interface HeaderProps {
+  onMenuClick: () => void; // To be passed from App.tsx
+}
+
+const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
   const [isSearchFocused, setIsSearchFocused] = useState(false);
 
   const headerStyle: React.CSSProperties = {
@@ -15,7 +19,7 @@ const Header = () => {
     position: "sticky", // Make header sticky
     top: 0,
     zIndex: 1001, // Above search history dropdown but below modals if any
-    backgroundColor: "#0071dc", // To avoid content showing through during blur
+    backgroundColor: "var(--theme-header-background, #0071dc)", // To avoid content showing through during blur
   };
 
   // Callback to close search/history/overlay
@@ -27,7 +31,7 @@ const Header = () => {
   return (
     <>
       <header style={headerStyle}>
-        <TopBar />
+        <TopBar onMenuClick={onMenuClick} />
         <SearchBar
           isFocused={isSearchFocused}
           setIsFocused={setIsSearchFocused}

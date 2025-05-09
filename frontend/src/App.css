@@ -1,11 +1,31 @@
+/* Apply base theme variables to the root or body */
+:root {
+  /* Default fallbacks, actual values will be set by JS from themes.ts */
+  --theme-background: #ffffff;
+  --theme-text: #212529;
+  --theme-primary: #007bff;
+  --theme-secondary: #6c757d;
+  --theme-header-background: #0071dc;
+  --theme-header-text: #ffffff;
+  --theme-sidebar-background: #f8f9fa;
+  --theme-sidebar-text: #212529;
+  --theme-sidebar-highlight: #007bff;
+  --theme-sidebar-divider: #e0e0e0;
+  --theme-search-input-background: #ffffff;
+  --theme-search-input-text: #495057;
+  --theme-search-input-placeholder: #6c757d;
+}
+
 .app-container {
   width: 100%;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  background-color: #ffffff;
+  background-color: var(--theme-background);
+  color: var(--theme-text);
   margin: 0;
   padding: 0;
+  transition: background-color 0.3s ease, color 0.3s ease; /* Smooth theme transitions */
 }
 
 .counter-card {
@@ -30,18 +50,20 @@ p {
 }
 
 button {
-  background-color: #ff9800;
-  color: white;
+  background-color: var(--theme-primary);
+  color: var(
+    --theme-header-text
+  ); /* Assuming primary buttons have light text */
   border: none;
   padding: 0.75rem 1.5rem;
   border-radius: 4px;
   font-size: 1rem;
   cursor: pointer;
-  transition: background-color 0.3s;
+  transition: background-color 0.3s, opacity 0.3s;
 }
 
 button:hover {
-  background-color: #f57c00;
+  opacity: 0.85;
 }
 
 button:active {
@@ -203,4 +225,47 @@ button:active {
   background-color: #fff5f5;
   color: #c53030;
   border: 1px solid #f56565;
+}
+
+/* Prevent body scroll when modal/sidebar is open */
+body.no-scroll {
+  overflow: hidden;
+}
+
+/* Theming for input placeholders */
+input::placeholder,
+textarea::placeholder {
+  color: var(--theme-search-input-placeholder, #6c757d);
+  opacity: 1; /* Firefox */
+  transition: color 0.3s ease;
+}
+
+input::-ms-input-placeholder, /* Edge */
+textarea::-ms-input-placeholder {
+  color: var(--theme-search-input-placeholder, #6c757d);
+  transition: color 0.3s ease;
+}
+
+input::-moz-placeholder, /* Firefox */
+textarea::-moz-placeholder {
+  color: var(--theme-search-input-placeholder, #6c757d);
+  opacity: 1; /* Firefox */
+  transition: color 0.3s ease;
+}
+
+/* Animations */
+@keyframes slideInFromLeftNavItems {
+  from {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.sidebar-nav-item-animate {
+  opacity: 0; /* Start hidden */
+  animation-fill-mode: forwards;
 }
