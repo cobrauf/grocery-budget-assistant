@@ -7,8 +7,8 @@ from typing import List, Optional
 # Import necessary components from parent directories or app modules
 from .. import models
 from ..schemas import data_schemas  # Changed to import from new location
-from ..database import SessionLocal
-from ..services import json_to_db_service
+from ..database import SessionLocal, get_db # Ensure get_db is correctly imported from database.py
+from ..services import json_to_db_service, product_service # Import product_service
 
 '''
 Defines API endpoints for retrieving data (Retailers, Weekly Ads, Products),
@@ -38,82 +38,72 @@ def list_retailers(db: Session = Depends(get_db)):
     return db.query(models.Retailer).all()
 
 @router.get("/weekly_ads/")
-def list_weekly_ads(db: Session = Depends(get_db)):
+async def list_weekly_ads(db: Session = Depends(get_db)):
     print("Listing weekly ads")
     return db.query(models.WeeklyAd).all()
 
 @router.post("/json_to_db/")
-def list_upload_jsons(db: Session = Depends(get_db)):
+async def upload_jsons_to_db(db: Session = Depends(get_db)):
     print("uploading JSONs to DB")
-    return json_to_db_service.process_json_extractions()
+    # Assuming this is a background task or a simple utility endpoint for now.
+    # Ensure json_to_db_service.process_json_extractions is async or handled appropriately.
+    return await json_to_db_service.process_json_extractions() # if it's an async function
 
 @router.get("/products/search/", response_model=List[data_schemas.ProductWithDetails])
-def search_products(
-    q: str = Query(..., min_length=1, description="Search term for products. Must not be empty."), 
-    db: Session = Depends(get_db), 
-    limit: int = Query(50, ge=1, le=200, description="Maximum number of results to return."), 
-    offset: int = Query(0, ge=0, description="Number of results to skip (for pagination).")
+async def search_products_endpoint(
+    q: str = Query(..., min_length=1, description="Search term for products."),
+    db: Session = Depends(get_db),
+    limit: int = Query(50, ge=1, le=200, description="Max results."),
+    offset: int = Query(0, ge=0, description="Offset for pagination.")
 ):
     print(f"Searching products with query: '{q}', limit: {limit}, offset: {offset}")
     if not q.strip():
-        raise HTTPException(status_code=400, detail="Search query 'q' cannot be empty or only whitespace.")
-
+        raise HTTPException(status_code=400, detail="Search query 'q' cannot be empty.")
+    
+    # This search logic could also be moved to product_service.py for consistency
     try:
-        # Using plainto_tsquery for simpler user input that doesn't require knowledge of tsquery syntax
-        # It converts the query string into a tsquery, interpreting spaces as AND operators by default.
-        # For more complex queries (phrases, OR, NOT), to_tsquery or websearch_to_tsquery might be better.
-        search_query = db.query(models.Product)\
-            .join(models.Product.weekly_ad)\
-            .join(models.Product.retailer)\
-            .filter(models.Product.fts_vector.match(q, postgresql_regconfig='english'))\
+        # Simplified search logic, adapt FTS from existing implementation or use a new service function
+        search_results = (
+            db.query(models.Product)
+            .join(models.WeeklyAd, models.Product.weekly_ad_id == models.WeeklyAd.id)
+            .join(models.Retailer, models.Product.retailer_id == models.Retailer.id)
+            .filter(models.Product.fts_vector.match(q, postgresql_regconfig='english')) # Assuming fts_vector is used
             .options(
-                joinedload(models.Product.weekly_ad).joinedload(models.WeeklyAd.retailer), # Ensures retailer of the ad is loaded
-                joinedload(models.Product.retailer) # Ensures retailer of the product is loaded (same as above if linked correctly)
-            )\
-            .offset(offset)\
-            .limit(limit)\
+                joinedload(models.Product.retailer),
+                joinedload(models.Product.weekly_ad)
+            )
+            .offset(offset)
+            .limit(limit)
             .all()
-
-        # Manually construct the ProductWithDetails response objects
-        # because SQLAlchemy's direct conversion might not easily map nested related objects to flat Pydantic fields
-        # if there are name clashes or complex mappings not handled by simple from_attributes.
-        # For this specific case where ProductWithDetails inherits Product, and adds related flat fields,
-        # Pydantic MIGHT be able to handle it if from_attributes=True and the ORM relationships are clear.
-        # Let's test the direct conversion first. If it fails or is ambiguous, manual mapping is the fallback.
-        
-        results_with_details = []
-        for product in search_query:
-            # Explicitly map fields to avoid conflicts and ensure correct types
-            product_data = {
-                "id": product.id,
-                "weekly_ad_id": product.weekly_ad_id,
-                "name": product.name,
-                "price": product.price,
-                "original_price": product.original_price,
-                "unit": product.unit,
-                "description": product.description,
-                "category": product.category,
-                "promotion_details": product.promotion_details,
-                "promotion_from": product.promotion_from,
-                "promotion_to": product.promotion_to,
-                # Fields for ProductBase & ProductBaseSchema
-                "retailer": product.retailer.name, # This is for ProductBaseSchema.retailer: str
-                "retailer_id": product.retailer_id,
-                # Fields specific to ProductWithDetails
-                "retailer_name": product.retailer.name, # This is for ProductWithDetails.retailer_name: str
-                "weekly_ad_valid_from": product.weekly_ad.valid_from,
-                "weekly_ad_valid_to": product.weekly_ad.valid_to,
-                "weekly_ad_ad_period": product.weekly_ad.ad_period
-            }
-            results_with_details.append(data_schemas.ProductWithDetails(**product_data))
-        return results_with_details
-        
+        )
+        return search_results
     except Exception as e:
-        # Log the exception for debugging
         print(f"Error during product search: {e}")
-        import traceback
-        traceback.print_exc()
-        raise HTTPException(status_code=500, detail="An error occurred while searching for products.")
+        # import traceback; traceback.print_exc(); # For detailed debugging
+        raise HTTPException(status_code=500, detail="Error searching products.")
+
+@router.get("/products/retailer/{retailer_id}", response_model=List[data_schemas.ProductWithDetails])
+async def get_products_by_retailer(
+    retailer_id: int,
+    ad_period: str = Query("current", description="Ad period (e.g., 'current', 'upcoming')."),
+    db: Session = Depends(get_db),
+    limit: int = Query(100, ge=1, le=500),
+    offset: int = Query(0, ge=0)
+):
+    try:
+        products = await product_service.get_products_by_retailer_and_ad_period(
+            db=db, 
+            retailer_id=retailer_id, 
+            ad_period=ad_period,
+            limit=limit,
+            offset=offset
+        )
+        # No need to explicitly check if not products, FastAPI handles empty list correctly with response_model
+        return products
+    except Exception as e:
+        print(f"Error fetching products for retailer {retailer_id}, ad period '{ad_period}': {e}")
+        # import traceback; traceback.print_exc(); # For detailed debugging
+        raise HTTPException(status_code=500, detail="Error fetching products for specified retailer and ad period.")
 
 
 

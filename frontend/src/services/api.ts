@@ -16,3 +16,31 @@ export const api = axios.create({
     "Content-Type": "application/json",
   },
 });
+
+// Import Product and Retailer types
+import { Product } from "../types/product";
+import { Retailer } from "../types/retailer";
+
+// API functions
+export const fetchRetailers = async (): Promise<Retailer[]> => {
+  const response = await api.get<Retailer[]>("/retailers");
+  return response.data;
+};
+
+export const fetchProductsByRetailer = async (
+  retailerId: number,
+  adPeriod: string = "current"
+): Promise<Product[]> => {
+  const response = await api.get<Product[]>(
+    `/data/products/retailer/${retailerId}?ad_period=${adPeriod}`
+  );
+  return response.data;
+};
+
+// Example of fetching products (search) - adjust as needed for your Product type
+// export const searchProducts = async (query: string): Promise<Product[]> => {
+//   const response = await api.get<Product[]>(
+//     `/data/products/search?q=${encodeURIComponent(query)}`
+//   );
+//   return response.data;
+// };

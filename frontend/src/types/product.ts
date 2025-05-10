@@ -11,7 +11,7 @@ export interface Product {
   promotion_from?: string | null;
   promotion_to?: string | null;
   retailer?: string; // e.g., "Walmart", "Aldi"
-  retailer_id?: string;
+  retailer_id: number;
   retailer_name?: string;
   weekly_ad_id?: string;
   weekly_ad_valid_from?: string;
