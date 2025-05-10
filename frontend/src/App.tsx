@@ -6,7 +6,7 @@ import Header from "./components/Header";
 import MainContent from "./components/MainContent";
 import BottomNav from "./components/BottomNav";
 import SideBar from "./components/sidebar/SideBar";
-import SearchOverlay from "./components/common/SearchOverlay";
+import SideBarOverlay from "./components/common/SideBarOverlay";
 import { themes, Theme, DEFAULT_THEME_NAME } from "./styles/themes"; // Import themes
 import { availableFonts } from "./styles/fonts"; // Import fonts
 import { Product, SearchResponse } from "./types/product"; // Import product types
@@ -191,7 +191,7 @@ function App() {
           )}
           {/* <PdfUpload /> */} {/* Commenting out PdfUpload for now */}
         </MainContent>
-        <BottomNav />
+        {/* <BottomNav /> */}
         <SideBar
           isOpen={isSidebarOpen}
           onClose={toggleSidebar}
@@ -200,7 +200,7 @@ function App() {
           currentFont={currentFont}
           onSelectFont={setCurrentFont}
         />
-        {isSidebarOpen && <SearchOverlay onClick={toggleSidebar} />}
+        <SideBarOverlay isOpen={isSidebarOpen} onClick={toggleSidebar} />
       </div>
     </ThemeContext.Provider>
   );
