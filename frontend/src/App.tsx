@@ -6,7 +6,7 @@ import Header from "./components/Header";
 import MainContent from "./components/MainContent";
 import BottomNav from "./components/BottomNav";
 import SideBar from "./components/sidebar/SideBar";
-import SideBarOverlay from "./components/common/SideBarOverlay";
+import FullOverlay from "./components/common/FullOverlay";
 import { themes, Theme, DEFAULT_THEME_NAME } from "./styles/themes"; // Import themes
 import { availableFonts } from "./styles/fonts"; // Import fonts
 import { Product, SearchResponse } from "./types/product"; // Import product types
@@ -200,7 +200,7 @@ function App() {
           currentFont={currentFont}
           onSelectFont={setCurrentFont}
         />
-        <SideBarOverlay isOpen={isSidebarOpen} onClick={toggleSidebar} />
+        <FullOverlay isOpen={isSidebarOpen} onClick={toggleSidebar} />
       </div>
     </ThemeContext.Provider>
   );
