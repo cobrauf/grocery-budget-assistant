@@ -6,6 +6,7 @@ interface ProductCardProps {
 }
 
 const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
+  console.log("Product data:", product);
   const [isLiked, setIsLiked] = useState(false);
 
   const cardStyle: React.CSSProperties = {
@@ -112,7 +113,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
             </div>
             <div style={descriptionStyle}>{truncateText(product.name, 70)}</div>
             {product.retailer && (
-              <div style={retailerStyle}>{product.retailer}</div>
+              <div style={retailerStyle}>{product.retailer.name}</div>
             )}
           </div>
           <span

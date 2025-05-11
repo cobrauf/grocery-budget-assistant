@@ -3,6 +3,9 @@ from sqlalchemy.orm import Session, joinedload
 from sqlalchemy.sql.expression import text # For using raw SQL expressions like to_tsquery
 from typing import List, Optional
 # from sqlalchemy.exc import IntegrityError
+# Import JSONResponse and jsonable_encoder
+from fastapi.responses import JSONResponse
+from fastapi.encoders import jsonable_encoder
 
 # Import necessary components from parent directories or app modules
 from .. import models
@@ -82,8 +85,8 @@ async def search_products_endpoint(
         # import traceback; traceback.print_exc(); # For detailed debugging
         raise HTTPException(status_code=500, detail="Error searching products.")
 
-@router.get("/products/retailer/{retailer_id}", response_model=List[data_schemas.ProductWithDetails])
-async def get_products_by_retailer(
+@router.get("/products/retailer/{retailer_id}")
+async def get_products_by_retailer_manual_json(
     retailer_id: int,
     ad_period: str = Query("current", description="Ad period (e.g., 'current', 'upcoming')."),
     db: Session = Depends(get_db),
@@ -91,15 +94,18 @@ async def get_products_by_retailer(
     offset: int = Query(0, ge=0)
 ):
     try:
-        products = await product_service.get_products_by_retailer_and_ad_period(
+        # product_service.get_products_by_retailer_and_ad_period returns a list of SQLAlchemy ORM objects
+        products_db = await product_service.get_products_by_retailer_and_ad_period(
             db=db, 
             retailer_id=retailer_id, 
             ad_period=ad_period,
             limit=limit,
             offset=offset
         )
-        # No need to explicitly check if not products, FastAPI handles empty list correctly with response_model
-        return products
+        # Use jsonable_encoder to convert ORM objects (and their relationships)
+        # into a structure that can be directly serialized to JSON.
+        # This will include nested objects for 'retailer' and 'weekly_ad'.
+        return JSONResponse(content=jsonable_encoder(products_db))
     except Exception as e:
         print(f"Error fetching products for retailer {retailer_id}, ad period '{ad_period}': {e}")
         # import traceback; traceback.print_exc(); # For detailed debugging
