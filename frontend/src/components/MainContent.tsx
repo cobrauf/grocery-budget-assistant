@@ -29,47 +29,103 @@ const MainContent: React.FC<MainContentProps> = ({
   hasMoreResults,
   loadMoreResults,
 }) => {
-  const [retailers, setRetailers] = useState<Retailer[]>([]);
+  const [rawRetailers, setRawRetailers] = useState<Retailer[]>([]);
+  const [verifiedRetailers, setVerifiedRetailers] = useState<Retailer[]>([]);
   const [selectedRetailerProducts, setSelectedRetailerProducts] = useState<
     Product[]
   >([]);
-  const [isLoadingRetailers, setIsLoadingRetailers] = useState<boolean>(false);
-  const [isLoadingRetailerProducts, setIsLoadingRetailerProducts] =
+
+  const [isLoadingApiRetailers, setIsLoadingApiRetailers] =
     useState<boolean>(false);
-  const [retailerError, setRetailerError] = useState<string | null>(null);
+  const [isLoadingLogoVerification, setIsLoadingLogoVerification] =
+    useState<boolean>(false);
+  const [retailerApiError, setRetailerApiError] = useState<string | null>(null);
+
+  const getLogoPath = (retailerName: string) => {
+    const imageName =
+      retailerName.toLowerCase().replace(/\s+/g, "").replace(/&/g, "and") +
+      ".png";
+    return `public/assets/logos/${imageName}`;
+  };
 
   useEffect(() => {
-    const loadRetailers = async () => {
-      setIsLoadingRetailers(true);
-      setRetailerError(null);
+    const loadInitialRetailers = async () => {
+      setIsLoadingApiRetailers(true);
+      setRetailerApiError(null);
       try {
         const fetchedRetailers = await fetchRetailers();
-        setRetailers(fetchedRetailers);
+        setRawRetailers(fetchedRetailers);
       } catch (error) {
-        console.error("Error fetching retailers:", error);
-        setRetailerError("Failed to load retailers.");
+        console.error("Error fetching retailers from API:", error);
+        setRetailerApiError("Failed to load retailers list.");
+        setRawRetailers([]); // Clear raw retailers on error
       }
-      setIsLoadingRetailers(false);
+      setIsLoadingApiRetailers(false);
     };
-    // Fetch retailers only if no search is active and no retailer products are loaded
+
     if (!searchQuery && selectedRetailerProducts.length === 0) {
-      loadRetailers();
+      loadInitialRetailers();
     }
-  }, [searchQuery, selectedRetailerProducts.length]); // Depend on searchQuery and selectedRetailerProducts
+  }, [searchQuery, selectedRetailerProducts.length]);
+
+  useEffect(() => {
+    if (rawRetailers.length === 0) {
+      setVerifiedRetailers([]);
+      setIsLoadingLogoVerification(false);
+      return;
+    }
+
+    setIsLoadingLogoVerification(true);
+    const verifyLogosAndSetRetailers = async () => {
+      const promises = rawRetailers.map((retailer) => {
+        return new Promise<Retailer | null>((resolve) => {
+          const img = new Image();
+          img.onload = () => resolve(retailer);
+          img.onerror = () => {
+            console.warn(
+              `Logo verification failed for: ${
+                retailer.name
+              }, path: ${getLogoPath(retailer.name)}`
+            );
+            resolve(null); // Indicates logo not found or failed to load
+          };
+          console.log("^^^^^^^^^retailer name:", retailer.name);
+          img.src = getLogoPath(retailer.name);
+          console.log("^^^^^^^^^^^Logo path:", img.src);
+        });
+      });
+
+      try {
+        const results = await Promise.all(promises);
+        setVerifiedRetailers(results.filter((r) => r !== null) as Retailer[]);
+      } catch (error) {
+        console.error("Error during bulk logo verification:", error);
+        setVerifiedRetailers([]); // Clear on error
+      } finally {
+        setIsLoadingLogoVerification(false);
+      }
+    };
+
+    verifyLogosAndSetRetailers();
+  }, [rawRetailers]); // Dependency is the list of retailers from the API
 
   const handleRetailerClick = async (retailerId: number) => {
-    setIsLoadingRetailerProducts(true);
-    setRetailerError(null);
-    setSelectedRetailerProducts([]); // Clear previous retailer products
+    setIsLoadingRetailerProducts(true); // This is a different loading state, for products
+    setRetailerApiError(null);
+    setSelectedRetailerProducts([]);
     try {
       const products = await fetchProductsByRetailer(retailerId, "current");
       setSelectedRetailerProducts(products);
     } catch (error) {
       console.error("Error fetching products for retailer:", error);
-      setRetailerError("Failed to load products for this retailer.");
+      setRetailerApiError("Failed to load products for this retailer.");
     }
-    setIsLoadingRetailerProducts(false);
+    setIsLoadingRetailerProducts(false); // Corresponds to isLoadingRetailerProducts
   };
+
+  // States used for retailer products, not for initial retailers list or logo check
+  const [isLoadingRetailerProducts, setIsLoadingRetailerProducts] =
+    useState<boolean>(false);
 
   const mainContentStyle: React.CSSProperties = {
     padding: "0", // Remove padding if sub-components handle it
@@ -115,7 +171,7 @@ const MainContent: React.FC<MainContentProps> = ({
     objectFit: "contain",
   };
 
-  // Determine if we should show search-related content or default content
+  const showLoadingState = isLoadingApiRetailers || isLoadingLogoVerification;
   const showSearchResultsView =
     searchQuery || searchResults.length > 0 || isLoadingSearch || searchError;
 
@@ -123,28 +179,16 @@ const MainContent: React.FC<MainContentProps> = ({
   const showRetailerProductsView =
     selectedRetailerProducts.length > 0 && !showSearchResultsView;
 
-  const getLogoPath = (retailerName: string) => {
-    // Normalize retailer name to match logo file names (e.g., "Food 4 Less" -> "food4less.png")
-    const imageName =
-      retailerName.toLowerCase().replace(/\s+/g, "").replace(/&/g, "and") +
-      ".png"; // or .svg, .jpg etc.
-    try {
-      // This uses Vite's public directory feature or dynamic imports if configured.
-      // For simple cases, ensure logos are in `public/assets/logos/`
-      // The path should be relative to the public directory.
-      return `/assets/logos/${imageName}`;
-    } catch (error) {
-      console.warn(
-        `Logo not found for ${retailerName} (expected ${imageName})`
-      );
-      return "/assets/logos/default.png"; // Fallback logo
-    }
-  };
-
   return (
     <main style={mainContentStyle}>
-      {(isLoadingRetailers || isLoadingRetailerProducts) && (
-        <FullOverlay isTransparent={false}>
+      {showLoadingState && (
+        <FullOverlay isOpen={true} isTransparent={false}>
+          <LoadingSpinner />
+        </FullOverlay>
+      )}
+
+      {isLoadingRetailerProducts && !showLoadingState && (
+        <FullOverlay isOpen={true} isTransparent={false}>
           <LoadingSpinner />
         </FullOverlay>
       )}
@@ -162,15 +206,14 @@ const MainContent: React.FC<MainContentProps> = ({
       ) : showRetailerProductsView ? (
         <SearchResultsList
           searchQuery={
-            retailers.find(
+            rawRetailers.find(
               (r) => r.id === selectedRetailerProducts[0]?.retailer_id
             )?.name || "Retailer Products"
-          } // Display retailer name as query
-          items={selectedRetailerProducts} // Products from selected retailer
+          }
+          items={selectedRetailerProducts}
           totalResults={selectedRetailerProducts.length}
-          isLoading={isLoadingRetailerProducts} // Use retailer product loading state
-          error={retailerError} // Use retailer error state
-          // Pagination for retailer products not implemented in this step, can be added
+          isLoading={isLoadingRetailerProducts}
+          error={retailerApiError}
           hasMore={false}
           loadMore={() => {}}
         />
@@ -183,20 +226,15 @@ const MainContent: React.FC<MainContentProps> = ({
             Front Page Section (Coming Soon)
           </div>
 
-          {isLoadingRetailers && (
-            <p style={{ textAlign: "center", padding: "20px" }}>
-              Loading retailers...
-            </p>
-          )}
-          {retailerError && !isLoadingRetailers && (
+          {retailerApiError && (
             <p style={{ textAlign: "center", padding: "20px", color: "red" }}>
-              {retailerError}
+              {retailerApiError}
             </p>
           )}
 
-          {!isLoadingRetailers && !retailerError && retailers.length > 0 && (
+          {!retailerApiError && verifiedRetailers.length > 0 && (
             <div style={retailerLogosContainerStyle}>
-              {retailers.map((retailer) => (
+              {verifiedRetailers.map((retailer) => (
                 <button
                   key={retailer.id}
                   onClick={() => handleRetailerClick(retailer.id)}
@@ -207,26 +245,30 @@ const MainContent: React.FC<MainContentProps> = ({
                     src={getLogoPath(retailer.name)}
                     alt={`${retailer.name} logo`}
                     style={retailerLogoStyle}
-                    onError={(e) => {
-                      (e.target as HTMLImageElement).src =
-                        "/assets/logos/default.png"; // Fallback if logo fails to load
-                      (
-                        e.target as HTMLImageElement
-                      ).alt = `${retailer.name} (logo not found)`;
-                    }}
                   />
                   <span>{retailer.name}</span>
                 </button>
               ))}
             </div>
           )}
-          {!isLoadingRetailers && !retailerError && retailers.length === 0 && (
-            <div
-              style={{ padding: "20px", textAlign: "center", color: "#777" }}
-            >
-              No retailers found or front page content coming soon.
-            </div>
-          )}
+          {!retailerApiError &&
+            rawRetailers.length > 0 &&
+            verifiedRetailers.length === 0 && (
+              <div
+                style={{ padding: "20px", textAlign: "center", color: "#777" }}
+              >
+                No retailers with available logos found.
+              </div>
+            )}
+          {!retailerApiError &&
+            rawRetailers.length === 0 &&
+            !isLoadingApiRetailers && (
+              <div
+                style={{ padding: "20px", textAlign: "center", color: "#777" }}
+              >
+                No retailers currently available.
+              </div>
+            )}
 
           {/* Keep the existing children prop for the test backend button */}
           {children}
