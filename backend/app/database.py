@@ -31,9 +31,6 @@ SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 # Base class for SQLAlchemy models
 Base = declarative_base()
 
-# Dependency to get DB session
-
-
 def get_db():
     db = SessionLocal()
     try:
@@ -41,6 +38,4 @@ def get_db():
     finally:
         db.close()
 
-
-# Print part of the URL for confirmation
 # print(f"Database URL: {DATABASE_URL[:]}...")
