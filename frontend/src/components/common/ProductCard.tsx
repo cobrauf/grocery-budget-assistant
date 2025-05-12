@@ -113,7 +113,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
             </div>
             <div style={descriptionStyle}>{truncateText(product.name, 70)}</div>
             {product.retailer && (
-              <div style={retailerStyle}>{product.retailer.name}</div>
+              <div style={retailerStyle}>{product.retailer_name}</div>
             )}
           </div>
           <span
