@@ -63,6 +63,12 @@ grocery-budget-assistant/
 │ │ ├── index.css ── Contains global CSS styles applied across application.
 │ │ ├── main.tsx ── Main entry point for React application. Renders root component.
 │ │ └── vite-env.d.ts ── TypeScript declaration file for Vite environment variables.
+│ │ ├── MainContent.tsx
+│ │ ├── Header.tsx
+│ │ ├── styles/
+│ │ │ ├── app.css ── Contains CSS styles specific to App.tsx component.
+│ │ │ ├── themes.css
+│ │ │ ├── fonts.css
 | |=====================================
 │ ├── cypress/ Contains end-to-end tests written using Cypress framework.
 │ │ ├── e2e/ Directory holds end-to-end test specification files.

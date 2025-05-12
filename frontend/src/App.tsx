@@ -1,5 +1,5 @@
 import { useState, useEffect, createContext, useContext } from "react";
-import "./styles/App.css";
+import "./styles/app.css";
 import { api } from "./services/api";
 // import { PdfUpload } from "./components/pdf-upload"; // Commenting out for now
 import Header from "./components/Header";
