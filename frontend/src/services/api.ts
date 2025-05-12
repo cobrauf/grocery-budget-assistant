@@ -32,15 +32,14 @@ export const fetchProductsByRetailer = async (
   adPeriod: string = "current"
 ): Promise<Product[]> => {
   const response = await api.get<Product[]>(
-    `/data/products/retailer/${retailerId}?ad_period=${adPeriod}`
+    `/products/retailer/${retailerId}?ad_period=${adPeriod}`
   );
   return response.data;
 };
 
-// Example of fetching products (search) - adjust as needed for your Product type
 // export const searchProducts = async (query: string): Promise<Product[]> => {
 //   const response = await api.get<Product[]>(
-//     `/data/products/search?q=${encodeURIComponent(query)}`
+//     `/products/search?q=${encodeURIComponent(query)}`
 //   );
 //   return response.data;
 // };

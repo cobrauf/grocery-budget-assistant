@@ -129,7 +129,7 @@ function App() {
 
     try {
       const response = await api.get<Product[]>(
-        `/data/products/search?q=${encodeURIComponent(query)}`
+        `/products/search?q=${encodeURIComponent(query)}`
       );
       const products = response.data;
 

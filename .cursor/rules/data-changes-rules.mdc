@@ -14,4 +14,5 @@ files in ./backend/app + all subfolders
 [main.tsx](mdc:frontend/src/main.tsx)
 [api.ts](mdc:frontend/src/services/api.ts)
 [MainContent.tsx](mdc:frontend/src/components/MainContent.tsx)
+[App.tsx](mdc:frontend/src/App.tsx)
 

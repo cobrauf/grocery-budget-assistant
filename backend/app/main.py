@@ -4,7 +4,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 # Import routers
-from .routers import data, pdf, retailers
+from .routers import data, pdf, retailers, products
 from . import database # Keep for SessionLocal usage if get_db_session remains here (or move get_db_session too)
 from .utils.utils import find_project_root
 
@@ -52,6 +52,7 @@ def read_root():
 app.include_router(data.router)
 app.include_router(pdf.router)
 app.include_router(retailers.router)
+app.include_router(products.router)
 
 
 # Keep the run block
