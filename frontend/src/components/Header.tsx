@@ -8,12 +8,16 @@ interface HeaderProps {
   onMenuClick: () => void; // To be passed from App.tsx
   onSearch: (query: string) => Promise<void>; // Added
   isLoadingSearch: boolean; // Added
+  onClearSearch: () => void; // Added
+  initialSearchQuery?: string; // Added, make optional
 }
 
 const Header: React.FC<HeaderProps> = ({
   onMenuClick,
   onSearch,
   isLoadingSearch,
+  onClearSearch,
+  initialSearchQuery,
 }) => {
   const [isSearchFocused, setIsSearchFocused] = useState(false);
 
@@ -43,6 +47,8 @@ const Header: React.FC<HeaderProps> = ({
           setIsFocused={setIsSearchFocused}
           onSearch={onSearch}
           isLoading={isLoadingSearch}
+          onClear={onClearSearch}
+          initialValue={initialSearchQuery}
         />
         {/* <DeliveryOptions /> */} {/* User commented out */}
       </header>

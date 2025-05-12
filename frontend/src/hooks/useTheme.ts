@@ -1,13 +1,13 @@
 import { useState, useEffect } from "react";
-import { themes, Theme, DEFAULT_THEME_NAME } from "../styles/themes";
-import { availableFonts, Font } from "../styles/fonts";
+import { themes, DEFAULT_THEME_NAME } from "../styles/themes";
+import { availableFonts } from "../styles/fonts";
 
-export const useThemeManager = () => {
+export const useTheme = () => {
   const [currentThemeName, setCurrentThemeName] = useState<string>(() => {
     return localStorage.getItem("appTheme") || DEFAULT_THEME_NAME;
   });
 
-  const [currentFont, setCurrentFont] = useState<Font>(() => {
+  const [currentFont, setCurrentFont] = useState(() => {
     const savedFont = localStorage.getItem("appFont");
     return savedFont ? JSON.parse(savedFont) : availableFonts[0];
   });

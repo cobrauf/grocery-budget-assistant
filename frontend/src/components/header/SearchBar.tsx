@@ -14,6 +14,8 @@ interface SearchBarProps {
   setIsFocused: (isFocused: boolean) => void;
   onSearch: (query: string) => Promise<void>;
   isLoading: boolean;
+  onClear?: () => void;
+  initialValue?: string;
 }
 
 const SearchBar: React.FC<SearchBarProps> = ({
@@ -21,8 +23,10 @@ const SearchBar: React.FC<SearchBarProps> = ({
   setIsFocused,
   onSearch,
   isLoading,
+  onClear,
+  initialValue,
 }) => {
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchTerm, setSearchTerm] = useState(initialValue || "");
   const [searchHistory, setSearchHistory] = useState<string[]>([]);
   const [currentPlaceholder, setCurrentPlaceholder] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
@@ -120,6 +124,9 @@ const SearchBar: React.FC<SearchBarProps> = ({
   const handleClearSearch = () => {
     setSearchTerm("");
     setCurrentPlaceholder(""); // Reset placeholder for typewriter if input is cleared
+    if (onClear) {
+      onClear();
+    }
     inputRef.current?.focus(); // Keep focus to allow new typing or see history
     setIsFocused(true); // Ensure history/overlay stays if it was cleared while focused
   };

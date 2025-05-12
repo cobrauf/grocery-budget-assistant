@@ -3,11 +3,9 @@ import NavTabs from "./main/NavTabs";
 // import SponsoredAd from "./main/SponsoredAd";
 import SearchResultsList from "./search/SearchResultsList";
 import { Product } from "../types/product";
-// import { Retailer } from "../types/retailer"; // Removed, managed by hook
-// import { fetchRetailers, fetchProductsByRetailer } from "../services/api"; // Removed, handled by hook
-import FullOverlay from "./common/FullOverlay"; // For loading overlay
-import LoadingSpinner from "./common/LoadingSpinner"; // For loading spinner
-import { useRetailers } from "../hooks/useRetailers"; // Import the retailers hook
+import FullOverlay from "./common/FullOverlay";
+import LoadingSpinner from "./common/LoadingSpinner";
+import { useRetailers } from "../hooks/useRetailers";
 
 // Updated props: Rely on props passed from App (which uses useSearch)
 interface MainContentProps {
