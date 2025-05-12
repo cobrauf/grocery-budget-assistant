@@ -3,13 +3,15 @@ import NavTabs from "./main/NavTabs";
 // import SponsoredAd from "./main/SponsoredAd";
 import SearchResultsList from "./search/SearchResultsList";
 import { Product } from "../types/product";
-import { Retailer } from "../types/retailer"; // Import Retailer type
-import { fetchRetailers, fetchProductsByRetailer } from "../services/api"; // API functions
+// import { Retailer } from "../types/retailer"; // Removed, managed by hook
+// import { fetchRetailers, fetchProductsByRetailer } from "../services/api"; // Removed, handled by hook
 import FullOverlay from "./common/FullOverlay"; // For loading overlay
 import LoadingSpinner from "./common/LoadingSpinner"; // For loading spinner
+import { useRetailers } from "../hooks/useRetailers"; // Import the retailers hook
 
+// Updated props: Rely on props passed from App (which uses useSearch)
 interface MainContentProps {
-  children: React.ReactNode;
+  children?: React.ReactNode; // Made optional as it's only for the test button now
   searchQuery: string;
   searchResults: Product[];
   totalResults: number;
@@ -20,7 +22,7 @@ interface MainContentProps {
 }
 
 const MainContent: React.FC<MainContentProps> = ({
-  children,
+  children, // Keep children for potential flexibility or the test button
   searchQuery,
   searchResults,
   totalResults,
@@ -29,103 +31,69 @@ const MainContent: React.FC<MainContentProps> = ({
   hasMoreResults,
   loadMoreResults,
 }) => {
-  const [rawRetailers, setRawRetailers] = useState<Retailer[]>([]);
-  const [verifiedRetailers, setVerifiedRetailers] = useState<Retailer[]>([]);
-  const [selectedRetailerProducts, setSelectedRetailerProducts] = useState<
-    Product[]
-  >([]);
+  // State related to retailers moved to useRetailers hook
+  // const [rawRetailers, setRawRetailers] = useState<Retailer[]>([]);
+  // const [verifiedRetailers, setVerifiedRetailers] = useState<Retailer[]>([]);
+  // const [selectedRetailerProducts, setSelectedRetailerProducts] = useState<Product[]>([]);
+  // const [isLoadingApiRetailers, setIsLoadingApiRetailers] = useState<boolean>(false);
+  // const [isLoadingLogoVerification, setIsLoadingLogoVerification] = useState<boolean>(false);
+  // const [retailerApiError, setRetailerApiError] = useState<string | null>(null);
+  // const [isLoadingRetailerProducts, setIsLoadingRetailerProducts] = useState<boolean>(false);
 
-  const [isLoadingApiRetailers, setIsLoadingApiRetailers] =
-    useState<boolean>(false);
-  const [isLoadingLogoVerification, setIsLoadingLogoVerification] =
-    useState<boolean>(false);
-  const [retailerApiError, setRetailerApiError] = useState<string | null>(null);
+  // Determine if a search is active (query exists or results are present)
+  const isSearchActive =
+    !!searchQuery ||
+    searchResults.length > 0 ||
+    isLoadingSearch ||
+    !!searchError;
 
-  const getLogoPath = (retailerName: string) => {
-    const imageName =
-      retailerName.toLowerCase().replace(/\s+/g, "").replace(/&/g, "and") +
-      ".png";
-    return `public/assets/logos/${imageName}`;
-  };
+  // Use the retailers hook
+  const {
+    rawRetailers,
+    verifiedRetailers,
+    selectedRetailerProducts,
+    isLoadingApiRetailers,
+    isLoadingLogoVerification,
+    isLoadingRetailerProducts,
+    retailerApiError,
+    handleRetailerClick,
+    getLogoPath,
+    clearSelectedRetailer, // Get the clear function
+  } = useRetailers(isSearchActive); // Pass search status to the hook
 
+  // Effect to clear retailer selection when a new search starts
   useEffect(() => {
-    const loadInitialRetailers = async () => {
-      setIsLoadingApiRetailers(true);
-      setRetailerApiError(null);
-      try {
-        const fetchedRetailers = await fetchRetailers();
-        setRawRetailers(fetchedRetailers);
-      } catch (error) {
-        console.error("Error fetching retailers from API:", error);
-        setRetailerApiError("Failed to load retailers list.");
-        setRawRetailers([]); // Clear raw retailers on error
-      }
-      setIsLoadingApiRetailers(false);
-    };
-
-    if (!searchQuery && selectedRetailerProducts.length === 0) {
-      loadInitialRetailers();
+    if (isSearchActive) {
+      clearSelectedRetailer();
     }
-  }, [searchQuery, selectedRetailerProducts.length]);
+  }, [isSearchActive, clearSelectedRetailer]);
 
-  useEffect(() => {
-    if (rawRetailers.length === 0) {
-      setVerifiedRetailers([]);
-      setIsLoadingLogoVerification(false);
-      return;
-    }
+  // Logic for getting logo path moved to useRetailers hook
+  // const getLogoPath = (retailerName: string) => {
+  //   const imageName =
+  //     retailerName.toLowerCase().replace(/\s+/g, "").replace(/&/g, "and") +
+  //     ".png";
+  //   return `public/assets/logos/${imageName}`;
+  // };
 
-    setIsLoadingLogoVerification(true);
-    const verifyLogosAndSetRetailers = async () => {
-      const promises = rawRetailers.map((retailer) => {
-        return new Promise<Retailer | null>((resolve) => {
-          const img = new Image();
-          img.onload = () => resolve(retailer);
-          img.onerror = () => {
-            console.warn(
-              `Logo verification failed for: ${
-                retailer.name
-              }, path: ${getLogoPath(retailer.name)}`
-            );
-            resolve(null); // Indicates logo not found or failed to load
-          };
-          console.log("^^^^^^^^^retailer name:", retailer.name);
-          img.src = getLogoPath(retailer.name);
-          console.log("^^^^^^^^^^^Logo path:", img.src);
-        });
-      });
+  // Effects for fetching retailers and verifying logos moved to useRetailers hook
+  // useEffect(() => { ... loadInitialRetailers ... }, [searchQuery, selectedRetailerProducts.length]);
+  // useEffect(() => { ... verifyLogosAndSetRetailers ... }, [rawRetailers]);
 
-      try {
-        const results = await Promise.all(promises);
-        setVerifiedRetailers(results.filter((r) => r !== null) as Retailer[]);
-      } catch (error) {
-        console.error("Error during bulk logo verification:", error);
-        setVerifiedRetailers([]); // Clear on error
-      } finally {
-        setIsLoadingLogoVerification(false);
-      }
-    };
-
-    verifyLogosAndSetRetailers();
-  }, [rawRetailers]); // Dependency is the list of retailers from the API
-
-  const handleRetailerClick = async (retailerId: number) => {
-    setIsLoadingRetailerProducts(true); // This is a different loading state, for products
-    setRetailerApiError(null);
-    setSelectedRetailerProducts([]);
-    try {
-      const products = await fetchProductsByRetailer(retailerId, "current");
-      setSelectedRetailerProducts(products);
-    } catch (error) {
-      console.error("Error fetching products for retailer:", error);
-      setRetailerApiError("Failed to load products for this retailer.");
-    }
-    setIsLoadingRetailerProducts(false); // Corresponds to isLoadingRetailerProducts
-  };
-
-  // States used for retailer products, not for initial retailers list or logo check
-  const [isLoadingRetailerProducts, setIsLoadingRetailerProducts] =
-    useState<boolean>(false);
+  // Function to handle retailer click moved to useRetailers hook
+  // const handleRetailerClick = async (retailerId: number) => {
+  //   setIsLoadingRetailerProducts(true);
+  //   setRetailerApiError(null);
+  //   setSelectedRetailerProducts([]);
+  //   try {
+  //     const products = await fetchProductsByRetailer(retailerId, "current");
+  //     setSelectedRetailerProducts(products);
+  //   } catch (error) {
+  //     console.error("Error fetching products for retailer:", error);
+  //     setRetailerApiError("Failed to load products for this retailer.");
+  //   }
+  //   setIsLoadingRetailerProducts(false);
+  // };
 
   const mainContentStyle: React.CSSProperties = {
     padding: "0", // Remove padding if sub-components handle it
@@ -176,6 +144,7 @@ const MainContent: React.FC<MainContentProps> = ({
     searchQuery || searchResults.length > 0 || isLoadingSearch || searchError;
 
   // Determine if we should show products from a selected retailer
+  // Ensure search results view takes precedence
   const showRetailerProductsView =
     selectedRetailerProducts.length > 0 && !showSearchResultsView;
 
@@ -206,9 +175,9 @@ const MainContent: React.FC<MainContentProps> = ({
       ) : showRetailerProductsView ? (
         <SearchResultsList
           searchQuery={
-            rawRetailers.find(
+            verifiedRetailers.find(
               (r) => r.id === selectedRetailerProducts[0]?.retailer_id
-            )?.name || "Retailer Products"
+            )?.name || `Products`
           }
           items={selectedRetailerProducts}
           totalResults={selectedRetailerProducts.length}
@@ -253,7 +222,9 @@ const MainContent: React.FC<MainContentProps> = ({
           )}
           {!retailerApiError &&
             rawRetailers.length > 0 &&
-            verifiedRetailers.length === 0 && (
+            verifiedRetailers.length === 0 &&
+            !isLoadingApiRetailers &&
+            !isLoadingLogoVerification && (
               <div
                 style={{ padding: "20px", textAlign: "center", color: "#777" }}
               >
@@ -262,7 +233,8 @@ const MainContent: React.FC<MainContentProps> = ({
             )}
           {!retailerApiError &&
             rawRetailers.length === 0 &&
-            !isLoadingApiRetailers && (
+            !isLoadingApiRetailers &&
+            !isLoadingLogoVerification && (
               <div
                 style={{ padding: "20px", textAlign: "center", color: "#777" }}
               >
