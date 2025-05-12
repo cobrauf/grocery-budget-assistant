@@ -16,15 +16,6 @@ const TopBar: React.FC<TopBarProps> = ({ onMenuClick }) => {
     height: "56px", // Standard app bar height
   };
 
-  const logoStyle: React.CSSProperties = {
-    height: "30px", // Placeholder for logo, adjust as needed
-    width: "auto",
-  };
-
-  const greetingStyle: React.CSSProperties = {
-    fontSize: "0.9rem",
-  };
-
   const menuIconStyle: React.CSSProperties = {
     fontSize: "2rem",
     cursor: "pointer",
