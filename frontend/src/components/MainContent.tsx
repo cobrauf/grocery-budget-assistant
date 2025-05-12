@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 // import SponsoredAd from "./main/SponsoredAd";
-import SearchResultsList from "./search/SearchResultsList";
+import SearchResultsView from "../views/SearchResultsView";
+import RetailerLogosView from "../views/RetailerLogosView";
 import { Product } from "../types/product";
 import FullOverlay from "./common/FullOverlay";
 import LoadingSpinner from "./common/LoadingSpinner";
@@ -63,46 +64,9 @@ const MainContent: React.FC<MainContentProps> = ({
     position: "relative", // For overlay positioning
   };
 
-  const flashDealsPlaceholderStyle: React.CSSProperties = {
-    padding: "1rem",
-    margin: "1rem",
-    border: "1px dashed #ccc",
-    textAlign: "center",
-    color: "#777",
-  };
-
-  const retailerLogosContainerStyle: React.CSSProperties = {
-    display: "flex",
-    flexWrap: "wrap",
-    justifyContent: "center",
-    gap: "20px",
-    padding: "20px",
-  };
-
-  const retailerButtonStyle: React.CSSProperties = {
-    background: "none",
-    border: "1px solid var(--theme-border-color, #ddd)",
-    borderRadius: "8px",
-    padding: "10px",
-    cursor: "pointer",
-    textAlign: "center",
-    minWidth: "120px",
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-    gap: "8px",
-    boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
-  };
-
-  const retailerLogoStyle: React.CSSProperties = {
-    maxHeight: "60px",
-    maxWidth: "100px",
-    objectFit: "contain",
-  };
-
   const showLoadingState = isLoadingApiRetailers || isLoadingLogoVerification;
   const showSearchResultsView =
-    searchQuery || searchResults.length > 0 || isLoadingSearch || searchError;
+    searchQuery || searchResults.length > 0 || isLoadingSearch || !!searchError;
 
   // Determine if we should show products from a selected retailer
   // Ensure search results view takes precedence
@@ -124,7 +88,7 @@ const MainContent: React.FC<MainContentProps> = ({
       )}
 
       {showSearchResultsView ? (
-        <SearchResultsList
+        <SearchResultsView
           searchQuery={searchQuery}
           items={searchResults}
           totalResults={totalResults}
@@ -134,7 +98,7 @@ const MainContent: React.FC<MainContentProps> = ({
           loadMore={loadMoreResults}
         />
       ) : showRetailerProductsView ? (
-        <SearchResultsList
+        <SearchResultsView
           searchQuery={
             verifiedRetailers.find(
               (r) => r.id === selectedRetailerProducts[0]?.retailer_id
@@ -148,63 +112,17 @@ const MainContent: React.FC<MainContentProps> = ({
           loadMore={() => {}}
         />
       ) : (
-        <>
-          {/* <SponsoredAd /> */}
-          {/* Placeholder for Flash Deals Section */}
-          <div style={flashDealsPlaceholderStyle}>
-            Front Page Section (Coming Soon)
-          </div>
-
-          {retailerApiError && (
-            <p style={{ textAlign: "center", padding: "20px", color: "red" }}>
-              {retailerApiError}
-            </p>
-          )}
-
-          {!retailerApiError && verifiedRetailers.length > 0 && (
-            <div style={retailerLogosContainerStyle}>
-              {verifiedRetailers.map((retailer) => (
-                <button
-                  key={retailer.id}
-                  onClick={() => handleRetailerClick(retailer.id)}
-                  style={retailerButtonStyle}
-                  title={`View products from ${retailer.name}`}
-                >
-                  <img
-                    src={getLogoPath(retailer.name)}
-                    alt={`${retailer.name} logo`}
-                    style={retailerLogoStyle}
-                  />
-                  <span>{retailer.name}</span>
-                </button>
-              ))}
-            </div>
-          )}
-          {!retailerApiError &&
-            rawRetailers.length > 0 &&
-            verifiedRetailers.length === 0 &&
-            !isLoadingApiRetailers &&
-            !isLoadingLogoVerification && (
-              <div
-                style={{ padding: "20px", textAlign: "center", color: "#777" }}
-              >
-                No retailers with available logos found.
-              </div>
-            )}
-          {!retailerApiError &&
-            rawRetailers.length === 0 &&
-            !isLoadingApiRetailers &&
-            !isLoadingLogoVerification && (
-              <div
-                style={{ padding: "20px", textAlign: "center", color: "#777" }}
-              >
-                No retailers currently available.
-              </div>
-            )}
-
-          {/* Keep the existing children prop for the test backend button */}
+        <RetailerLogosView
+          rawRetailers={rawRetailers}
+          verifiedRetailers={verifiedRetailers}
+          isLoadingApiRetailers={isLoadingApiRetailers}
+          isLoadingLogoVerification={isLoadingLogoVerification}
+          retailerApiError={retailerApiError}
+          handleRetailerClick={handleRetailerClick}
+          getLogoPath={getLogoPath}
+        >
           {children}
-        </>
+        </RetailerLogosView>
       )}
     </main>
   );
