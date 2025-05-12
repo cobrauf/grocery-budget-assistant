@@ -11,4 +11,7 @@ files in ./backend/app + all subfolders
 [main.py](mdc:backend/app/main.py)
 [database.py](mdc:backend/app/database.py)
 [schema.sql](mdc:backend/sql/schema.sql)
+[main.tsx](mdc:frontend/src/main.tsx)
+[api.ts](mdc:frontend/src/services/api.ts)
+[MainContent.tsx](mdc:frontend/src/components/MainContent.tsx)
 

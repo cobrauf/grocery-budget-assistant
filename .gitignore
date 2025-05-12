@@ -1,6 +1,6 @@
 # Folders
 backend/pdf/
-backend/sql/
+backend/sql/*
 
 
 # Python
