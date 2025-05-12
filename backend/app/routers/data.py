@@ -2,8 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 
 from .. import models
-from ..database import SessionLocal, get_db # Ensure get_db is correctly imported from database.py
-# Removed product_service import
+from ..database import get_db 
 from ..services import json_to_db_service
 
 '''
@@ -14,20 +13,12 @@ Handles database operations using SQLAlchemy sessions.
 Validates and formats data using Pydantic schemas.
 '''
 
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
-
 router = APIRouter(
     prefix="/data",  # Optional prefix for all routes in this router
     tags=["Data Management"]  # Tag for Swagger UI documentation
 )
 
-# Keeping get retailers and weekly ads here as these might be the only retailer/weekly ad endpoints needed
-# Products endpoints moved to products.py + product_service.py
+# Keeping get retailers/weekly ads here for now. Products endpoints moved to products.py + product_service.py
 @router.get("/retailers/")
 def list_retailers(db: Session = Depends(get_db)):
     print("Listing retailers")
@@ -41,7 +32,8 @@ async def list_weekly_ads(db: Session = Depends(get_db)):
 @router.post("/json_to_db/")
 async def upload_jsons_to_db(db: Session = Depends(get_db)):
     print("uploading JSONs to DB")
-    return await json_to_db_service.process_json_extractions() # if it's an async function //TODO
+    # Pass the db session to the service function
+    return await json_to_db_service.process_json_extractions(db)
 
 
 

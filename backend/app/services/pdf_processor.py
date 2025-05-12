@@ -6,13 +6,10 @@ from pydantic import ValidationError
 import asyncio
 import aiofiles # For async file operations
 from pathlib import Path
-from sqlalchemy.orm import Session # Added import
 from datetime import date 
 
 
 from ..schemas.pdf_schema import ExtractedPDFData
-# Use the get_db_session context manager/dependency
-from ..database import SessionLocal # Assuming SessionLocal is the factory
 from ..utils.utils import find_project_root
 from .pdf_prompts import GENERAL_PROMPT_TEMPLATE, PRODUCT_CATEGORIES, KNOWN_RETAILERS, PRODUCT_UNITS # 
 
@@ -31,13 +28,6 @@ PROJECT_ROOT = find_project_root()
 UPLOADS_DIR = PROJECT_ROOT / "backend" / "pdf" / "uploads"
 EXTRACTIONS_DIR = PROJECT_ROOT / "backend" / "pdf" / "extractions"
 
-# Context manager for database sessions in background tasks
-def get_db() -> Session:
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
 
 # --- Initialization ---
 if not GEMINI_API_KEY:
@@ -75,7 +65,7 @@ class GroceryAdProcessor:
         
         # Check if the output JSON file already exists
         if output_json_path.exists():
-            print(f"Warning: Output JSON file {output_json_path} already exists. Skipping processing for {pdf_path.name}.")
+            print(f"=== Warning === : Output JSON file {output_json_path} already exists. Skipping processing for {pdf_path.name}.")
             return None
 
         uploaded_file = None # To keep track for potential deletion

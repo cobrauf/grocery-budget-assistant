@@ -4,7 +4,6 @@ import logging
 from sqlalchemy.orm import Session
 from .. import models
 from ..schemas.pdf_schema import ExtractedPDFData
-from ..database import SessionLocal
 from pathlib import Path
 
 logging.basicConfig(level=logging.INFO)
@@ -12,12 +11,6 @@ logger = logging.getLogger(__name__)
 
 EXTRACTIONS_DIR = Path(__file__).resolve().parent.parent.parent / "pdf" / "extractions"
 
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
 
 def update_ad_periods(db: Session, retailer_id: int):
     logger.info(f"Updating ad periods for retailer_id: {retailer_id}")
@@ -110,10 +103,8 @@ def process_single_json_file(db: Session, file_path: Path):
     
     logger.info(f"Successfully processed {file_path.name}")
 
-def process_json_extractions():
+def process_json_extractions(db: Session):
     logger.info(f"Starting JSON extraction processing from directory: {EXTRACTIONS_DIR}")
-    db_gen = get_db()
-    db = next(db_gen)
     try:
         if not EXTRACTIONS_DIR.exists() or not EXTRACTIONS_DIR.is_dir():
             logger.error(f"Extractions directory not found: {EXTRACTIONS_DIR}")
@@ -130,9 +121,5 @@ def process_json_extractions():
             
         logger.info(f"Finished processing. Total files attempted: {processed_files}")
     finally:
-        db.close()
+        pass # Pass if no other cleanup is needed
 
-if __name__ == "__main__":
-    # This allows the script to be run directly for testing or batch processing
-    logger.info("Running json_to_db_service directly.")
-    process_json_extractions() 
