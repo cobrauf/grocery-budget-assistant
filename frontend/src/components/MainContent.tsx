@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import NavTabs from "./main/NavTabs";
 // import SponsoredAd from "./main/SponsoredAd";
 import SearchResultsList from "./search/SearchResultsList";
 import { Product } from "../types/product";
@@ -29,15 +28,6 @@ const MainContent: React.FC<MainContentProps> = ({
   hasMoreResults,
   loadMoreResults,
 }) => {
-  // State related to retailers moved to useRetailers hook
-  // const [rawRetailers, setRawRetailers] = useState<Retailer[]>([]);
-  // const [verifiedRetailers, setVerifiedRetailers] = useState<Retailer[]>([]);
-  // const [selectedRetailerProducts, setSelectedRetailerProducts] = useState<Product[]>([]);
-  // const [isLoadingApiRetailers, setIsLoadingApiRetailers] = useState<boolean>(false);
-  // const [isLoadingLogoVerification, setIsLoadingLogoVerification] = useState<boolean>(false);
-  // const [retailerApiError, setRetailerApiError] = useState<string | null>(null);
-  // const [isLoadingRetailerProducts, setIsLoadingRetailerProducts] = useState<boolean>(false);
-
   // Determine if a search is active (query exists or results are present)
   const isSearchActive =
     !!searchQuery ||
@@ -65,33 +55,6 @@ const MainContent: React.FC<MainContentProps> = ({
       clearSelectedRetailer();
     }
   }, [isSearchActive, clearSelectedRetailer]);
-
-  // Logic for getting logo path moved to useRetailers hook
-  // const getLogoPath = (retailerName: string) => {
-  //   const imageName =
-  //     retailerName.toLowerCase().replace(/\s+/g, "").replace(/&/g, "and") +
-  //     ".png";
-  //   return `public/assets/logos/${imageName}`;
-  // };
-
-  // Effects for fetching retailers and verifying logos moved to useRetailers hook
-  // useEffect(() => { ... loadInitialRetailers ... }, [searchQuery, selectedRetailerProducts.length]);
-  // useEffect(() => { ... verifyLogosAndSetRetailers ... }, [rawRetailers]);
-
-  // Function to handle retailer click moved to useRetailers hook
-  // const handleRetailerClick = async (retailerId: number) => {
-  //   setIsLoadingRetailerProducts(true);
-  //   setRetailerApiError(null);
-  //   setSelectedRetailerProducts([]);
-  //   try {
-  //     const products = await fetchProductsByRetailer(retailerId, "current");
-  //     setSelectedRetailerProducts(products);
-  //   } catch (error) {
-  //     console.error("Error fetching products for retailer:", error);
-  //     setRetailerApiError("Failed to load products for this retailer.");
-  //   }
-  //   setIsLoadingRetailerProducts(false);
-  // };
 
   const mainContentStyle: React.CSSProperties = {
     padding: "0", // Remove padding if sub-components handle it
@@ -186,7 +149,6 @@ const MainContent: React.FC<MainContentProps> = ({
         />
       ) : (
         <>
-          <NavTabs />
           {/* <SponsoredAd /> */}
           {/* Placeholder for Flash Deals Section */}
           <div style={flashDealsPlaceholderStyle}>
