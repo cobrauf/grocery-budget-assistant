@@ -1,16 +1,16 @@
 export interface Product {
   id: string;
   emoji?: string | null;
-  name: string; // The main description, e.g., "Great Value Cage Free Large White Eggs"
+  name: string;
   price: number;
   original_price?: number;
-  unit: string; // e.g., "12 count", "Each", "per lb"
+  unit: string;
   description?: string;
   category?: string;
-  promotion_details?: string | null; // e.g., "SNAP eligible", "2 for $5"
+  promotion_details?: string | null;
   promotion_from?: string | null;
   promotion_to?: string | null;
-  retailer?: string; // e.g., "Walmart", "Aldi"
+  retailer?: string;
   retailer_id: number;
   retailer_name?: string;
   weekly_ad_id?: string;
@@ -25,5 +25,5 @@ export interface SearchResponse {
   page: number;
   limit: number;
   has_more: boolean;
-  query_echo?: string; // The search term echoed back
+  query_echo?: string;
 }
