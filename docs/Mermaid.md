@@ -34,6 +34,77 @@ A --> D[docs]
 
     P --> T[pdf-upload]
 
+## Frontend Directory Sturcture
+
+graph TD
+MainTSX[main.tsx] --> AppTSX(App.tsx)
+
+    subgraph AppLevelComponents [App.tsx Imports]
+        AppTSX --> HeaderComp(Header.tsx)
+        AppTSX --> MainContentComp(MainContent.tsx)
+        AppTSX --> BottomNavComp(BottomNav.tsx)
+        AppTSX --> SideBarComp(sidebar/SideBar.tsx)
+        AppTSX --> FullOverlayComp(common/FullOverlay.tsx)
+        AppTSX --> PdfUploadComp(pdf-upload/PdfUpload.tsx)
+    end
+
+    subgraph HeaderComponents [Header.tsx Imports]
+        HeaderComp --> TopBarComp(header/TopBar.tsx)
+        HeaderComp --> SearchBarComp(header/SearchBar.tsx)
+        HeaderComp --> CommonSearchOverlayComp(common/SearchOverlay.tsx)
+    end
+
+    subgraph TopBarComponents [TopBar.tsx Imports]
+        TopBarComp --> CartIconComp(header/CartIcon.tsx)
+    end
+
+    subgraph MainContentComponents [MainContent.tsx Imports]
+        MainContentComp --> NavTabsComp(main/NavTabs.tsx)
+        MainContentComp --> SearchResultsListComp(search/SearchResultsList.tsx)
+        MainContentComp --> MainContent_FullOverlay(common/FullOverlay.tsx)
+        MainContentComp --> MainContent_LoadingSpinner(common/LoadingSpinner.tsx)
+        MainContentComp --> SponsoredAdComp(not_used/SponsoredAd.tsx)
+    end
+
+    subgraph SearchResultsListComponents [SearchResultsList.tsx Imports]
+        SearchResultsListComp --> ProductCardComp(common/ProductCard.tsx)
+    end
+
+    subgraph SideBarComponents [SideBar.tsx Imports]
+        SideBarComp --> ThemeSelectorComp(sidebar/ThemeSelector.tsx)
+        SideBarComp --> FontSelectorComp(sidebar/FontSelector.tsx)
+    end
+
+    subgraph CommonComponents [Common Reusable Components]
+        direction LR
+        Common_FullOverlay(common/FullOverlay.tsx)
+        Common_LoadingSpinner(common/LoadingSpinner.tsx)
+        Common_ProductCard(common/ProductCard.tsx)
+        Common_SearchOverlay(common/SearchOverlay.tsx)
+        Common_SideBarOverlay(common/SideBarOverlay.tsx)
+    end
+
+    subgraph PdfUploadComponents [PDF Upload Feature]
+        PdfUploadIndex(pdf-upload/index.ts) --> PdfUpload(pdf-upload/PdfUpload.tsx)
+    end
+
+    subgraph NotUsedComponents [Currently Not Used Components]
+      direction LR
+      NotUsed_DeliveryOptions(not_used/DeliveryOptions.tsx)
+      NotUsed_SponsoredAd(not_used/SponsoredAd.tsx)
+    end
+
+    %% Styling for subgraphs
+    style AppLevelComponents fill:#f9f,stroke:#333,stroke-width:2px
+    style HeaderComponents fill:#e6ffe6,stroke:#333,stroke-width:2px
+    style TopBarComponents fill:#e6ffe6,stroke:#333,stroke-width:2px
+    style MainContentComponents fill:#fff0e6,stroke:#333,stroke-width:2px
+    style SearchResultsListComponents fill:#fff0e6,stroke:#333,stroke-width:2px
+    style SideBarComponents fill:#e6e6ff,stroke:#333,stroke-width:2px
+    style CommonComponents fill:#ffffcc,stroke:#333,stroke-width:2px
+    style PdfUploadComponents fill:#ffe6cc,stroke:#333,stroke-width:2px
+    style NotUsedComponents fill:#lightgrey,stroke:#333,stroke-width:2px
+
 ## Backend Directory Structure (Simplified)
 
 ```mermaid
