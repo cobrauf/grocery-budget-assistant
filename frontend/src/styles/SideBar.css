@@ -1,0 +1,91 @@
+/* Styles for SideBar.tsx */
+
+.sidebar {
+  position: fixed;
+  top: 0;
+  /* left is controlled by isOpen prop in the component */
+  width: 200px;
+  height: 100%;
+  background-color: var(--theme-sidebar-background, #2c3e50);
+  color: var(--theme-sidebar-text, white);
+  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2);
+  padding: 1rem;
+  z-index: 1050;
+  transition: left 0.5s ease-in-out, background-color 0.5s ease, color 0.5s ease;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar-open {
+  left: 0;
+}
+
+.sidebar-closed {
+  left: -300px; /* Or the width of your sidebar */
+}
+
+.sidebar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.sidebar-logo {
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+.sidebar-close-button {
+  font-size: 1.5rem;
+  color: var(--theme-sidebar-text, white);
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+
+.sidebar-nav {
+  flex-grow: 1;
+}
+
+.sidebar-menu-item {
+  padding: 0.75rem 0;
+  font-size: 1.1rem;
+  cursor: pointer;
+  border-bottom: 1px solid var(--theme-sidebar-divider, #34495e);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: border-color 0.3s ease;
+}
+
+.sidebar-menu-item-last {
+  /* Inherits from sidebar-menu-item */
+  border-bottom: none;
+}
+
+.sidebar-submenu-container {
+  padding-left: 1rem;
+  /* maxHeight is controlled by isThemesExpanded/isFontsExpanded prop in the component */
+  overflow: hidden;
+  transition: max-height 0.3s ease-in-out;
+}
+
+/* Animation for nav items when sidebar opens */
+@keyframes slideInFromLeftNavItems {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.sidebar-nav-item-animate {
+  /* Applied when sidebar is open */
+  /* animation properties are set inline based on isOpen and index */
+}

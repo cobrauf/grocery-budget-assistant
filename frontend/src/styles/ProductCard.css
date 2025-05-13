@@ -1,0 +1,91 @@
+/* Styles for ProductCard.tsx */
+
+.product-card {
+  display: flex;
+  align-items: flex-start;
+  padding: 1rem;
+  border-bottom: 1px solid var(--theme-sidebar-divider, #eee);
+  background-color: var(--theme-background, white);
+  color: var(--theme-text, #212529);
+}
+
+.product-card-image-placeholder {
+  width: 80px;
+  height: 80px;
+  background-color: var(--theme-secondary-bg, #e9ecef);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  border-radius: 4px;
+  margin-right: 1rem;
+  color: var(--theme-secondary-text, #495057);
+}
+
+.product-card-details {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.product-card-title-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.product-card-text-details {
+  flex-grow: 1;
+}
+
+.product-card-price {
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: var(--theme-primary, #007bff);
+}
+
+.product-card-unit {
+  font-size: 0.9rem;
+  margin-left: 0.3rem;
+  color: var(--theme-text-secondary, #6c757d);
+}
+
+.product-card-promo {
+  font-size: 0.8rem;
+  font-style: italic;
+  color: var(--theme-text-secondary, #6c757d);
+  margin-left: 0.5rem;
+}
+
+.product-card-description {
+  font-size: 1rem;
+  margin: 0.3rem 0;
+  /* For truncation, a CSS approach is often better but JS can work too
+  white-space: 'nowrap'; // if single line
+  overflow: 'hidden',
+  text-overflow: 'ellipsis',
+  display: '-webkit-box',
+  WebkitLineClamp: 2, // Number of lines
+  WebkitBoxOrient: 'vertical', */
+}
+
+.product-card-retailer {
+  font-size: 0.85rem;
+  color: var(--theme-text-secondary, #6c757d);
+}
+
+.product-card-heart-icon {
+  font-size: 1.5rem;
+  cursor: pointer;
+  margin-left: 1rem;
+  /* color handled by isLiked state in component */
+  transition: color 0.2s ease-in-out;
+}
+
+.product-card-heart-icon-liked {
+  color: var(--theme-error, red);
+}
+
+.product-card-heart-icon-unliked {
+  color: var(--theme-icon-secondary, #ccc);
+}

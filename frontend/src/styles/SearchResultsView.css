@@ -1,0 +1,46 @@
+/* Styles for SearchResultsView.tsx */
+
+.results-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem; /* Spacing between cards */
+  padding: 1rem; /* Padding around the grid */
+  justify-content: center; /* Center items horizontally */
+  height: calc(
+    100vh - 120px
+  ); /* Example: Adjust based on header/footer height */
+  overflow-y: auto; /* Make the container scrollable */
+}
+
+.info-text {
+  width: 100%;
+  text-align: center;
+  padding: 2rem 0;
+  color: #555;
+}
+
+.error-text {
+  width: 100%;
+  text-align: center;
+  padding: 2rem 0;
+  color: red;
+}
+
+.infinite-scroll-loader-container {
+  width: 100%;
+  text-align: center;
+  padding: 1rem 0;
+}
+
+.infinite-scroll-component-style {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  justify-content: center; /* Keep items centered */
+  width: 100%; /* Ensure InfiniteScroll takes full width */
+  overflow: visible !important; /* Prevent InfiniteScroll from creating its own scrollbar and override its default */
+}
+
+.loading-spinner-container-initial {
+  width: 100%;
+}

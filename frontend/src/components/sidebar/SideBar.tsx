@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import ThemeSelector from "./ThemeSelector";
 import FontSelector from "./FontSelector";
 import { availableFonts } from "../../styles/fonts";
+import "../../styles/SideBar.css"; // Import the CSS file
 
 interface SideBarProps {
   isOpen: boolean;
@@ -31,87 +32,6 @@ const SideBar: React.FC<SideBarProps> = ({
     }
   }, [isOpen]);
 
-  const sidebarStyle: React.CSSProperties = {
-    position: "fixed",
-    top: 0,
-    left: isOpen ? "0" : "-300px",
-    width: "200px",
-    height: "100%",
-    backgroundColor: "var(--theme-sidebar-background, #2c3e50)",
-    color: "var(--theme-sidebar-text, white)",
-    boxShadow: "2px 0 5px rgba(0,0,0,0.2)",
-    padding: "1rem",
-    zIndex: 1050,
-    transition:
-      "left .5s ease-in-out, background-color .5s ease, color 0.5s ease",
-    overflowY: "auto",
-    display: "flex", // For easier spacing of logo/close and content
-    flexDirection: "column",
-  };
-
-  const headerStyle: React.CSSProperties = {
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: "1.5rem",
-  };
-
-  const logoStyle: React.CSSProperties = {
-    fontSize: "1.5rem",
-    fontWeight: "bold",
-  };
-
-  const closeButtonStyle: React.CSSProperties = {
-    fontSize: "1.5rem",
-    color: "var(--theme-sidebar-text, white)",
-    background: "none",
-    border: "none",
-    cursor: "pointer",
-    transition: "color 0.3s ease",
-  };
-
-  const navStyle: React.CSSProperties = {
-    flexGrow: 1,
-  };
-
-  const menuItemStyle: React.CSSProperties = {
-    padding: "0.75rem 0",
-    fontSize: "1.1rem",
-    cursor: "pointer",
-    borderBottom: "1px solid var(--theme-sidebar-divider, #34495e)",
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
-    transition: "border-color 0.3s ease",
-  };
-
-  const lastMenuItemStyle: React.CSSProperties = {
-    ...menuItemStyle,
-    borderBottom: "none",
-  };
-
-  const subMenuContainerStyle: React.CSSProperties = {
-    paddingLeft: "1rem",
-    maxHeight: isThemesExpanded ? "500px" : "0", // Control expansion
-    overflow: "hidden",
-    transition: "max-height 0.3s ease-in-out", // Animate expansion
-  };
-
-  //   const subMenuItemStyle: React.CSSProperties = {
-  //     padding: "0.5rem 0",
-  //     fontSize: "1rem",
-  //     cursor: "pointer",
-  //   };
-
-  // Placeholder for animation, not fully implemented yet
-  //   const itemAnimationStyle = (index: number) => ({
-  //     animation: isOpen
-  //       ? `slideInFromLeft 0.5s ease-out ${index * 0.1}s forwards`
-  //       : "none",
-  //     opacity: isOpen ? 0 : 1, // Start transparent for animation
-  //     transform: isOpen ? "translateX(-20px)" : "translateX(0)",
-  //   });
-
   const menuItems = [
     {
       name: "Themes",
@@ -135,14 +55,18 @@ const SideBar: React.FC<SideBarProps> = ({
   }
 
   return (
-    <div style={sidebarStyle}>
-      <div style={headerStyle}>
-        <span style={logoStyle}> ☰ </span> {/* Or your app logo/name */}
-        <button onClick={onClose} style={closeButtonStyle} title="Close menu">
+    <div className={`sidebar ${isOpen ? "sidebar-open" : "sidebar-closed"}`}>
+      <div className="sidebar-header">
+        <span className="sidebar-logo"> ☰ </span> {/* Or your app logo/name */}
+        <button
+          onClick={onClose}
+          className="sidebar-close-button"
+          title="Close menu"
+        >
           ✕
         </button>
       </div>
-      <nav style={navStyle}>
+      <nav className="sidebar-nav">
         {menuItems.map((item, index) => (
           <div
             key={item.name}
@@ -154,10 +78,10 @@ const SideBar: React.FC<SideBarProps> = ({
             }}
           >
             <div
-              style={
+              className={
                 index === menuItems.length - 1
-                  ? lastMenuItemStyle
-                  : menuItemStyle
+                  ? "sidebar-menu-item sidebar-menu-item-last"
+                  : "sidebar-menu-item"
               }
               onClick={item.action}
             >
@@ -173,8 +97,8 @@ const SideBar: React.FC<SideBarProps> = ({
             </div>
             {item.name === "Themes" && (
               <div
+                className="sidebar-submenu-container"
                 style={{
-                  ...subMenuContainerStyle,
                   maxHeight: isThemesExpanded ? "500px" : "0",
                 }}
               >
@@ -186,8 +110,8 @@ const SideBar: React.FC<SideBarProps> = ({
             )}
             {item.name === "Fonts" && (
               <div
+                className="sidebar-submenu-container"
                 style={{
-                  ...subMenuContainerStyle,
                   maxHeight: isFontsExpanded ? "500px" : "0",
                 }}
               >
@@ -205,15 +129,3 @@ const SideBar: React.FC<SideBarProps> = ({
 };
 
 export default SideBar;
-
-/* Basic CSS for slide-in (can be moved to App.css or component CSS) */
-/* @keyframes slideInFromLeft {
-  from {
-    opacity: 0;
-    transform: translateX(-20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-} */
