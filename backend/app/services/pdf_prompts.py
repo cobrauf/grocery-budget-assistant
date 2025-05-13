@@ -8,6 +8,8 @@ its unit (choose from the provided list: {units_list_str}),
 its category (choose from the provided list: {categories_list_str}),
 any descriptive text (eg, USDA Choice Family Pack, don't repeat unit info, this complements the "name" product field, keep to < 50 characters),
 and any promotion_details (e.g., "With Digital Coupon", "Must Buy 4", "Limit 2", "Requires Coupon", etc).
+Identify if a product appears on the front page of the ad and set is_frontpage to true or false.
+Assign an emoji for the product in the emoji field (e.g., "🥬" for lettuce). Try to find matching emoji, but can use generic one if no good match.
 Optionally, also extract original_price (often not present), promotion_from and promotion_to ONLY if they differ from the main weekly_ad valid_from and valid_to dates.
 Don't output text within the (), that is meant as hints for you. Your output should not have any parentheses.
 Becareful of prices that are non-standard, like 2/$4, which means 2 items for $4,
@@ -34,7 +36,9 @@ Respond ONLY with a valid JSON object matching the following structure:
       "promotion_details": "string | null",
       "original_price": "float | null",
       "promotion_from": "YYYY-MM-DD | null",
-      "promotion_to": "YYYY-MM-DD | null"
+      "promotion_to": "YYYY-MM-DD | null",
+      "is_frontpage": "boolean | null",
+      "emoji": "string (emoji character) | null"
     }}
   ]
 }}
@@ -50,7 +54,9 @@ Here's an example of a product output:
   "promotion_details": "With Digital Coupon",
   "original_price": 4.99,
   "promotion_from": null,
-  "promotion_to": null
+  "promotion_to": null,
+  "is_frontpage": true,
+  "emoji": "🍎"
 }}
 Ensure the response contains only the JSON object, with no surrounding text, explanations, or markdown formatting like ```json.
 """

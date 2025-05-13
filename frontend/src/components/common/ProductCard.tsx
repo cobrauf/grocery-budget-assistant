@@ -44,6 +44,11 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
                 {product.retailer_name}
               </div>
             )}
+            {product.is_frontpage && (
+              <span className="product-card-frontpage-indicator">
+                ⭐ Front Page
+              </span>
+            )}
           </div>
           <span
             className={`product-card-heart-icon ${

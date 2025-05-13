@@ -13,6 +13,8 @@ class ProductBaseSchema(BaseModel):
     original_price: Optional[float] = None
     promotion_from: Optional[date] = None
     promotion_to: Optional[date] = None
+    is_frontpage: Optional[bool] = None
+    emoji: Optional[str] = None
 
 class WeeklyAdBaseSchema(BaseModel):
     valid_from: date

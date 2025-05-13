@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Date, Numeric, Text, ForeignKey, DateTime, CheckConstraint, Index, BigInteger, text
+from sqlalchemy import Column, Integer, String, Date, Numeric, Text, ForeignKey, DateTime, CheckConstraint, Index, BigInteger, text, Boolean
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from sqlalchemy.dialects.postgresql import TIMESTAMP, TSVECTOR
@@ -63,6 +63,8 @@ class Product(Base):
     created_at = Column(TIMESTAMP(timezone=True), server_default=func.now())
     fts_vector = Column(TSVECTOR) # For full-text search
     retailer_id = Column(BigInteger, ForeignKey("retailers.id", ondelete="CASCADE"), nullable=False)
+    is_frontpage = Column(Boolean, default=False)
+    emoji = Column(String(10), nullable=True)
     retailer = relationship("Retailer")
 
     weekly_ad = relationship("WeeklyAd", back_populates="products")

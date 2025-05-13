@@ -86,7 +86,9 @@ def process_single_json_file(db: Session, file_path: Path):
             category=pdf_product.category,
             promotion_details=pdf_product.promotion_details,
             promotion_from=pdf_product.promotion_from,
-            promotion_to=pdf_product.promotion_to
+            promotion_to=pdf_product.promotion_to,
+            is_frontpage=pdf_product.is_frontpage,
+            emoji=pdf_product.emoji
         )
         products_to_add.append(new_product)
     

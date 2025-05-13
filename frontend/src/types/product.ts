@@ -17,6 +17,7 @@ export interface Product {
   weekly_ad_valid_from?: string;
   weekly_ad_valid_to?: string;
   weekly_ad_ad_period?: string;
+  is_frontpage?: boolean;
 }
 
 export interface SearchResponse {
