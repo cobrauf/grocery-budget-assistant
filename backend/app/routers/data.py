@@ -33,7 +33,7 @@ async def list_weekly_ads(db: Session = Depends(get_db)):
 async def upload_jsons_to_db(db: Session = Depends(get_db)):
     print("uploading JSONs to DB")
     # Pass the db session to the service function
-    return await json_to_db_service.process_json_extractions(db)
+    return json_to_db_service.process_json_extractions(db)
 
 
 

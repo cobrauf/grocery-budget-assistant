@@ -1,20 +1,36 @@
 GENERAL_PROMPT_TEMPLATE = """
 Extract grocery ad data from the provided PDF file ({file_display_name}).
-Identify the retailer name. Consider the following known retailers: {retailers_list_str}. If the retailer is not in this list, use the name found in the PDF.
-For the weekly ad, extract the valid_from date, valid_to date (YYYY-MM-DD format),
-and the date_processed={current_date_for_processing}, and the original PDF filename.
-For each product, extract its name (keep it less than 20 characters), price (as a float/number),
-its unit (choose from the provided list: {units_list_str}),
-its category (choose from the provided list: {categories_list_str}).
 
-Additionally, extract RELEVANT sales info in "description" field (e.g., "8-oz. Pkg.", "Must Buy 4", "Limit 2", "Requires Coupon", etc). keep to < 50 characters.
-But don't repeat the unit info in the description field, otherwise it will be redundant to the unit field.
+"retailer": Identify the retailer name only from the following known retailers: {retailers_list_str}. If not on list, use "Unknown".
 
-Add other misc info to promotion_details field, keep to < 50 characters, this field is less important and ok to be empty.
-Identify if a product appears on the front page of the ad and set is_frontpage to true or false.
-Assign an (just 1) emoji for the product in the emoji field (e.g., "🥬" for lettuce). Don't use 🪴. Try to find matching emoji, but can use loosely related emoji.
-Optionally, also extract original_price (often not present), promotion_from and promotion_to ONLY if they differ from the main weekly_ad valid_from and valid_to dates.
-Don't output text within the (), that is meant as hints for you. Your output should not have any parentheses.
+"valid_from/to": For the weekly ad, extract the valid_from date, valid_to date (YYYY-MM-DD format).
+
+"date_processed": Extract the date_processed={current_date_for_processing}, and the original PDF filename.
+
+"name": For each product, extract its name.
+
+"price": price (as a float/number).
+
+"unit": Extract its unit, (FYI, bottle, can, jar, bag etc all should be "Each") (choose from the provided list: {units_list_str}).
+
+"category": Extract its category (choose from the provided list: {categories_list_str}).
+
+"promotion_details": Extract relevant SALES/PACKAGING info into "promotion_details" field (e.g., "8-oz. Pkg.", "Must Buy 4", "Limit 2", "Requires Coupon", etc).
+(But don't repeat the unit info in the promotion_details field, otherwise it will be redundant to the "unit" field.)
+
+"description": Extract relevant PRODUCT info into the "description" field, return null for this field if there is no relevant info. (eg, )
+(But don't repeat the unit info in the description field, otherwise it will be redundant to the "unit" field.)
+
+"is_frontpage": Identify if a product appears on the front page of the ad and set is_frontpage to true or false.
+
+"emoji": Assign an (just 1) emoji for the product in the emoji field (e.g., "🥬" for lettuce). Don't use 🪴 or words. Can use loosely related emoji if no exact match.
+
+"original_price": Optionally, also extract original_price (often not present).
+
+"promotion_from/to": ONLY if they differ from the main weekly_ad valid_from and valid_to dates.
+
+Additional instructions:
+Your output should not have any parentheses.
 Becareful of prices that are non-standard, like 2/$4, which means 2 items for $4,
 in that case, calculate the price per item, and put the 2/$4 in the promotion_details field.
 Ignore Spanish text. Don't output Spanish text unless it's a product name.
@@ -30,13 +46,13 @@ Respond ONLY with a valid JSON object matching the following structure:
   }},
   "products": [
     {{
-      "name": "string",
+      "name": "string", (keep it <= 20 characters)
       "price": float,
       "retailer": "string",
-      "description": "string | null",
+      "description": "string | null", (keep to <= 40 characters)
       "unit": "string | null",
       "category": "string | null",
-      "promotion_details": "string | null",
+      "promotion_details": "string | null", (keep to <= 40 characters)
       "original_price": "float | null",
       "promotion_from": "YYYY-MM-DD | null",
       "promotion_to": "YYYY-MM-DD | null",
@@ -51,16 +67,33 @@ Here's an example of a product output:
   "name": "Organic Apple",
   "price": 3.99,
   "retailer": "Aldi",
-  "description": "3-LB. Pkg., 2/$4, Limit 2",
+  "description": "Gala Variety",
   "unit": "Pound",
   "category": "Fruits", 
-  "promotion_details": "With Digital Coupon",
+  "promotion_details": "3-LB. Pkg., 2/$4, Limit 2",
   "original_price": 4.99,
   "promotion_from": null,
   "promotion_to": null,
   "is_frontpage": true,
   "emoji": "🍎"
 }}
+
+Here's another example of a product output:
+{{
+    "name": "Coca-Cola, Pepsi, Squirt",
+      "price": 10.99,
+      "retailer": "Food4Less",
+      "description": null,
+      "unit": "Pack",
+      "category": "Beverages",
+      "promotion_details": "24-Pack Cans, With Digital Coupon",
+      "original_price": 15.99,
+      "promotion_from": null,
+      "promotion_to": null,
+      "is_frontpage": true,
+      "emoji": "🥤"
+}}
+
 Ensure the response contains only the JSON object, with no surrounding text, explanations, or markdown formatting like ```json.
 """
 
@@ -92,11 +125,11 @@ PRODUCT_CATEGORIES = [
     "Kitchen",
     "Kids",
     "Furniture",
-    "Other (if can't find a suitable category)"
+    "Other"
 ]
 
 PRODUCT_UNITS = [
-    "Each (eg, bottle, can, jar, bagetc all should be Each)",
+    "Each",
     "Pack",
     "Count",
     "Dozen",
@@ -110,7 +143,7 @@ PRODUCT_UNITS = [
     "Quart",
     "Liter",
     "Pint",
-    "Other (if can't find a suitable unit)"
+    "Other"
 ]
 
 KNOWN_RETAILERS = [

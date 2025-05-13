@@ -31,7 +31,7 @@ def update_ad_periods(db: Session, retailer_id: int):
 def process_single_json_file(db: Session, file_path: Path):
     logger.info(f"Processing file: {file_path.name}")
     try:
-        with open(file_path, 'r') as f:
+        with open(file_path, 'r', encoding='utf-8') as f:
             data = json.load(f)
         
         parsed_data = ExtractedPDFData(**data)
