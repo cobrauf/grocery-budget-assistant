@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Product } from "../types/product";
 import { Retailer } from "../types/retailer";
 import { fetchRetailers, fetchProductsByRetailer } from "../services/api";
@@ -17,14 +17,14 @@ export const useRetailers = (isSearchActive: boolean) => {
     useState<boolean>(false);
   const [retailerApiError, setRetailerApiError] = useState<string | null>(null);
 
-  const getLogoPath = (retailerName: string): string => {
+  const getLogoPath = useCallback((retailerName: string): string => {
     const imageName =
       retailerName.toLowerCase().replace(/\s+/g, "").replace(/&/g, "and") +
       ".png";
     // Ensure the path starts from the public directory correctly
     // Assuming the build process places assets at the root level accessible via '/'
     return `public/assets/logos/${imageName}`;
-  };
+  }, []);
 
   // Effect to fetch initial retailers list
   useEffect(() => {
@@ -86,10 +86,10 @@ export const useRetailers = (isSearchActive: boolean) => {
     };
 
     verifyLogosAndSetRetailers();
-  }, [rawRetailers]); // Depends only on rawRetailers changing
+  }, [rawRetailers, getLogoPath]); // Depends only on rawRetailers changing and getLogoPath
 
   // Function to handle fetching products for a selected retailer
-  const handleRetailerClick = async (retailerId: number) => {
+  const handleRetailerClick = useCallback(async (retailerId: number) => {
     setIsLoadingRetailerProducts(true);
     setRetailerApiError(null);
     setSelectedRetailerProducts([]); // Clear previous products
@@ -104,13 +104,13 @@ export const useRetailers = (isSearchActive: boolean) => {
     } finally {
       setIsLoadingRetailerProducts(false);
     }
-  };
+  }, []);
 
   // Function to clear selected retailer products, e.g., when going back or starting a search
-  const clearSelectedRetailer = () => {
+  const clearSelectedRetailer = useCallback(() => {
     setSelectedRetailerProducts([]);
     setRetailerApiError(null); // Also clear any related errors
-  };
+  }, []);
 
   return {
     rawRetailers,
