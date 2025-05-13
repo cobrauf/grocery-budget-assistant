@@ -94,10 +94,10 @@
 }
 
 .product-card-frontpage-indicator {
-  font-size: 0.75rem;
+  font-size: 0.6rem;
   font-weight: bold;
   color: var(--theme-accent-color, #ffc107); /* Example accent color */
-  margin-right: 1rem;
+  margin-right: 2rem;
 }
 
 .product-card-meta-row {
