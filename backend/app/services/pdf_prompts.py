@@ -8,6 +8,7 @@ its unit (choose from the provided list: {units_list_str}),
 its category (choose from the provided list: {categories_list_str}).
 
 Additionally, extract RELEVANT sales info in "description" field (e.g., "8-oz. Pkg.", "Must Buy 4", "Limit 2", "Requires Coupon", etc). keep to < 50 characters.
+But don't repeat the unit info in the description field, otherwise it will be redundant to the unit field.
 
 Add other misc info to promotion_details field, keep to < 50 characters, this field is less important and ok to be empty.
 Identify if a product appears on the front page of the ad and set is_frontpage to true or false.
@@ -50,7 +51,7 @@ Here's an example of a product output:
   "name": "Organic Apple",
   "price": 3.99,
   "retailer": "Aldi",
-  "description": "Organic, Gala, locally grown",
+  "description": "3-LB. Pkg., 2/$4, Limit 2",
   "unit": "Pound",
   "category": "Fruits", 
   "promotion_details": "With Digital Coupon",

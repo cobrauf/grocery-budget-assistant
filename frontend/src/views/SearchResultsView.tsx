@@ -26,11 +26,6 @@ const SearchResultsView: React.FC<SearchResultsViewProps> = ({
   const scrollableDivRef = useRef<HTMLDivElement>(null); // Ref for the scrollable container
 
   const resultsContainerStyle: React.CSSProperties = {
-    display: "flex",
-    flexWrap: "wrap",
-    gap: "1rem", // Spacing between cards
-    padding: "1rem", // Padding around the grid
-    justifyContent: "center", // Center items horizontally
     height: "calc(100vh - 120px)", // Example: Adjust based on header/footer height
     overflowY: "auto", // Make the container scrollable
   };
@@ -77,12 +72,12 @@ const SearchResultsView: React.FC<SearchResultsViewProps> = ({
         }
         scrollableTarget="scrollableDiv" // Target the scrollable container
         style={{
-          display: "flex",
-          flexWrap: "wrap",
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))",
           gap: "1rem",
-          justifyContent: "center", // Keep items centered
-          width: "100%", // Ensure InfiniteScroll takes full width
-          overflow: "visible", // Prevent InfiniteScroll from creating its own scrollbar
+          width: "100%",
+          overflow: "visible",
+          padding: "1rem",
         }}
       >
         {items.map((item) => (
