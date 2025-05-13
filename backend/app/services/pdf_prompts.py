@@ -18,7 +18,7 @@ Extract grocery ad data from the provided PDF file ({file_display_name}).
 "promotion_details": Extract relevant SALES/PACKAGING info into "promotion_details" field (e.g., "8-oz. Pkg.", "Must Buy 4", "Limit 2", "Requires Coupon", etc).
 (But don't repeat the unit info in the promotion_details field, otherwise it will be redundant to the "unit" field.)
 
-"description": Extract relevant PRODUCT info into the "description" field, return null for this field if there is no relevant info. (eg, )
+"description": Extract relevant PRODUCT info into the "description" field, return null for this field if there is no relevant info. (eg, Oats & Honey or Cinnamon Raisin, or brand names)
 (But don't repeat the unit info in the description field, otherwise it will be redundant to the "unit" field.)
 
 "is_frontpage": Identify if a product appears on the front page of the ad and set is_frontpage to true or false.
