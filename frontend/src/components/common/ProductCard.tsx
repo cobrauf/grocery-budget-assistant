@@ -24,28 +24,30 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
             <div className="product-card-description">
               {truncateText(product.name, 25)}
             </div>
-            <div>
-              <span className="product-card-price">
-                ${product.price.toFixed(2)}
-              </span>
-              {product.unit && (
-                <span className="product-card-unit">/{product.unit}</span>
+            <div className="product-price-line">
+              <div>
+                <span className="product-card-price">
+                  ${product.price.toFixed(2)}
+                </span>
+                {product.unit && (
+                  <span className="product-card-unit">/{product.unit}</span>
+                )}
+              </div>
+              {product.is_frontpage && (
+                <span className="product-card-frontpage-indicator">
+                  {" "}
+                  ⭐ Front Page
+                </span>
               )}
             </div>
 
-            {product.is_frontpage ? (
-              <div className="product-card-frontpage-wrapper">
-                <span className="product-card-frontpage-indicator">
-                  ⭐ Front Page
-                </span>
-              </div>
-            ) : product.promotion_details ? (
+            {product.promotion_details && (
               <div className="product-card-promo-details-row">
                 <span className="product-card-promo">
                   {truncateText(product.promotion_details, 30)}
                 </span>
               </div>
-            ) : null}
+            )}
 
             {product.retailer_name && (
               <div className="product-card-retailer">
