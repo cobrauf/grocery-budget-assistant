@@ -1,141 +1,128 @@
 # Project Structure & Flow
 
-## Directory Structure
+## Frontend Directory Structure (Detailed)
 
 graph TD
-A[grocery-budget-assistant] --> B[backend]
-A --> C[frontend]
-A --> D[docs]
+MainTSX[src/Main.tsx] --> AppTSX(src/App.tsx)
 
-    B --> E[app]
-    B --> F[sql]
-    B --> PDFDIR[pdf/]
+    subgraph AppLevel [App.tsx Imports & Structure]
+        AppTSX --> Header(src/components/Header.tsx)
+        AppTSX --> MainContent(src/components/MainContent.tsx)
+        AppTSX --> BottomNav(src/components/BottomNav.tsx)
+        AppTSX --> SideBar(src/components/sidebar/SideBar.tsx)
+        AppTSX --> PdfUpload(src/components/pdf-upload/PdfUpload.tsx)
+        AppTSX --> SearchResultsView(src/views/SearchResultsView.tsx)
+        AppTSX --> RetailerLogosView(src/views/RetailerLogosView.tsx)
+        AppTSX --> useThemeHook(src/hooks/useTheme.ts)
+        AppTSX --> useSearchHook(src/hooks/useSearch.ts)
+        AppTSX --> useRetailersHook(src/hooks/useRetailers.ts)
+        AppTSX --> apiService(src/services/api.ts)
+    end
 
-    E --> G[main.py]
-    E --> H[models.py]
-    E --> I[crud.py]
-    E --> J[database.py]
-    E --> UTILS[utils/]
+    subgraph MainContentLevel [MainContent.tsx Imports]
+        MainContent --> FullOverlay(src/components/common/FullOverlay.tsx)
+        MainContent --> LoadingSpinner(src/components/common/LoadingSpinner.tsx)
+        MainContent --> ProductCard(src/components/common/ProductCard.tsx)
+    end
 
-    F --> L[schema.sql]
+    subgraph HeaderLevel [Header.tsx Imports]
+       Header --> SearchOverlay(src/components/common/SearchOverlay.tsx)
+    end
 
-    PDFDIR --> K[uploads/]
-    PDFDIR --> EXT[extractions/]
-    PDFDIR --> TMP[temp_pdfs/]
-    PDFDIR --> ARC[archived/]
+    subgraph SideBarLevel [SideBar.tsx Imports]
+        SideBar --> FontSelector(src/components/sidebar/FontSelector.tsx)
+        SideBar --> ThemeSelector(src/components/sidebar/ThemeSelector.tsx)
+    end
 
-    C --> M[src]
-    C --> N[public]
+    subgraph ViewLevel [View Components]
+        SearchResultsView --> ProductCard_View(src/components/common/ProductCard.tsx)
+        RetailerLogosView --> ProductCard_RetailerView(src/components/common/ProductCard.tsx)
+    end
 
-    M --> P[components]
-    M --> Q[services]
-    M --> R[App.tsx]
-    M --> S[main.tsx]
+    subgraph HookLevel [Custom Hooks]
+        useSearchHook
+        useThemeHook
+        useRetailersHook
+    end
 
-    P --> T[pdf-upload]
+    subgraph ServiceLevel [Services]
+        apiService
+    end
 
-## Frontend Directory Sturcture
+    subgraph TypeLevel [Types]
+        ProductType(src/types/product.ts)
+        RetailerType(src/types/retailer.ts)
+    end
+
+    subgraph StyleLevel [Styles]
+        AppCSS(src/styles/app.css)
+        IndexCSS(src/styles/index.css)
+        LoadingCSS(src/styles/loadingSpinner.css)
+        FontsTS(src/styles/fonts.ts)
+        ThemesTS(src/styles/themes.ts)
+    end
+
+    %% Styling for subgraphs (optional)
+    style AppLevel fill:#f9f,stroke:#333,stroke-width:1px
+    style MainContentLevel fill:#fff0e6,stroke:#333,stroke-width:1px
+    style HeaderLevel fill:#e6ffe6,stroke:#333,stroke-width:1px
+    style SideBarLevel fill:#e6e6ff,stroke:#333,stroke-width:1px
+    style ViewLevel fill:#ccffee,stroke:#333,stroke-width:1px
+    style HookLevel fill:#ffffcc,stroke:#333,stroke-width:1px
+    style ServiceLevel fill:#ffe6cc,stroke:#333,stroke-width:1px
+    style TypeLevel fill:#ffcccc,stroke:#333,stroke-width:1px
+    style StyleLevel fill:#ccffcc,stroke:#333,stroke-width:1px
+
+## Frontend Directory Structure (simplified)
 
 graph TD
-MainTSX[main.tsx] --> AppTSX(App.tsx)
+MainTSX[src/Main.tsx] --> AppTSX(src/App.tsx)
 
-    subgraph AppLevelComponents [App.tsx Imports]
-        AppTSX --> HeaderComp(Header.tsx)
-        AppTSX --> MainContentComp(MainContent.tsx)
-        AppTSX --> BottomNavComp(BottomNav.tsx)
-        AppTSX --> SideBarComp(sidebar/SideBar.tsx)
-        AppTSX --> FullOverlayComp(common/FullOverlay.tsx)
-        AppTSX --> PdfUploadComp(pdf-upload/PdfUpload.tsx)
-    end
+    AppTSX --> AppComps(App-Level Components<br>src/components/Header.tsx<br>src/components/MainContent.tsx<br>src/components/BottomNav.tsx<br>src/components/PdfUpload.tsx)
+    AppTSX --> SideBar(src/components/sidebar/SideBar.tsx)
+    AppTSX --> Views(Views<br>src/views/SearchResultsView.tsx<br>src/views/RetailerLogosView.tsx)
+    AppTSX --> Hooks(Hooks<br>src/hooks/useTheme.ts<br>src/hooks/useSearch.ts<br>src/hooks/useRetailers.ts)
+    AppTSX --> Services(Services<br>src/services/api.ts)
+    AppTSX --> Types(Types<br>src/types/product.ts<br>src/types/retailer.ts)
+    AppTSX --> Styles(Styles<br>src/styles/app.css<br>src/styles/index.css<br>src/styles/loadingSpinner.css<br>src/styles/fonts.ts<br>src/styles/themes.ts)
 
-    subgraph HeaderComponents [Header.tsx Imports]
-        HeaderComp --> TopBarComp(header/TopBar.tsx)
-        HeaderComp --> SearchBarComp(header/SearchBar.tsx)
-        HeaderComp --> CommonSearchOverlayComp(common/SearchOverlay.tsx)
-    end
 
-    subgraph TopBarComponents [TopBar.tsx Imports]
-        TopBarComp --> CartIconComp(header/CartIcon.tsx)
-    end
+    AppComps --> CommonComps(Common Components<br>src/components/common/FullOverlay.tsx<br>src/components/common/LoadingSpinner.tsx<br>src/components/common/ProductCard.tsx<br>src/components/common/SearchOverlay.tsx)
 
-    subgraph MainContentComponents [MainContent.tsx Imports]
-        MainContentComp --> NavTabsComp(main/NavTabs.tsx)
-        MainContentComp --> SearchResultsListComp(search/SearchResultsList.tsx)
-        MainContentComp --> MainContent_FullOverlay(common/FullOverlay.tsx)
-        MainContentComp --> MainContent_LoadingSpinner(common/LoadingSpinner.tsx)
-        MainContentComp --> SponsoredAdComp(not_used/SponsoredAd.tsx)
-    end
+    SideBar --> SidebarComps(Sidebar Components<br>src/components/sidebar/FontSelector.tsx<br>src/components/sidebar/ThemeSelector.tsx)
 
-    subgraph SearchResultsListComponents [SearchResultsList.tsx Imports]
-        SearchResultsListComp --> ProductCardComp(common/ProductCard.tsx)
-    end
+    Views --> CommonComps
+    Views --> Hooks
+    Views --> Types
 
-    subgraph SideBarComponents [SideBar.tsx Imports]
-        SideBarComp --> ThemeSelectorComp(sidebar/ThemeSelector.tsx)
-        SideBarComp --> FontSelectorComp(sidebar/FontSelector.tsx)
-    end
+    Hooks --> Services
+    Hooks --> Types
 
-    subgraph CommonComponents [Common Reusable Components]
-        direction LR
-        Common_FullOverlay(common/FullOverlay.tsx)
-        Common_LoadingSpinner(common/LoadingSpinner.tsx)
-        Common_ProductCard(common/ProductCard.tsx)
-        Common_SearchOverlay(common/SearchOverlay.tsx)
-        Common_SideBarOverlay(common/SideBarOverlay.tsx)
-    end
-
-    subgraph PdfUploadComponents [PDF Upload Feature]
-        PdfUploadIndex(pdf-upload/index.ts) --> PdfUpload(pdf-upload/PdfUpload.tsx)
-    end
-
-    subgraph NotUsedComponents [Currently Not Used Components]
-      direction LR
-      NotUsed_DeliveryOptions(not_used/DeliveryOptions.tsx)
-      NotUsed_SponsoredAd(not_used/SponsoredAd.tsx)
-    end
-
-    %% Styling for subgraphs
-    style AppLevelComponents fill:#f9f,stroke:#333,stroke-width:2px
-    style HeaderComponents fill:#e6ffe6,stroke:#333,stroke-width:2px
-    style TopBarComponents fill:#e6ffe6,stroke:#333,stroke-width:2px
-    style MainContentComponents fill:#fff0e6,stroke:#333,stroke-width:2px
-    style SearchResultsListComponents fill:#fff0e6,stroke:#333,stroke-width:2px
-    style SideBarComponents fill:#e6e6ff,stroke:#333,stroke-width:2px
-    style CommonComponents fill:#ffffcc,stroke:#333,stroke-width:2px
-    style PdfUploadComponents fill:#ffe6cc,stroke:#333,stroke-width:2px
-    style NotUsedComponents fill:#lightgrey,stroke:#333,stroke-width:2px
+    Services --> Types
 
 ## Backend Directory Structure (Simplified)
 
-```mermaid
+<!-- (when updating, keep to this format consistency, ignore init files) -->
+
 graph TD
-    B(backend) --> APP(app)
-    B --> PDFROOT(pdf/)
+backend --> app
+backend --> pdf
+backend --> root_files(requirements.txt<br>Procfile<br>venv/)
 
-    APP --> ROUTERS(routers/)
-    APP --> SERVICES(services/)
-    APP --> SCHEMAS(schemas/)
-    APP --> UTILS_APP(utils/)
-    APP --> MODELS(models.py)
-    APP --> CRUD(crud.py)
-    APP --> DBSETUP(database.py)
-    APP --> MAIN(main.py)
+    app --> routers
+    app --> services
+    app --> schemas
+    app --> utils
+    app --> app_files(models.py<br>database.py<br>main.py)
 
-    ROUTERS --> PDATA(data.py)
-    ROUTERS --> PPDF(pdf.py)
+    pdf --> pdf_uploads(uploads/)
+    pdf --> pdf_extractions(extractions/)
+    pdf --> pdf_archived(archived/)
 
-    SERVICES --> PDFPROC(pdf_processor.py)
-    SERVICES --> PDFPROMPTS(pdf_prompts.py)
-
-    SCHEMAS --> SBASE(base_schemas.py)
-    SCHEMAS --> SDATA(data_schemas.py)
-    SCHEMAS --> SPDF(pdf_schema.py)
-
-    PDFROOT --> PDFUPLOADS(uploads/)
-    PDFROOT --> PDFEXTRACTIONS(extractions/)
-    PDFROOT --> PDFTEMP(temp_pdfs/)
-    PDFROOT --> PDFARCHIVED(archived/)
-```
+    routers --> routers_files(data.py<br>pdf.py<br>products.py<br>retailers.py)
+    services --> services_files(pdf_processor.py<br>pdf_prompts.py<br>json_to_db_service.py<br>product_service.py<br>retailer_service.py)
+    schemas --> schemas_files(base_schemas.py<br>data_schemas.py<br>pdf_schema.py)
+    utils --> utils_files(utils.py<br>schema.sql)
 
 ## Database Schema
 
@@ -309,8 +296,8 @@ sequenceDiagram
 
 ## Technology Stack
 
-- Frontend: React + TypeScript + Vite
-- Backend: FastAPI + SQLAlchemy + google-generativeai + aiofiles
+- Frontend: React + TypeScript + Vite + Tailwind CSS (Confirm primary UI lib)
+- Backend: FastAPI + SQLAlchemy + google-generativeai + aiofiles + asyncpg
 - Database: PostgreSQL (Supabase)
-- Testing: Cypress
+- Testing: Cypress + Pytest (Confirm frontend testing setup)
 - Development Tools: uvicorn, python-dotenv

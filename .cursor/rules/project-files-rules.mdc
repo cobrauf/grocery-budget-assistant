@@ -1,6 +1,9 @@
 ---
 description: 
-globs: ProjectFiles.md
+globs: 
 alwaysApply: false
 ---
-Update the ProjectFiles.md if files or folders have been changes or are added/removed.
+Update these files:
+[ProjectDoc.md](mdc:docs/ProjectDoc.md)
+[ProjectFiles.md](mdc:docs/ProjectFiles.md)
+[Mermaid.md](mdc:docs/Mermaid.md)
