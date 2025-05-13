@@ -3,21 +3,22 @@
 .product-card {
   display: flex;
   align-items: flex-start;
-  padding: 1rem;
+  padding: 0rem 0.5rem;
+  margin-top: -0.5rem;
   border-bottom: 1px solid var(--theme-sidebar-divider, #eee);
   background-color: var(--theme-background, white);
   color: var(--theme-text, #212529);
   width: 100%;
 }
 
-.product-card-image-placeholder {
+.product-card-image {
   width: 80px;
   height: 80px;
-  background-color: var(--theme-secondary-bg, #e9ecef);
+  background-color: var(--theme-secondary-bg, #e9ecef00);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 2rem;
+  font-size: 3rem;
   border-radius: 4px;
   margin-right: 1rem;
   color: var(--theme-secondary-text, #495057);
@@ -52,7 +53,7 @@
 }
 
 .product-card-promo {
-  font-size: 0.8rem;
+  font-size: 0.7rem;
   font-style: italic;
   color: var(--theme-text-secondary, #6c757d);
   margin-left: 0.5rem;
@@ -61,24 +62,19 @@
 .product-card-description {
   font-size: 1rem;
   margin: 0.3rem 0;
-  /* For truncation, a CSS approach is often better but JS can work too
-  white-space: 'nowrap'; // if single line
-  overflow: 'hidden',
-  text-overflow: 'ellipsis',
-  display: '-webkit-box',
-  WebkitLineClamp: 2, // Number of lines
-  WebkitBoxOrient: 'vertical', */
 }
 
 .product-card-retailer {
   font-size: 0.85rem;
   color: var(--theme-text-secondary, #6c757d);
+  flex-shrink: 0;
 }
 
 .product-card-heart-icon {
-  font-size: 1.5rem;
+  font-size: 2rem;
   cursor: pointer;
   margin-left: 1rem;
+  margin-right: 1rem;
   /* color handled by isLiked state in component */
   transition: color 0.2s ease-in-out;
 }
@@ -95,6 +91,19 @@
   font-size: 0.75rem;
   font-weight: bold;
   color: var(--theme-accent-color, #ffc107); /* Example accent color */
-  margin-top: 0.25rem;
-  display: block; /* Ensure it takes its own line or adjust as needed */
+}
+
+.product-card-frontpage-wrapper {
+  margin-left: auto;
+  margin-bottom: 0.5rem;
+  margin-right: 0.5rem;
+  margin-top: -0.5rem;
+}
+
+.product-card-meta-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 0.1rem;
+  width: 100%;
 }

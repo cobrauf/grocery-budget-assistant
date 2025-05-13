@@ -17,12 +17,13 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
 
   return (
     <div className="product-card">
-      <div className="product-card-image-placeholder">
-        {product.emoji || "🥬"}
-      </div>
+      <div className="product-card-image">{product.emoji || "🥬"}</div>
       <div className="product-card-details">
         <div className="product-card-title-row">
           <div className="product-card-text-details">
+            <div className="product-card-description">
+              {truncateText(product.name, 25)}
+            </div>
             <div>
               <span className="product-card-price">
                 ${product.price.toFixed(2)}
@@ -30,24 +31,25 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
               {product.unit && (
                 <span className="product-card-unit">{product.unit}</span>
               )}
-              {product.promotion_details && (
+            </div>
+            {product.promotion_details && (
+              <div className="product-card-promo-details-row">
                 <span className="product-card-promo">
-                  ({product.promotion_details})
+                  {truncateText(product.promotion_details, 20)}
                 </span>
-              )}
-            </div>
-            <div className="product-card-description">
-              {truncateText(product.name, 70)}
-            </div>
-            {product.retailer && (
+              </div>
+            )}
+            {product.retailer_name && (
               <div className="product-card-retailer">
                 {product.retailer_name}
               </div>
             )}
             {product.is_frontpage && (
-              <span className="product-card-frontpage-indicator">
-                ⭐ Front Page
-              </span>
+              <div className="product-card-frontpage-wrapper">
+                <span className="product-card-frontpage-indicator">
+                  ⭐ Front Page
+                </span>
+              </div>
             )}
           </div>
           <span
