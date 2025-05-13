@@ -5,11 +5,13 @@ For the weekly ad, extract the valid_from date, valid_to date (YYYY-MM-DD format
 and the date_processed={current_date_for_processing}, and the original PDF filename.
 For each product, extract its name (keep it less than 20 characters), price (as a float/number),
 its unit (choose from the provided list: {units_list_str}),
-its category (choose from the provided list: {categories_list_str}),
-any descriptive text (eg, USDA Choice Family Pack, don't repeat unit info, this complements the "name" product field, keep to < 50 characters),
-and any promotion_details (e.g., "With Digital Coupon", "Must Buy 4", "Limit 2", "Requires Coupon", etc).
+its category (choose from the provided list: {categories_list_str}).
+
+Additionally, extract RELEVANT sales info in "description" field (e.g., "8-oz. Pkg.", "Must Buy 4", "Limit 2", "Requires Coupon", etc). keep to < 50 characters.
+
+Add other misc info to promotion_details field, keep to < 50 characters, this field is less important and ok to be empty.
 Identify if a product appears on the front page of the ad and set is_frontpage to true or false.
-Assign an emoji for the product in the emoji field (e.g., "🥬" for lettuce). Try to find matching emoji, but can use generic one if no good match.
+Assign an (just 1) emoji for the product in the emoji field (e.g., "🥬" for lettuce). Don't use 🪴. Try to find matching emoji, but can use loosely related emoji.
 Optionally, also extract original_price (often not present), promotion_from and promotion_to ONLY if they differ from the main weekly_ad valid_from and valid_to dates.
 Don't output text within the (), that is meant as hints for you. Your output should not have any parentheses.
 Becareful of prices that are non-standard, like 2/$4, which means 2 items for $4,
@@ -89,7 +91,7 @@ PRODUCT_CATEGORIES = [
     "Kitchen",
     "Kids",
     "Furniture",
-    "Other (if can't find a suitable category)" 
+    "Other (if can't find a suitable category)"
 ]
 
 PRODUCT_UNITS = [
@@ -98,11 +100,11 @@ PRODUCT_UNITS = [
     "Count",
     "Dozen",
     "Case",
-    "Pound",          
-    "Ounce",          
-    "Kg",          
+    "Pound",
+    "Ounce",
+    "Kg",
     "Gram",
-    "Ml",          
+    "Ml",
     "Gallon",
     "Quart",
     "Liter",
