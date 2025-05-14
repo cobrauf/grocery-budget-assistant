@@ -23,7 +23,9 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
 
   return (
     <div className="product-card">
-      <div className="product-card-image">{product.emoji || "🥬"}</div>
+      <div className="product-card-image">
+        {product.emoji ? Array.from(product.emoji)[0] : "🛒"}
+      </div>
       <div className="product-card-details">
         <div className="product-card-title-row">
           <div className="product-card-text-details">
@@ -49,7 +51,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
 
             <div className="product-card-promo-details-row">
               <span className="product-card-promo">
-                {truncateText(product.promotion_details || "No details", 30)}
+                {truncateText(product.promotion_details || "---", 30)}
               </span>
             </div>
           </div>
