@@ -19,15 +19,41 @@ async def get_products_by_retailer_and_ad_period(
         .filter(WeeklyAdModel.ad_period == ad_period)
         .options(
             joinedload(ProductModel.retailer), # Ensure retailer data is loaded
-            joinedload(ProductModel.weekly_ad) # Ensure weekly_ad data is loaded for ProductWithDetails
+            joinedload(ProductModel.weekly_ad) # Ensure weekly_ad data is loaded
         )
         .offset(offset)
         .limit(limit)
     )
-    products_db = query.all()
-    return products_db 
+    products_orm = query.all()
+    
+    products_with_details: List[ProductWithDetails] = []
+    for p_orm in products_orm:
+        details = ProductWithDetails(
+            id=p_orm.id,
+            name=p_orm.name,
+            price=p_orm.price,
+            original_price=p_orm.original_price,
+            unit=p_orm.unit,
+            description=p_orm.description,
+            category=p_orm.category,
+            promotion_details=p_orm.promotion_details,
+            promotion_from=p_orm.promotion_from,
+            promotion_to=p_orm.promotion_to,
+            is_frontpage=p_orm.is_frontpage,
+            emoji=p_orm.emoji,
+            # retailer: str field from ProductBaseSchema, inherited.
+            retailer=p_orm.retailer.name if p_orm.retailer else "N/A", 
+            retailer_id=p_orm.retailer_id,
+            weekly_ad_id=p_orm.weekly_ad_id,
+            # Fields specific to ProductWithDetails
+            retailer_name=p_orm.retailer.name if p_orm.retailer else "N/A",
+            weekly_ad_valid_from=p_orm.weekly_ad.valid_from if p_orm.weekly_ad else None,
+            weekly_ad_valid_to=p_orm.weekly_ad.valid_to if p_orm.weekly_ad else None,
+            weekly_ad_ad_period=p_orm.weekly_ad.ad_period if p_orm.weekly_ad else None,
+        )
+        products_with_details.append(details)
+    return products_with_details
 
-# New function for searching products
 async def search_products(
     db: Session, 
     q: str, 
@@ -37,12 +63,13 @@ async def search_products(
     '''
     Searches for products using Full-Text Search (FTS) based on the query string.
     Includes joined loading for retailer and weekly ad details.
+    Returns a list of Pydantic ProductWithDetails models.
     '''
     if not q or not q.strip():
         raise HTTPException(status_code=400, detail="Search query 'q' cannot be empty.")
 
     try:
-        search_results = (
+        query_results_orm = (
             db.query(ProductModel)
             .join(WeeklyAdModel, ProductModel.weekly_ad_id == WeeklyAdModel.id)
             .join(RetailerModel, ProductModel.retailer_id == RetailerModel.id)
@@ -55,8 +82,35 @@ async def search_products(
             .limit(limit)
             .all()
         )
-        # The results should already be ORM objects compatible with ProductWithDetails
-        return search_results
+        
+        products_with_details: List[ProductWithDetails] = []
+        for p_orm in query_results_orm:
+            details = ProductWithDetails(
+                id=p_orm.id,
+                name=p_orm.name,
+                price=p_orm.price,
+                original_price=p_orm.original_price,
+                unit=p_orm.unit,
+                description=p_orm.description,
+                category=p_orm.category,
+                promotion_details=p_orm.promotion_details,
+                promotion_from=p_orm.promotion_from,
+                promotion_to=p_orm.promotion_to,
+                is_frontpage=p_orm.is_frontpage,
+                emoji=p_orm.emoji,
+                # retailer: str field from ProductBaseSchema
+                retailer=p_orm.retailer.name if p_orm.retailer else "N/A",
+                retailer_id=p_orm.retailer_id,
+                weekly_ad_id=p_orm.weekly_ad_id,
+                # Fields specific to ProductWithDetails
+                retailer_name=p_orm.retailer.name if p_orm.retailer else "N/A",
+                weekly_ad_valid_from=p_orm.weekly_ad.valid_from if p_orm.weekly_ad else None,
+                weekly_ad_valid_to=p_orm.weekly_ad.valid_to if p_orm.weekly_ad else None,
+                weekly_ad_ad_period=p_orm.weekly_ad.ad_period if p_orm.weekly_ad else None,
+            )
+            products_with_details.append(details)
+        
+        return products_with_details
     except Exception as e:
         print(f"Error during product search service: {e}")
         raise HTTPException(status_code=500, detail=f"Internal server error during product search: {str(e)}")

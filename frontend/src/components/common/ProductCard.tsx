@@ -49,9 +49,9 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
               </div>
             )}
 
-            {product.retailer?.name && (
+            {product.retailer_name && (
               <div className="product-card-retailer">
-                {product.retailer.name}
+                {product.retailer_name}
               </div>
             )}
           </div>
