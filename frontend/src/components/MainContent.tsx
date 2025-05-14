@@ -1,15 +1,13 @@
-import React, { useEffect } from "react";
-// import SponsoredAd from "./main/SponsoredAd";
+import React from "react";
 import SearchResultsView from "../views/SearchResultsView";
 import RetailerLogosView from "../views/RetailerLogosView";
 import { Product } from "../types/product";
-import FullOverlay from "./common/FullOverlay";
-import LoadingSpinner from "./common/LoadingSpinner";
-import { useRetailers } from "../hooks/useRetailers";
+import { Retailer } from "../types/retailer";
+import { AppView } from "../hooks/useAppView";
 
-// Updated props: Rely on props passed from App (which uses useSearch)
 interface MainContentProps {
-  children?: React.ReactNode; // Made optional as it's only for the test button now
+  children?: React.ReactNode;
+  currentViewType: AppView;
   searchQuery: string;
   searchResults: Product[];
   totalResults: number;
@@ -17,10 +15,20 @@ interface MainContentProps {
   searchError: string | null;
   hasMoreResults: boolean;
   loadMoreResults: () => void;
+  rawRetailers: Retailer[];
+  verifiedRetailers: Retailer[];
+  isLoadingApiRetailers: boolean;
+  isLoadingLogoVerification: boolean;
+  retailerApiError: string | null;
+  onRetailerClick: (retailerId: number) => void;
+  getLogoPath: (name: string) => string;
+  retailerProducts: Product[];
+  isLoadingRetailerProducts: boolean;
 }
 
 const MainContent: React.FC<MainContentProps> = ({
-  children, // Keep children for potential flexibility or the test button
+  children,
+  currentViewType,
   searchQuery,
   searchResults,
   totalResults,
@@ -28,104 +36,72 @@ const MainContent: React.FC<MainContentProps> = ({
   searchError,
   hasMoreResults,
   loadMoreResults,
+  rawRetailers,
+  verifiedRetailers,
+  isLoadingApiRetailers,
+  isLoadingLogoVerification,
+  retailerApiError,
+  onRetailerClick,
+  getLogoPath,
+  retailerProducts,
+  isLoadingRetailerProducts,
 }) => {
-  // Determine if a search is active (query exists or results are present)
-  const isSearchActive =
-    !!searchQuery ||
-    searchResults.length > 0 ||
-    isLoadingSearch ||
-    !!searchError;
-
-  // Use the retailers hook
-  const {
-    rawRetailers,
-    verifiedRetailers,
-    selectedRetailerProducts,
-    isLoadingApiRetailers,
-    isLoadingLogoVerification,
-    isLoadingRetailerProducts,
-    retailerApiError,
-    handleRetailerClick,
-    getLogoPath,
-    clearSelectedRetailer, // Get the clear function
-  } = useRetailers(isSearchActive); // Pass search status to the hook
-
-  // Effect to clear retailer selection when a new search starts
-  useEffect(() => {
-    if (isSearchActive) {
-      clearSelectedRetailer();
-    }
-  }, [isSearchActive, clearSelectedRetailer]);
-
   const mainContentStyle: React.CSSProperties = {
-    padding: "0", // Remove padding if sub-components handle it
+    padding: "0",
     flexGrow: 1,
-    backgroundColor: "var(--theme-background, #fff)", // Main content background
-    position: "relative", // For overlay positioning
+    backgroundColor: "var(--theme-background, #fff)",
+    position: "relative",
   };
 
-  const showLoadingState = isLoadingApiRetailers || isLoadingLogoVerification;
-  const showSearchResultsView =
-    searchQuery || searchResults.length > 0 || isLoadingSearch || !!searchError;
+  const renderContent = () => {
+    switch (currentViewType) {
+      case "searchResults":
+        return (
+          <SearchResultsView
+            searchQuery={searchQuery}
+            items={searchResults}
+            totalResults={totalResults}
+            isLoading={isLoadingSearch}
+            error={searchError}
+            hasMore={hasMoreResults}
+            loadMore={loadMoreResults}
+          />
+        );
+      case "retailerProducts":
+        const retailerNameForProductsView =
+          verifiedRetailers.find(
+            (r) => r.id === retailerProducts[0]?.retailer_id
+          )?.name || "Products";
+        return (
+          <SearchResultsView
+            searchQuery={retailerNameForProductsView}
+            items={retailerProducts}
+            totalResults={retailerProducts.length}
+            isLoading={isLoadingRetailerProducts}
+            error={retailerApiError}
+            hasMore={false}
+            loadMore={() => {}}
+          />
+        );
+      case "retailerLogos":
+      default:
+        return (
+          <RetailerLogosView
+            rawRetailers={rawRetailers}
+            verifiedRetailers={verifiedRetailers}
+            isLoadingApiRetailers={isLoadingApiRetailers}
+            isLoadingLogoVerification={isLoadingLogoVerification}
+            retailerApiError={retailerApiError}
+            handleRetailerClick={onRetailerClick}
+            getLogoPath={getLogoPath}
+          >
+            {children}
+          </RetailerLogosView>
+        );
+    }
+  };
 
-  // Determine if we should show products from a selected retailer
-  // Ensure search results view takes precedence
-  const showRetailerProductsView =
-    selectedRetailerProducts.length > 0 && !showSearchResultsView;
-
-  return (
-    <main style={mainContentStyle}>
-      {showLoadingState && (
-        <FullOverlay isOpen={true} isTransparent={false}>
-          <LoadingSpinner />
-        </FullOverlay>
-      )}
-
-      {isLoadingRetailerProducts && !showLoadingState && (
-        <FullOverlay isOpen={true} isTransparent={false}>
-          <LoadingSpinner />
-        </FullOverlay>
-      )}
-
-      {showSearchResultsView ? (
-        <SearchResultsView
-          searchQuery={searchQuery}
-          items={searchResults}
-          totalResults={totalResults}
-          isLoading={isLoadingSearch}
-          error={searchError}
-          hasMore={hasMoreResults}
-          loadMore={loadMoreResults}
-        />
-      ) : showRetailerProductsView ? (
-        <SearchResultsView
-          searchQuery={
-            verifiedRetailers.find(
-              (r) => r.id === selectedRetailerProducts[0]?.retailer_id
-            )?.name || `Products`
-          }
-          items={selectedRetailerProducts}
-          totalResults={selectedRetailerProducts.length}
-          isLoading={isLoadingRetailerProducts}
-          error={retailerApiError}
-          hasMore={false}
-          loadMore={() => {}}
-        />
-      ) : (
-        <RetailerLogosView
-          rawRetailers={rawRetailers}
-          verifiedRetailers={verifiedRetailers}
-          isLoadingApiRetailers={isLoadingApiRetailers}
-          isLoadingLogoVerification={isLoadingLogoVerification}
-          retailerApiError={retailerApiError}
-          handleRetailerClick={handleRetailerClick}
-          getLogoPath={getLogoPath}
-        >
-          {children}
-        </RetailerLogosView>
-      )}
-    </main>
-  );
+  return <main style={mainContentStyle}>{renderContent()}</main>;
 };
 
 export default MainContent;

@@ -11,6 +11,7 @@ interface SideBarProps {
   onSelectTheme: (themeName: string) => void;
   currentFont: (typeof availableFonts)[0];
   onSelectFont: (font: (typeof availableFonts)[0]) => void;
+  onGoHome?: () => void;
 }
 
 const SideBar: React.FC<SideBarProps> = ({
@@ -20,6 +21,7 @@ const SideBar: React.FC<SideBarProps> = ({
   onSelectTheme,
   currentFont,
   onSelectFont,
+  onGoHome,
 }) => {
   const [isThemesExpanded, setIsThemesExpanded] = useState(false);
   const [isFontsExpanded, setIsFontsExpanded] = useState(false);
@@ -33,6 +35,14 @@ const SideBar: React.FC<SideBarProps> = ({
   }, [isOpen]);
 
   const menuItems = [
+    {
+      name: "Home",
+      action: () => {
+        if (onGoHome) onGoHome();
+        onClose();
+      },
+      expandable: false,
+    },
     {
       name: "Themes",
       action: () => setIsThemesExpanded(!isThemesExpanded),

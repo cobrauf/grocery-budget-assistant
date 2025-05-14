@@ -1,5 +1,7 @@
 # Project Structure & Flow
 
+<!-- (when updating, keep to this format consistency, ignore init files) -->
+
 ## Frontend Directory Structure (Detailed)
 
 graph TD
@@ -74,6 +76,8 @@ MainTSX[src/Main.tsx] --> AppTSX(src/App.tsx)
     style StyleLevel fill:#ccffcc,stroke:#333,stroke-width:1px
 
 ## Frontend Directory Structure (simplified)
+
+<!-- (when updating, keep to this format consistency, ignore init files) -->
 
 graph TD
 MainTSX[src/Main.tsx] --> AppTSX(src/App.tsx)

@@ -8,6 +8,8 @@ import SideBar from "./components/sidebar/SideBar";
 import FullOverlay from "./components/common/FullOverlay";
 import { useTheme as useAppTheme } from "./hooks/useTheme"; // Renamed import to avoid conflict
 import { useSearch } from "./hooks/useSearch"; // Import search hook
+import { useRetailers } from "./hooks/useRetailers"; // Import retailers hook
+import { useAppView } from "./hooks/useAppView"; // Updated import
 
 // --- Theme Context ---
 interface ThemeContextType {
@@ -28,13 +30,14 @@ export const useThemeContext = () => {
 function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
-  // Use custom hooks
   const { currentThemeName, setCurrentThemeName, currentFont, setCurrentFont } =
     useAppTheme();
 
+  const { currentViewState, navigateToView, goHome } = useAppView();
+
   const {
     searchQuery,
-    setSearchQuery, // Use this to clear search if needed
+    setSearchQuery,
     searchResults,
     totalResults,
     isLoadingSearch,
@@ -42,7 +45,24 @@ function App() {
     hasMoreResults,
     performSearch,
     loadMoreResults,
+    resetSearch,
   } = useSearch();
+
+  // Determine if search is active based on view state
+  const isSearchActive = currentViewState.type === "searchResults";
+
+  const {
+    rawRetailers,
+    verifiedRetailers,
+    selectedRetailerProducts,
+    isLoadingApiRetailers,
+    isLoadingLogoVerification,
+    isLoadingRetailerProducts,
+    retailerApiError,
+    handleRetailerClick: fetchRetailerProductsLogic,
+    clearSelectedRetailer,
+    getLogoPath,
+  } = useRetailers(isSearchActive);
 
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
@@ -61,32 +81,94 @@ function App() {
   }, [isSidebarOpen]);
 
   const handleNewSearch = async (query: string) => {
-    await performSearch(query);
+    await performSearch(query); // performSearch should set its own searchQuery state in useSearch
+    navigateToView({ type: "searchResults", searchQuery: query });
   };
 
-  const clearSearch = () => {
+  const handleRetailerLogoClick = async (retailerId: number) => {
+    await fetchRetailerProductsLogic(retailerId);
+    navigateToView({ type: "retailerProducts", retailerId: retailerId });
+  };
+
+  const clearSearchLocal = () => {
     setSearchQuery("");
+    // If clearing search results in a dedicated search view, navigate back to home
+    if (currentViewState.type === "searchResults") {
+      goHome();
+    }
   };
 
+  // Effect for managing browser history and unload/popstate events
   useEffect(() => {
-    const handleBeforeUnload = (event: BeforeUnloadEvent) => {
-      // Standard way to trigger the browser's native confirmation dialog.
-      // The text you set here might not be displayed by all modern browsers;
-      // they often show a generic message for security reasons.
-      const confirmationMessage =
-        "Are you sure you want to leave? Changes you made may not be saved.";
-      event.preventDefault(); // Recommended for cross-browser compatibility
-      event.returnValue = confirmationMessage; // For older browsers
-      return confirmationMessage; // For modern browsers
-    };
+    // --- Handle Browser History (Pushing State) ---
+    if (
+      window.history.state?.type !== currentViewState.type ||
+      window.history.state?.searchQuery !== currentViewState.searchQuery ||
+      window.history.state?.retailerId !== currentViewState.retailerId
+    ) {
+      window.history.pushState(
+        {
+          type: currentViewState.type,
+          searchQuery: currentViewState.searchQuery,
+          retailerId: currentViewState.retailerId,
+        },
+        ""
+        // Optional: Update URL fragment for bookmarking/sharing
+        // `#${currentViewState.type}${currentViewState.searchQuery ? `?q=${currentViewState.searchQuery}` : ''}${currentViewState.retailerId ? `&retailer=${currentViewState.retailerId}`: ''}`
+      );
+    }
 
+    // --- Popstate Listener (Browser Back/Forward) ---
+    const handlePopstate = (event: PopStateEvent) => {
+      console.log(
+        "Popstate event. Current app view type:",
+        currentViewState.type,
+        "History state:",
+        event.state
+      );
+      // If the current view in the app is NOT the home view (retailerLogos),
+      // then any 'popstate' (usually from browser back) should take us home.
+      if (currentViewState.type !== "retailerLogos") {
+        // event.preventDefault(); // preventDefault in popstate is not reliably effective
+        goHome(); // Navigate app to home view
+
+        // We need to push the 'retailerLogos' state again because the browser
+        // already popped to the *previous* state. We want the *next* back
+        // press from 'retailerLogos' to trigger beforeunload or exit.
+        window.history.pushState(
+          { type: "retailerLogos" },
+          "" /* #retailerLogos */
+        );
+      }
+      // If currentViewState.type IS 'retailerLogos', popstate means the user is trying
+      // to go back *from* the home view. `beforeunload` will handle the exit confirmation.
+    };
+    window.addEventListener("popstate", handlePopstate);
+
+    // --- Beforeunload Listener (Refresh, Close Tab, True Exit) ---
+    // This listener was added in a previous step, ensure it's not duplicated or remove the old one.
+    // For this exercise, I'm assuming the previous one is removed by this new useEffect's cleanup.
+    const handleBeforeUnload = (event: BeforeUnloadEvent) => {
+      const confirmationMessage = "Are you sure you want to leave or refresh?";
+      event.preventDefault();
+      event.returnValue = confirmationMessage;
+      return confirmationMessage;
+    };
     window.addEventListener("beforeunload", handleBeforeUnload);
 
-    // Cleanup function to remove the event listener when the component unmounts
     return () => {
+      window.removeEventListener("popstate", handlePopstate);
       window.removeEventListener("beforeunload", handleBeforeUnload);
     };
-  }, []); // Empty dependency array means this effect runs once on mount and cleans up on unmount
+  }, [currentViewState, goHome]); // Removed navigateToView from deps as per prompt's final version
+
+  // Effect to reset states when navigating to home
+  useEffect(() => {
+    if (currentViewState.type === "retailerLogos") {
+      resetSearch();
+      clearSelectedRetailer();
+    }
+  }, [currentViewState, resetSearch, clearSelectedRetailer]);
 
   return (
     <ThemeContext.Provider
@@ -97,10 +179,11 @@ function App() {
           onMenuClick={toggleSidebar}
           onSearch={handleNewSearch}
           isLoadingSearch={isLoadingSearch}
-          onClearSearch={clearSearch}
+          onClearSearch={clearSearchLocal}
           initialSearchQuery={searchQuery}
         />
         <MainContent
+          currentViewType={currentViewState.type}
           searchQuery={searchQuery}
           searchResults={searchResults}
           totalResults={totalResults}
@@ -108,7 +191,18 @@ function App() {
           searchError={searchError}
           hasMoreResults={hasMoreResults}
           loadMoreResults={loadMoreResults}
-        ></MainContent>
+          // Props for RetailerLogosView
+          rawRetailers={rawRetailers}
+          verifiedRetailers={verifiedRetailers}
+          isLoadingApiRetailers={isLoadingApiRetailers}
+          isLoadingLogoVerification={isLoadingLogoVerification}
+          onRetailerClick={handleRetailerLogoClick}
+          retailerApiError={retailerApiError}
+          getLogoPath={getLogoPath}
+          // Props for RetailerProductsView
+          retailerProducts={selectedRetailerProducts}
+          isLoadingRetailerProducts={isLoadingRetailerProducts}
+        />
         {/* <BottomNav /> */}
         <SideBar
           isOpen={isSidebarOpen}
@@ -117,6 +211,7 @@ function App() {
           onSelectTheme={setCurrentThemeName}
           currentFont={currentFont}
           onSelectFont={setCurrentFont}
+          onGoHome={() => goHome()}
         />
         <FullOverlay isOpen={isSidebarOpen} onClick={toggleSidebar} />
       </div>

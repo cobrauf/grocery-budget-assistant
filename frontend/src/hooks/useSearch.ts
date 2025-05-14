@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { api } from "../services/api";
 import { Product } from "../types/product";
 
@@ -10,6 +10,15 @@ export const useSearch = () => {
   const [searchError, setSearchError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [hasMoreResults, setHasMoreResults] = useState<boolean>(false); // Keep track if more results are available
+
+  const resetSearch = useCallback(() => {
+    setSearchQuery("");
+    setSearchResults([]);
+    setTotalResults(0);
+    setCurrentPage(1);
+    setHasMoreResults(false);
+    setSearchError(null);
+  }, []); // Empty dependency array as setters are stable
 
   const performSearch = async (query: string, page: number = 1) => {
     if (!query.trim()) return;
@@ -75,5 +84,6 @@ export const useSearch = () => {
     performSearch,
     loadMoreResults,
     currentPage, // Expose current page if needed
+    resetSearch, // Expose the reset function
   };
 };
