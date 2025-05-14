@@ -4,6 +4,10 @@
   box-sizing: border-box;
 }
 
+* {
+  -webkit-tap-highlight-color: rgba(136, 44, 217, 0.1);
+}
+
 /* Import statement will be added by vite */
 body,
 html {
