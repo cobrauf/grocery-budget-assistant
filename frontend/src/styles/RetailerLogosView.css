@@ -48,3 +48,11 @@
   text-align: center;
   color: #777;
 }
+
+/* Styles for retailer name text */
+.retailer-name-text {
+  font-family: var(--current-font-family);
+  color: var(--theme-text);
+  font-size: 0.9rem; /* Adjust as needed */
+  margin-top: 4px; /* Space between logo and text */
+}

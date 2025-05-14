@@ -50,7 +50,7 @@ const RetailerLogosView: React.FC<RetailerLogosViewProps> = ({
                 alt={`${retailer.name} logo`}
                 className="retailer-logo-img"
               />
-              <span>{retailer.name}</span>
+              <span className="retailer-name-text">{retailer.name}</span>
             </button>
           ))}
         </div>
