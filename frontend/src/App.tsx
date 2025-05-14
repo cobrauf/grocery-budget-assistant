@@ -68,6 +68,26 @@ function App() {
     setSearchQuery("");
   };
 
+  useEffect(() => {
+    const handleBeforeUnload = (event: BeforeUnloadEvent) => {
+      // Standard way to trigger the browser's native confirmation dialog.
+      // The text you set here might not be displayed by all modern browsers;
+      // they often show a generic message for security reasons.
+      const confirmationMessage =
+        "Are you sure you want to leave? Changes you made may not be saved.";
+      event.preventDefault(); // Recommended for cross-browser compatibility
+      event.returnValue = confirmationMessage; // For older browsers
+      return confirmationMessage; // For modern browsers
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+
+    // Cleanup function to remove the event listener when the component unmounts
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+    };
+  }, []); // Empty dependency array means this effect runs once on mount and cleans up on unmount
+
   return (
     <ThemeContext.Provider
       value={{ themeName: currentThemeName, setThemeName: setCurrentThemeName }}
