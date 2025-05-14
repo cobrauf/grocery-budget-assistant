@@ -7,12 +7,18 @@ interface ProductCardProps {
 }
 
 const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
-  console.log("Product data:", product);
+  // console.log("Product data:", product);
   const [isLiked, setIsLiked] = useState(false);
 
   const truncateText = (text: string, maxLength: number): string => {
     if (text.length <= maxLength) return text;
     return text.substring(0, maxLength) + "...";
+  };
+
+  const getRetailerLogoPath = (retailerName: string | undefined): string => {
+    if (!retailerName) return "";
+    // console.log(`public/assets/logos/${retailerName}.png`);
+    return `public/assets/logos/${retailerName}.png`; // Adjusted path assuming assets are served from public root
   };
 
   return (
@@ -48,12 +54,6 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
                 </span>
               </div>
             )}
-
-            {product.retailer_name && (
-              <div className="product-card-retailer">
-                {product.retailer_name}
-              </div>
-            )}
           </div>
           <span
             className={`product-card-heart-icon ${
@@ -68,6 +68,16 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
             {/* Using actual heart emojis for simplicity */}
           </span>
         </div>
+        {product.retailer_name && (
+          <img
+            src={getRetailerLogoPath(product.retailer_name)}
+            alt={`${product.retailer_name} logo`}
+            className="product-card-retailer-logo"
+            onError={(e) => {
+              (e.target as HTMLImageElement).style.display = "none";
+            }}
+          />
+        )}
       </div>
     </div>
   );
