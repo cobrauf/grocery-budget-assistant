@@ -47,13 +47,11 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
               )}
             </div>
 
-            {product.promotion_details && (
-              <div className="product-card-promo-details-row">
-                <span className="product-card-promo">
-                  {truncateText(product.promotion_details, 30)}
-                </span>
-              </div>
-            )}
+            <div className="product-card-promo-details-row">
+              <span className="product-card-promo">
+                {truncateText(product.promotion_details || "No details", 30)}
+              </span>
+            </div>
           </div>
           <span
             className={`product-card-heart-icon ${
