@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { Retailer } from "../types/retailer";
 import "../styles/DefaultBrowseView.css";
+import StoreFilterModal from "../components/modals/StoreFilterModal";
+import CategoryFilterModal from "../components/modals/CategoryFilterModal";
 
 interface DefaultBrowseViewProps {
   rawRetailers: Retailer[];
@@ -60,6 +62,9 @@ const DefaultBrowseView: React.FC<DefaultBrowseViewProps> = ({
     new Set()
   );
 
+  const [isStoreModalOpen, setIsStoreModalOpen] = useState(false);
+  const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
+
   const isLoading = isLoadingApiRetailers || isLoadingLogoVerification;
 
   const toggleStoreSelection = (id: number) => {
@@ -90,20 +95,36 @@ const DefaultBrowseView: React.FC<DefaultBrowseViewProps> = ({
     if (selectedStoreIds.size === 1 && selectedCategories.size === 0) {
       const storeId = Array.from(selectedStoreIds)[0];
       handleRetailerClick(storeId);
+    } else if (selectedStoreIds.size === 0 && selectedCategories.size === 0) {
+      console.log("Show Items clicked with no selection.");
     } else {
       console.log(
-        "Show Items clicked with stores:",
-        selectedStoreIds,
-        "and categories:",
-        selectedCategories
+        "Show Items clicked with MULTIPLE stores/categories selected:",
+        {
+          stores: Array.from(selectedStoreIds),
+          categories: Array.from(selectedCategories),
+        }
       );
       alert(
-        "Multi-filter 'Show Items' not fully implemented yet for BrowseResultsView. Only single store selection works for now when clicking 'Show Items' with one store selected or clicking the store logo directly."
+        "Multi-filter 'Show Items' (for multiple stores/categories) not fully implemented yet. " +
+          "Currently, it only processes a single selected store if no categories are chosen."
       );
     }
   };
 
   const canShowItems = selectedStoreIds.size > 0 || selectedCategories.size > 0;
+
+  const handleStoreModalConfirm = (newSelectedIds: Set<number>) => {
+    setSelectedStoreIds(newSelectedIds);
+    setIsStoreModalOpen(false);
+    handleShowItems();
+  };
+
+  const handleCategoryModalConfirm = (newSelectedNames: Set<string>) => {
+    setSelectedCategories(newSelectedNames);
+    setIsCategoryModalOpen(false);
+    handleShowItems();
+  };
 
   const retailersToDisplay = verifiedRetailers;
   const categoriesToDisplay = PRODUCT_CATEGORIES_WITH_ICONS;
@@ -112,8 +133,18 @@ const DefaultBrowseView: React.FC<DefaultBrowseViewProps> = ({
     <div className="default-browse-view">
       <div className="filters-header">
         <span>Filters:</span>
-        <button className="filter-button">+ Add store Filter</button>
-        <button className="filter-button">+ Add Category Filter</button>
+        <button
+          className="filter-button"
+          onClick={() => setIsStoreModalOpen(true)}
+        >
+          + Add store Filter
+        </button>
+        <button
+          className="filter-button"
+          onClick={() => setIsCategoryModalOpen(true)}
+        >
+          + Add Category Filter
+        </button>
       </div>
 
       {/* Retailer Logos Section */}
@@ -185,6 +216,24 @@ const DefaultBrowseView: React.FC<DefaultBrowseViewProps> = ({
           Show Items
         </button>
       </div>
+
+      {/* Modals */}
+      <StoreFilterModal
+        isOpen={isStoreModalOpen}
+        onClose={() => setIsStoreModalOpen(false)}
+        retailers={verifiedRetailers}
+        initialSelectedStoreIds={selectedStoreIds}
+        onConfirmSelections={handleStoreModalConfirm}
+        getLogoPath={getLogoPath}
+      />
+
+      <CategoryFilterModal
+        isOpen={isCategoryModalOpen}
+        onClose={() => setIsCategoryModalOpen(false)}
+        categories={PRODUCT_CATEGORIES_WITH_ICONS}
+        initialSelectedCategories={selectedCategories}
+        onConfirmSelections={handleCategoryModalConfirm}
+      />
     </div>
   );
 };
