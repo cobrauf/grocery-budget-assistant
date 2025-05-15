@@ -78,7 +78,7 @@
 }
 
 .filter-button {
-  background-color: #757272;
+  background-color: #aeadad;
   border: 1px solid #ccc;
   padding: 0.5rem 1rem;
   border-radius: 4px;
@@ -87,10 +87,14 @@
   font-size: 0.9rem;
   transition: background-color 0.3s ease, color 0.3s ease,
     border-color 0.3s ease;
+  font-family: inherit;
 }
 
 .filter-button:hover {
   background-color: #ddd;
+  border-radius: 4px;
+  cursor: pointer;
+  font-family: inherit;
 }
 
 .filter-button.active-filter {
@@ -204,10 +208,11 @@
   border: none;
   border-radius: 4px;
   cursor: pointer;
+  font-family: inherit;
 }
 
 .show-items-button:disabled {
-  background-color: #ccc;
+  background-color: #aeadad;
   cursor: not-allowed;
 }
 

@@ -26,6 +26,11 @@
   margin: 0;
   padding: 0;
   transition: background-color 0.3s ease, color 0.3s ease; /* Smooth theme transitions */
+  font-family: var(
+    --current-font-family,
+    "Arial",
+    sans-serif
+  ); /* Added default font family */
 }
 
 .counter-card {
@@ -58,6 +63,7 @@ button {
   padding: 0.75rem 1.5rem;
   border-radius: 4px;
   font-size: 1rem;
+  font-family: inherit; /* Ensure buttons inherit font-family from parent */
   cursor: pointer;
   transition: background-color 0.3s, opacity 0.3s;
 }
