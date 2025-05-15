@@ -45,14 +45,13 @@ const PRODUCT_CATEGORIES_WITH_ICONS: { name: string; icon: string }[] = [
 ];
 
 const DefaultBrowseView: React.FC<DefaultBrowseViewProps> = ({
-  rawRetailers,
   verifiedRetailers,
   isLoadingApiRetailers,
   isLoadingLogoVerification,
   retailerApiError,
   handleRetailerClick,
   getLogoPath,
-  children,
+  // children prop is not used anymore, can be removed from props if desired
 }) => {
   const [selectedStoreIds, setSelectedStoreIds] = useState<Set<number>>(
     new Set()
@@ -88,13 +87,10 @@ const DefaultBrowseView: React.FC<DefaultBrowseViewProps> = ({
   };
 
   const handleShowItems = () => {
-    // For now, if only one store is selected and no categories, mimic single retailer click
     if (selectedStoreIds.size === 1 && selectedCategories.size === 0) {
       const storeId = Array.from(selectedStoreIds)[0];
       handleRetailerClick(storeId);
     } else {
-      // TODO: Implement multi-filter logic: fetch products for selectedStoreIds & selectedCategories
-      // And then display them using BrowseResultsView via a callback to App.tsx
       console.log(
         "Show Items clicked with stores:",
         selectedStoreIds,
@@ -109,15 +105,8 @@ const DefaultBrowseView: React.FC<DefaultBrowseViewProps> = ({
 
   const canShowItems = selectedStoreIds.size > 0 || selectedCategories.size > 0;
 
-  // Split retailers into two rows for display
-  const retailersPerRow = Math.ceil(verifiedRetailers.length / 2);
-  const retailerRow1 = verifiedRetailers.slice(0, retailersPerRow);
-  const retailerRow2 = verifiedRetailers.slice(retailersPerRow);
-
-  // Split categories into two rows for display
-  const categoriesPerRow = Math.ceil(PRODUCT_CATEGORIES_WITH_ICONS.length / 2);
-  const categoryRow1 = PRODUCT_CATEGORIES_WITH_ICONS.slice(0, categoriesPerRow);
-  const categoryRow2 = PRODUCT_CATEGORIES_WITH_ICONS.slice(categoriesPerRow);
+  const retailersToDisplay = verifiedRetailers;
+  const categoriesToDisplay = PRODUCT_CATEGORIES_WITH_ICONS;
 
   return (
     <div className="default-browse-view">
@@ -135,72 +124,56 @@ const DefaultBrowseView: React.FC<DefaultBrowseViewProps> = ({
           Error loading retailers: {retailerApiError}
         </p>
       )}
-      {!isLoading && !retailerApiError && verifiedRetailers.length === 0 && (
+      {!isLoading && !retailerApiError && retailersToDisplay.length === 0 && (
         <p>No stores available.</p>
       )}
-
-      {[retailerRow1, retailerRow2].map(
-        (row, rowIndex) =>
-          row.length > 0 && (
-            <div
-              key={`retailer-row-${rowIndex}`}
-              className="logo-scroll-container horizontal-scroll"
-            >
-              {row.map((retailer) => (
-                <div
-                  key={retailer.id}
-                  className={`logo-item-card ${
-                    selectedStoreIds.has(retailer.id) ? "selected" : ""
-                  }`}
-                  onClick={() => {
-                    // If user clicks a store logo, this is treated as a direct view request for that store's items
-                    // It also toggles selection for the multi-filter UI state.
-                    toggleStoreSelection(retailer.id);
-                    // For immediate view on single click (as per original requirement for retailer logos):
-                    // handleRetailerClick(retailer.id);
-                    // Decided to make logo click primarily for selection. Actual view via Show Items or single logo click with specific behavior.
-                    // The task says: "Clicking a single retailer logo loads its products into BrowseResultsView"
-                    // So, we will call handleRetailerClick here directly as well.
-                    handleRetailerClick(retailer.id);
-                  }}
-                >
-                  <img
-                    src={getLogoPath(retailer.name)}
-                    alt={retailer.name}
-                    className="logo-image"
-                  />
-                  <span className="logo-label">{retailer.name}</span>
-                </div>
-              ))}
-            </div>
-          )
+      {retailersToDisplay.length > 0 && (
+        <div className="logo-scroll-container horizontal-scroll">
+          <div className="two-row-grid">
+            {retailersToDisplay.map((retailer) => (
+              <div
+                key={retailer.id}
+                className={`logo-item-card ${
+                  selectedStoreIds.has(retailer.id) ? "selected" : ""
+                }`}
+                onClick={() => {
+                  toggleStoreSelection(retailer.id);
+                  handleRetailerClick(retailer.id);
+                }}
+              >
+                <img
+                  src={getLogoPath(retailer.name)}
+                  alt={retailer.name}
+                  className="logo-image"
+                />
+                <span className="logo-label">{retailer.name}</span>
+              </div>
+            ))}
+          </div>
+        </div>
       )}
 
       {/* Category Icons Section */}
       <div className="section-title">Categories</div>
-      {[categoryRow1, categoryRow2].map(
-        (row, rowIndex) =>
-          row.length > 0 && (
-            <div
-              key={`category-row-${rowIndex}`}
-              className="logo-scroll-container horizontal-scroll"
-            >
-              {row.map((category) => (
-                <div
-                  key={category.name}
-                  className={`logo-item-card category-item ${
-                    selectedCategories.has(category.name) ? "selected" : ""
-                  }`}
-                  onClick={() => toggleCategorySelection(category.name)}
-                >
-                  <span className="logo-image category-icon">
-                    {category.icon}
-                  </span>
-                  <span className="logo-label">{category.name}</span>
-                </div>
-              ))}
-            </div>
-          )
+      {categoriesToDisplay.length > 0 && (
+        <div className="logo-scroll-container horizontal-scroll">
+          <div className="two-row-grid">
+            {categoriesToDisplay.map((category) => (
+              <div
+                key={category.name}
+                className={`logo-item-card category-item ${
+                  selectedCategories.has(category.name) ? "selected" : ""
+                }`}
+                onClick={() => toggleCategorySelection(category.name)}
+              >
+                <span className="logo-image category-icon">
+                  {category.icon}
+                </span>
+                <span className="logo-label">{category.name}</span>
+              </div>
+            ))}
+          </div>
+        </div>
       )}
 
       <div className="show-items-button-container">

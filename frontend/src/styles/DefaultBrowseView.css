@@ -100,11 +100,22 @@
 }
 
 .logo-scroll-container {
-  display: flex;
+  display: flex; /* This will be the outer scroller */
   overflow-x: auto;
-  padding-bottom: 10px; /* For scrollbar visibility */
-  margin-bottom: 10px; /* Space between rows */
-  gap: 10px; /* Spacing between items */
+  padding-bottom: 10px; /* For scrollbar visibility if not hidden */
+  margin-bottom: 10px;
+  /* Remove gap from here, apply to grid items if needed or let grid handle it */
+}
+
+.two-row-grid {
+  display: grid;
+  grid-auto-flow: column; /* Key: makes items flow horizontally into columns */
+  grid-template-rows: repeat(
+    2,
+    auto
+  ); /* Creates two rows of automatic height */
+  gap: 10px; /* Spacing between all grid items */
+  /* The width of this grid will be determined by its content (columns) */
 }
 
 /* Hide scrollbar for a cleaner look, but still scrollable */
@@ -120,18 +131,18 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: flex-start; /* Align content to top */
+  justify-content: center; /* Better centering for fixed height items */
   padding: 10px;
   border: 1px solid #ddd;
   border-radius: 8px;
-  min-width: 100px; /* Ensure items don't get too squeezed */
-  max-width: 120px;
-  height: 120px; /* Fixed height */
+  width: 100px; /* Fixed width for items in the grid */
+  height: 100px; /* Fixed height for items in the grid, adjusted from 120px for better 2-row fit */
   cursor: pointer;
   transition: border-color 0.3s ease, box-shadow 0.3s ease;
   text-align: center;
   background-color: #fff;
-  overflow: hidden; /* Prevent content spill */
+  box-sizing: border-box; /* Include padding and border in the element's total width and height */
+  overflow: hidden;
 }
 
 .logo-item-card:hover {
@@ -146,19 +157,19 @@
 }
 
 .logo-image {
-  width: 60px;
-  height: 60px;
+  width: 45px; /* Adjusted for smaller card */
+  height: 45px; /* Adjusted for smaller card */
   object-fit: contain;
-  margin-bottom: 8px;
+  margin-bottom: 5px; /* Adjusted margin */
 }
 
 .category-icon {
-  font-size: 40px; /* Larger for emoji icons */
-  line-height: 60px; /* Center emoji in the allocated space */
+  font-size: 30px; /* Adjusted for smaller card */
+  line-height: 45px; /* Adjusted for smaller card */
 }
 
 .logo-label {
-  font-size: 0.8rem;
+  font-size: 0.75rem; /* Slightly smaller to fit */
   color: #333;
   white-space: nowrap;
   overflow: hidden;
