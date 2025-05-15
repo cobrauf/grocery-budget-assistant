@@ -68,17 +68,17 @@
   align-items: center;
   margin-bottom: 1rem;
   padding: 0.5rem;
-  background-color: #f9f9f9;
+  background-color: #e3000000;
   border-radius: 4px;
 }
 
 .filters-header span {
-  font-weight: bold;
+  /* font-weight: bold; */
   margin-right: 1rem;
 }
 
 .filter-button {
-  background-color: #e7e7e7;
+  background-color: #757272;
   border: 1px solid #ccc;
   padding: 0.5rem 1rem;
   border-radius: 4px;

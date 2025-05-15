@@ -7,7 +7,10 @@
   left: 0;
   width: 100%;
   height: 60px; /* Adjust height as needed */
-  background-color: #5a2a82; /* Purple background from mockup */
+  background-color: var(
+    --theme-bottom-nav-background,
+    #5a2a82
+  ); /* Purple background from mockup */
   /* border-top: 1px solid #cccccc; */ /* Removed default border, mockup doesn't show it */
   z-index: 1000; /* Ensure it's above other content */
   padding: 0 5px; /* Add some padding for the items */
@@ -20,7 +23,10 @@
   justify-content: center;
   background: none;
   border: none;
-  color: rgba(255, 255, 255, 0.7); /* Dimmed white for inactive tabs */
+  color: var(
+    --theme-bottom-nav-text-inactive,
+    rgba(255, 255, 255, 0.7)
+  ); /* Dimmed white for inactive tabs */
   font-size: 10px; /* Adjust font size as needed */
   cursor: pointer;
   padding: 5px 0; /* Adjusted padding */
@@ -31,7 +37,10 @@
 }
 
 .bottom-nav-item.active {
-  color: #ffffff; /* Bright white for active tab */
+  color: var(
+    --theme-bottom-nav-text-active,
+    #ffffff
+  ); /* Bright white for active tab */
 }
 
 /* Underline for active tab */
@@ -42,7 +51,10 @@
   left: 20%; /* Adjust to center the underline */
   right: 20%; /* Adjust to center the underline */
   height: 2px; /* Thickness of the underline */
-  background-color: #ffffff; /* White underline */
+  background-color: var(
+    --theme-bottom-nav-indicator-active,
+    #ffffff
+  ); /* White underline */
   border-radius: 2px;
 }
 

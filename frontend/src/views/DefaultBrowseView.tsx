@@ -143,11 +143,11 @@ const DefaultBrowseView: React.FC<DefaultBrowseViewProps> = ({
   const storeFilterButtonText =
     selectedStoreIds.size > 0
       ? `Stores (${selectedStoreIds.size})`
-      : "+ Add store Filter";
+      : "+ Store Filter";
   const categoryFilterButtonText =
     selectedCategories.size > 0
       ? `Categories (${selectedCategories.size})`
-      : "+ Add Category Filter";
+      : "+ Category Filter";
 
   const showFilteredResults =
     filteredBrowseProducts.length > 0 || isLoadingFilteredBrowseProducts;

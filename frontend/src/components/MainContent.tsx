@@ -27,7 +27,7 @@ interface MainContentProps {
   isLoadingApiRetailers: boolean;
   isLoadingLogoVerification: boolean;
   retailerApiError: string | null;
-  onRetailerClick: (retailerId: number) => void; // Renaming to onSingleRetailerClick for clarity with App.tsx
+  onSingleRetailerClick: (retailerId: number) => void;
   getLogoPath: (name: string) => string;
   // Props for single retailer product display
   singleRetailerProducts: Product[];
@@ -57,7 +57,7 @@ const MainContent: React.FC<MainContentProps> = ({
   isLoadingApiRetailers,
   isLoadingLogoVerification,
   retailerApiError,
-  onRetailerClick, // This will be onSingleRetailerClick from App.tsx
+  onSingleRetailerClick,
   getLogoPath,
   // Single retailer products
   singleRetailerProducts,
@@ -86,7 +86,7 @@ const MainContent: React.FC<MainContentProps> = ({
             isLoadingApiRetailers={isLoadingApiRetailers}
             isLoadingLogoVerification={isLoadingLogoVerification}
             retailerApiError={retailerApiError}
-            handleSingleRetailerClick={onRetailerClick} // Pass the correctly named prop
+            handleSingleRetailerClick={onSingleRetailerClick}
             getLogoPath={getLogoPath}
             // Single retailer products
             singleRetailerProducts={singleRetailerProducts}

@@ -22,6 +22,12 @@ export interface Theme {
     searchInputText: string;
     searchInputPlaceholder: string;
 
+    // Bottom Navigation
+    bottomNavBackground: string;
+    bottomNavTextInactive: string;
+    bottomNavTextActive: string;
+    bottomNavIndicatorActive: string;
+
     // Add more specific component colors as needed
     // e.g., buttonBackground, cardBackground, etc.
   };
@@ -44,6 +50,10 @@ export const themes: Theme[] = [
       searchInputBackground: "#ffffff",
       searchInputText: "#495057",
       searchInputPlaceholder: "#6c757d",
+      bottomNavBackground: "#5a2a82",
+      bottomNavTextInactive: "rgba(255, 255, 255, 0.7)",
+      bottomNavTextActive: "#ffffff",
+      bottomNavIndicatorActive: "#ffffff",
     },
   },
   {
@@ -62,6 +72,10 @@ export const themes: Theme[] = [
       searchInputBackground: "#252525",
       searchInputText: "#e0e0e0",
       searchInputPlaceholder: "#777777",
+      bottomNavBackground: "#003f7f",
+      bottomNavTextInactive: "rgba(220, 220, 220, 0.7)",
+      bottomNavTextActive: "#ffffff",
+      bottomNavIndicatorActive: "#00aaff",
     },
   },
   {
@@ -80,6 +94,10 @@ export const themes: Theme[] = [
       searchInputBackground: "#ffffff",
       searchInputText: "#5d5d5d",
       searchInputPlaceholder: "#a0a0a0",
+      bottomNavBackground: "#e0a9a0",
+      bottomNavTextInactive: "rgba(255, 255, 255, 0.75)",
+      bottomNavTextActive: "#ffffff",
+      bottomNavIndicatorActive: "#ffffff",
     },
   },
   {
@@ -101,6 +119,10 @@ export const themes: Theme[] = [
       searchInputBackground: "#ffffff", // White/Off-white (Button text color)
       searchInputText: "#212121", // Dark Grey/Black
       searchInputPlaceholder: "#757575", // Medium Grey placeholder text
+      bottomNavBackground: "#2a2a2a",
+      bottomNavTextInactive: "rgba(200, 200, 200, 0.7)",
+      bottomNavTextActive: "#e0e0e0",
+      bottomNavIndicatorActive: "#cc0000",
     },
   },
 ];
