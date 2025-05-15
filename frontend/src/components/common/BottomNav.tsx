@@ -1,14 +1,17 @@
 import React from "react";
-import { useAppTab, AppTab } from "../../hooks/useAppTab"; // Adjust path as necessary
+import { AppTab } from "../../hooks/useAppTab"; // Keep AppTab type import
 import "./BottomNav.css"; // We'll create this for styling
 
-const BottomNav: React.FC = () => {
-  const { activeTab, setActiveTab } = useAppTab();
+interface BottomNavProps {
+  activeTab: AppTab;
+  setActiveTab: (tab: AppTab) => void;
+}
 
+const BottomNav: React.FC<BottomNavProps> = ({ activeTab, setActiveTab }) => {
   const navItems: { label: string; tab: AppTab; icon?: string }[] = [
-    { label: "Browse", tab: "browse", icon: "🔍" }, // Placeholder icons
-    { label: "Search", tab: "search", icon: "📄" },
-    { label: "AI (WIP)", tab: "ai", icon: "🤖" },
+    { label: "Browse", tab: "browse", icon: "🛒" },
+    { label: "Search", tab: "search", icon: "🔍" },
+    { label: "AI (WIP)", tab: "ai", icon: "✨" },
   ];
 
   return (

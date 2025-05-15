@@ -1,6 +1,7 @@
 import React from "react";
-// import SearchResultsView from "../views/SearchResultsView";
-// import DefaultBrowseView from "../views/DefaultBrowseView";
+import SearchResultsView from "../views/SearchResultsView";
+import DefaultSearchView from "../views/DefaultSearchView";
+import DefaultBrowseView from "../views/DefaultBrowseView";
 import { Product } from "../types/product";
 import { Retailer } from "../types/retailer";
 // import { AppView } from "../hooks/useAppView";
@@ -19,13 +20,23 @@ interface MainContentProps {
   searchError: string | null;
   hasMoreResults: boolean;
   loadMoreResults: () => void;
-  rawRetailers: Retailer[];
-  verifiedRetailers: Retailer[];
-  isLoadingApiRetailers: boolean;
-  isLoadingLogoVerification: boolean;
-  retailerApiError: string | null;
-  onRetailerClick: (retailerId: number) => void;
-  getLogoPath: (name: string) => string;
+  rawRetailers: React.ComponentProps<typeof DefaultBrowseView>["rawRetailers"]; // Assuming DefaultBrowseView will be used
+  verifiedRetailers: React.ComponentProps<
+    typeof DefaultBrowseView
+  >["verifiedRetailers"];
+  isLoadingApiRetailers: React.ComponentProps<
+    typeof DefaultBrowseView
+  >["isLoadingApiRetailers"];
+  isLoadingLogoVerification: React.ComponentProps<
+    typeof DefaultBrowseView
+  >["isLoadingLogoVerification"];
+  retailerApiError: React.ComponentProps<
+    typeof DefaultBrowseView
+  >["retailerApiError"];
+  onRetailerClick: React.ComponentProps<
+    typeof DefaultBrowseView
+  >["handleRetailerClick"];
+  getLogoPath: React.ComponentProps<typeof DefaultBrowseView>["getLogoPath"];
   retailerProducts: Product[];
   isLoadingRetailerProducts: boolean;
 }
@@ -52,25 +63,25 @@ const MainContent: React.FC<MainContentProps> = ({
   isLoadingRetailerProducts,
 }) => {
   const mainContentStyle: React.CSSProperties = {
-    padding: "1rem", // Added some padding for visibility of messages
-    paddingBottom: "70px", // Ensure content doesn't hide behind fixed bottom nav
+    padding: "0", // Remove padding, let views manage their own
+    paddingBottom: "60px", // Ensure content doesn't hide behind fixed bottom nav (height of nav)
     flexGrow: 1,
     backgroundColor: "var(--theme-background, #fff)",
     position: "relative",
-    textAlign: "center", // Center placeholder text
+    // textAlign: "center", // Remove global text align, let views manage
   };
 
   const renderContent = () => {
     switch (activeTab) {
       case "browse":
-        // Placeholder for Browse content
-        // Later, this will render DefaultBrowseView or BrowseResultsView
+        // Placeholder for Browse content. Will later use DefaultBrowseView and BrowseResultsView.
         return (
-          <div>
-            <h2>Browse Tab Content</h2>
-            <p>Displaying content for the Browse tab.</p>
-            {/* Example of how DefaultBrowseView might be integrated later
-            <DefaultBrowseView
+          <div style={{ textAlign: "center", paddingTop: "20px" }}>
+            <h2>Browse Tab</h2>
+            <p>
+              This is where browsing content will go (e.g., DefaultBrowseView).
+            </p>
+            {/* <DefaultBrowseView 
               rawRetailers={rawRetailers}
               verifiedRetailers={verifiedRetailers}
               isLoadingApiRetailers={isLoadingApiRetailers}
@@ -78,44 +89,39 @@ const MainContent: React.FC<MainContentProps> = ({
               retailerApiError={retailerApiError}
               handleRetailerClick={onRetailerClick}
               getLogoPath={getLogoPath}
-            >
-              {children}
-            </DefaultBrowseView>
-            */}
+            /> */}
           </div>
         );
       case "search":
-        // Placeholder for Search content
-        // Later, this will render DefaultSearchView or SearchResultsView
-        return (
-          <div>
-            <h2>Search Tab Content</h2>
-            <p>Displaying content for the Search tab.</p>
-            {/* Example of how SearchResultsView might be integrated later
-            {searchQuery && (
-              <SearchResultsView
-                searchQuery={searchQuery}
-                items={searchResults}
-                totalResults={totalResults}
-                isLoading={isLoadingSearch}
-                error={searchError}
-                hasMore={hasMoreResults}
-                loadMore={loadMoreResults}
-              />
-            )}
-            */}
-          </div>
-        );
+        if (searchQuery || searchResults.length > 0 || isLoadingSearch) {
+          return (
+            <SearchResultsView
+              searchQuery={searchQuery}
+              items={searchResults}
+              totalResults={totalResults}
+              isLoading={isLoadingSearch}
+              error={searchError}
+              hasMore={hasMoreResults}
+              loadMore={loadMoreResults}
+            />
+          );
+        } else {
+          return <DefaultSearchView />;
+        }
       case "ai":
-        // Placeholder for AI content
         return (
-          <div>
-            <h2>AI (WIP) Tab Content</h2>
-            <p>Displaying content for the AI tab (Work In Progress).</p>
+          <div style={{ textAlign: "center", paddingTop: "20px" }}>
+            <h2>AI (WIP) Tab</h2>
+            <p>AI features are a work in progress.</p>
           </div>
         );
       default:
-        return <div>Unknown Tab</div>;
+        // Should not happen with AppTab type safety
+        return (
+          <div style={{ textAlign: "center", paddingTop: "20px" }}>
+            Unknown Tab
+          </div>
+        );
     }
   };
 

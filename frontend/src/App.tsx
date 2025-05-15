@@ -131,7 +131,7 @@ function App() {
           retailerProducts={selectedRetailerProducts}
           isLoadingRetailerProducts={isLoadingRetailerProducts}
         />
-        <BottomNav />
+        <BottomNav activeTab={activeTab} setActiveTab={setActiveTab} />
         <SideBar
           isOpen={isSidebarOpen}
           onClose={toggleSidebar}
