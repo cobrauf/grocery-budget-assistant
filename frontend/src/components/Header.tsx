@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import TopBar from "./header/TopBar";
 import SearchBar from "./header/SearchBar";
 import SearchOverlay from "./common/SearchOverlay";
+import { AppTab } from "../hooks/useAppTab";
 
 interface HeaderProps {
   onMenuClick: () => void;
@@ -9,6 +10,7 @@ interface HeaderProps {
   isLoadingSearch: boolean;
   onClearSearch: () => void;
   initialSearchQuery?: string;
+  activeTab: AppTab;
 }
 
 const Header: React.FC<HeaderProps> = ({
@@ -17,6 +19,7 @@ const Header: React.FC<HeaderProps> = ({
   isLoadingSearch,
   onClearSearch,
   initialSearchQuery,
+  activeTab,
 }) => {
   const [isSearchFocused, setIsSearchFocused] = useState(false);
   const prevIsLoadingSearchRef = useRef<boolean>(isLoadingSearch); // Initialize with isLoadingSearch
@@ -51,16 +54,20 @@ const Header: React.FC<HeaderProps> = ({
     <>
       <header style={headerStyle}>
         <TopBar onMenuClick={onMenuClick} />
-        <SearchBar
-          isFocused={isSearchFocused}
-          setIsFocused={setIsSearchFocused}
-          onSearch={onSearch}
-          isLoading={isLoadingSearch}
-          onClear={onClearSearch}
-          initialValue={initialSearchQuery}
-        />
+        {activeTab === "search" && (
+          <SearchBar
+            isFocused={isSearchFocused}
+            setIsFocused={setIsSearchFocused}
+            onSearch={onSearch}
+            isLoading={isLoadingSearch}
+            onClear={onClearSearch}
+            initialValue={initialSearchQuery}
+          />
+        )}
       </header>
-      {isSearchFocused && <SearchOverlay onClick={handleCloseSearchMode} />}
+      {activeTab === "search" && isSearchFocused && (
+        <SearchOverlay onClick={handleCloseSearchMode} />
+      )}
     </>
   );
 };

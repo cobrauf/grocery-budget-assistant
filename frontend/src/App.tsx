@@ -111,6 +111,7 @@ function App() {
           isLoadingSearch={isLoadingSearch}
           onClearSearch={clearSearchLocal}
           initialSearchQuery={searchQuery}
+          activeTab={activeTab}
         />
         <MainContent
           activeTab={activeTab}

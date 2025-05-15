@@ -3,7 +3,7 @@ import { api } from "../../services/api"; // Import the api service
 
 const LOCAL_STORAGE_KEY = "searchHistory";
 const PLACEHOLDER_TEXTS = [
-  "Search for weekly sale items",
+  "Search for weekly ad items",
   // "What's on sale in bread?",
   // "Chicken breast offers...",
   // "Search for your groceries...",
@@ -51,7 +51,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
         currentText += fullText.charAt(currentIndex);
         setCurrentPlaceholder(currentText);
         currentIndex++;
-        typingInterval = setTimeout(type, 100); // Adjust typing speed
+        typingInterval = setTimeout(type, 50); // Adjust typing speed
       } else {
         // Finished typing current text, pause then move to next or erase
         setTimeout(() => {
@@ -143,7 +143,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
     setSearchTerm(event.target.value);
     if (event.target.value !== "") {
       // If user starts typing, use a static placeholder or clear dynamic one
-      setCurrentPlaceholder("Search for weekly sale items");
+      setCurrentPlaceholder("Search for weekly ad items");
     } else if (!isFocused) {
       // Potentially restart typewriter if cleared and not focused, or set a default
       // For simplicity, let it be, or set a static default
@@ -159,11 +159,11 @@ const SearchBar: React.FC<SearchBarProps> = ({
 
   const handleFocus = () => {
     setIsFocused(true);
-    setCurrentPlaceholder("Search for weekly sale items"); // Static placeholder on focus
+    setCurrentPlaceholder("Search for weekly ad items"); // Static placeholder on focus
   };
 
   const effectivePlaceholder = searchTerm
-    ? "Search for weekly sale items"
+    ? "Search for weekly ad items"
     : currentPlaceholder || "Search your groceries...";
 
   const searchBarStyle: React.CSSProperties = {

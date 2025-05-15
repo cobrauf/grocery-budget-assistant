@@ -17,7 +17,7 @@ Product Requirements Document: Enhanced Tab-Based Navigation & Filtering
    Tab Management Hook: A central hook (e.g., useAppTab) will manage the active tab and facilitate state preservation.
    4.2. Global Header & Search Bar
    Main Header: A top header will persist, containing the hamburger menu for the sidebar, the application title ("Grocery-Assistant"), and a secondary icon (e.g., favorites/heart).
-   Global Search Bar: A search input field will be consistently visible below the main header but above the tab-specific content.
+   Search Bar: A search input field will be visible below the main header but above the tab-specific content.Only activates when search tab is active.
    Initiating a search from this bar will always navigate the user to the "Search" tab and display results there, regardless of the previously active tab.
 
 4.3. Browse Tab Functionality
@@ -43,7 +43,7 @@ Default Search View (DefaultSearchView.tsx):
 A simple view displayed when the Search tab is active and no search has been performed (e.g., displays "Search for items...").
 
 Search Results View (SearchResultsView.tsx):
-Dedicated exclusively to displaying results from a user-initiated search (triggered by the global search bar) within the Search tab.
+Dedicated exclusively to displaying results from a user-initiated search (triggered by the search bar) within the Search tab.
 Functionality remains similar to current search results display (infinite scroll, product cards).
 
 Search State: Search query and results are maintained within the Search tab.
@@ -68,8 +68,7 @@ Potentially new hooks for managing browse filter state.
 API Interactions: Backend API for fetching products might need to support fetching by multiple retailer IDs and/or multiple categories simultaneously. 6. Success Metrics
 Smooth and intuitive switching between Browse and Search tabs using the bottom navigation.
 User's context (viewed products, selected filters) is successfully preserved when switching tabs.
-Users can successfully filter and view products from multiple retailers/categories in the Browse tab using the new UI.
-The global search bar consistently directs users to the Search tab with results. 7. Future Considerations
+Users can successfully filter and view products from multiple retailers/categories in the Browse tab using the new UI. 7. Future Considerations
 Implementation of the "AI" tab.
 Displaying active filter counts or selected filter items more explicitly in the "Filters:" row if needed.
 Saving user filter preferences.
