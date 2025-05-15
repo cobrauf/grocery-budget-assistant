@@ -1,15 +1,14 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import TopBar from "./header/TopBar";
 import SearchBar from "./header/SearchBar";
-// import DeliveryOptions from './header/DeliveryOptions'; // User commented out
-import SearchOverlay from "./common/SearchOverlay"; // Corrected import path
+import SearchOverlay from "./common/SearchOverlay";
 
 interface HeaderProps {
-  onMenuClick: () => void; // To be passed from App.tsx
-  onSearch: (query: string) => Promise<void>; // Added
-  isLoadingSearch: boolean; // Added
-  onClearSearch: () => void; // Added
-  initialSearchQuery?: string; // Added, make optional
+  onMenuClick: () => void;
+  onSearch: (query: string) => Promise<void>;
+  isLoadingSearch: boolean;
+  onClearSearch: () => void;
+  initialSearchQuery?: string;
 }
 
 const Header: React.FC<HeaderProps> = ({
@@ -20,6 +19,16 @@ const Header: React.FC<HeaderProps> = ({
   initialSearchQuery,
 }) => {
   const [isSearchFocused, setIsSearchFocused] = useState(false);
+  const prevIsLoadingSearchRef = useRef<boolean>(isLoadingSearch); // Initialize with isLoadingSearch
+
+  useEffect(() => {
+    if (prevIsLoadingSearchRef.current === true && !isLoadingSearch) {
+      if (isSearchFocused) {
+        setIsSearchFocused(false);
+      }
+    }
+    prevIsLoadingSearchRef.current = isLoadingSearch;
+  }, [isLoadingSearch, isSearchFocused, setIsSearchFocused]);
 
   const headerStyle: React.CSSProperties = {
     display: "flex",
@@ -50,7 +59,6 @@ const Header: React.FC<HeaderProps> = ({
           onClear={onClearSearch}
           initialValue={initialSearchQuery}
         />
-        {/* <DeliveryOptions /> */} {/* User commented out */}
       </header>
       {isSearchFocused && <SearchOverlay onClick={handleCloseSearchMode} />}
     </>
