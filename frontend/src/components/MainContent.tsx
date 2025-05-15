@@ -2,7 +2,8 @@ import React from "react";
 import SearchResultsView from "../views/SearchResultsView";
 import DefaultSearchView from "../views/DefaultSearchView";
 import DefaultBrowseView from "../views/DefaultBrowseView";
-import BrowseResultsView from "../views/BrowseResultsView";
+// BrowseResultsView will now be used by DefaultBrowseView, so not directly here
+// import BrowseResultsView from "../views/BrowseResultsView";
 import { Product } from "../types/product";
 import { Retailer } from "../types/retailer";
 import { AppTab } from "../hooks/useAppTab";
@@ -20,20 +21,24 @@ interface MainContentProps {
   hasMoreResults: boolean;
   loadMoreResults: () => void;
 
-  // Browse Tab Props (some from useRetailers, will be adapted/moved to useBrowse later)
+  // Props for DefaultBrowseView (which will now also handle results display)
   rawRetailers: Retailer[];
   verifiedRetailers: Retailer[];
   isLoadingApiRetailers: boolean;
   isLoadingLogoVerification: boolean;
   retailerApiError: string | null;
-  onRetailerClick: (retailerId: number) => void; // For DefaultBrowseView to trigger single retailer product load
+  onRetailerClick: (retailerId: number) => void; // Renaming to onSingleRetailerClick for clarity with App.tsx
   getLogoPath: (name: string) => string;
+  // Props for single retailer product display
+  singleRetailerProducts: Product[];
+  isLoadingSingleRetailerProducts: boolean;
+  // retailerProductsError: string | null; // If there's a specific error for single product fetching
 
-  // Props for BrowseResultsView (when single retailer is clicked, or filters applied)
-  retailerProducts: Product[]; // Products for the selected retailer / browse filters
-  isLoadingRetailerProducts: boolean; // Loading state for the above
-  // We might need a way to get the name of the retailer for filterDescription
-  // For now, App.tsx will need to manage this or pass it if retailerProducts are specific to one retailer
+  // Props for multi-filter product display
+  onFetchProductsByFilter: (storeIds: string[], categories: string[]) => void;
+  filteredBrowseProducts: Product[];
+  isLoadingFilteredBrowseProducts: boolean;
+  // filteredBrowseError: string | null; // If there's a specific error for multi-filter fetching
 }
 
 const MainContent: React.FC<MainContentProps> = ({
@@ -46,17 +51,21 @@ const MainContent: React.FC<MainContentProps> = ({
   searchError,
   hasMoreResults,
   loadMoreResults,
-  // Browse props (for DefaultBrowseView)
+  // Browse props for DefaultBrowseView
   rawRetailers,
   verifiedRetailers,
   isLoadingApiRetailers,
   isLoadingLogoVerification,
   retailerApiError,
-  onRetailerClick,
+  onRetailerClick, // This will be onSingleRetailerClick from App.tsx
   getLogoPath,
-  // Browse props (for BrowseResultsView)
-  retailerProducts,
-  isLoadingRetailerProducts,
+  // Single retailer products
+  singleRetailerProducts,
+  isLoadingSingleRetailerProducts,
+  // Multi-filter products
+  onFetchProductsByFilter,
+  filteredBrowseProducts,
+  isLoadingFilteredBrowseProducts,
 }) => {
   const mainContentStyle: React.CSSProperties = {
     padding: "0",
@@ -69,39 +78,27 @@ const MainContent: React.FC<MainContentProps> = ({
   const renderContent = () => {
     switch (activeTab) {
       case "browse":
-        // If retailerProducts are loaded (e.g., after clicking a retailer in DefaultBrowseView)
-        // or if we are currently loading them, show BrowseResultsView.
-        if (isLoadingRetailerProducts || retailerProducts.length > 0) {
-          let description = "Filtered Results";
-          if (retailerProducts.length > 0 && retailerProducts[0]?.retailer_id) {
-            const retailer = verifiedRetailers.find(
-              (r) => r.id === retailerProducts[0].retailer_id
-            );
-            if (retailer) description = retailer.name;
-          }
-          return (
-            <BrowseResultsView
-              items={retailerProducts}
-              isLoading={isLoadingRetailerProducts}
-              error={null} // Assuming retailerApiError from useRetailers is for logo/list fetching, not product fetching error here
-              filterDescription={description}
-              // totalResults and pagination can be added later if needed for browse results
-            />
-          );
-        } else {
-          // Otherwise, show the default view for browsing (filters, retailer logos, categories)
-          return (
-            <DefaultBrowseView
-              rawRetailers={rawRetailers}
-              verifiedRetailers={verifiedRetailers}
-              isLoadingApiRetailers={isLoadingApiRetailers}
-              isLoadingLogoVerification={isLoadingLogoVerification}
-              retailerApiError={retailerApiError}
-              handleRetailerClick={onRetailerClick} // This will trigger loading retailerProducts
-              getLogoPath={getLogoPath}
-            />
-          );
-        }
+        // DefaultBrowseView now handles its own content including results
+        return (
+          <DefaultBrowseView
+            rawRetailers={rawRetailers}
+            verifiedRetailers={verifiedRetailers}
+            isLoadingApiRetailers={isLoadingApiRetailers}
+            isLoadingLogoVerification={isLoadingLogoVerification}
+            retailerApiError={retailerApiError}
+            handleSingleRetailerClick={onRetailerClick} // Pass the correctly named prop
+            getLogoPath={getLogoPath}
+            // Single retailer products
+            singleRetailerProducts={singleRetailerProducts}
+            isLoadingSingleRetailerProducts={isLoadingSingleRetailerProducts}
+            // Multi-filter products & handler
+            handleFetchProductsByFilter={onFetchProductsByFilter}
+            filteredBrowseProducts={filteredBrowseProducts}
+            isLoadingFilteredBrowseProducts={isLoadingFilteredBrowseProducts}
+            // retailerProductsError={retailerProductsError} // if available
+            // filteredBrowseError={filteredBrowseError} // if available
+          />
+        );
       case "search":
         if (searchQuery || searchResults.length > 0 || isLoadingSearch) {
           return (

@@ -5,14 +5,12 @@ import LoadingSpinner from "../components/common/LoadingSpinner";
 import InfiniteScroll from "react-infinite-scroll-component";
 
 interface BrowseResultsViewProps {
-  // title?: string; // Optional title for the view (e.g., "Results for Walmart" or "Filtered Deals")
   items: Product[];
-  totalResults?: number; // Might not always be known for browse, or might be items.length
+  totalResults?: number;
   isLoading: boolean;
   error: string | null;
-  hasMore?: boolean; // For potential pagination/infinite scroll if applicable
-  loadMore?: () => void; // For potential pagination/infinite scroll
-  filterDescription?: string; // e.g. "Tokyo Central"
+  hasMore?: boolean;
+  loadMore?: () => void;
 }
 
 const BrowseResultsView: React.FC<BrowseResultsViewProps> = ({
@@ -20,9 +18,8 @@ const BrowseResultsView: React.FC<BrowseResultsViewProps> = ({
   totalResults,
   isLoading,
   error,
-  hasMore = false, // Default to false if not paginating browse results initially
+  hasMore = false,
   loadMore = () => {},
-  filterDescription,
 }) => {
   const scrollableDivRef = useRef<HTMLDivElement>(null);
 
@@ -67,13 +64,7 @@ const BrowseResultsView: React.FC<BrowseResultsViewProps> = ({
 
   if (!isLoading && items.length === 0 && !error) {
     return (
-      <p style={infoTextStyle}>
-        No products found{" "}
-        {filterDescription
-          ? `for ${filterDescription}`
-          : "matching your filters"}
-        .
-      </p>
+      <p style={infoTextStyle}>No products found matching your filters.</p>
     );
   }
 
@@ -83,9 +74,6 @@ const BrowseResultsView: React.FC<BrowseResultsViewProps> = ({
       ref={scrollableDivRef}
       style={resultsContainerStyle}
     >
-      {filterDescription && (
-        <h2 style={{ textAlign: "center" }}>{filterDescription}</h2>
-      )}
       <InfiniteScroll
         dataLength={items.length}
         next={loadMore}

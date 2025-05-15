@@ -7,6 +7,7 @@ from ..database import get_db
 from ..services import product_service 
 from fastapi.responses import JSONResponse  
 from fastapi.encoders import jsonable_encoder   
+from ..schemas.data_schemas import ProductWithDetails # Ensure ProductWithDetails is available
 
 
 router = APIRouter(
@@ -70,3 +71,37 @@ async def get_products_by_retailer_manual_json(
     except Exception as e:
         print(f"Error fetching products for retailer {retailer_id}, ad period '{ad_period}': {e}")
         raise HTTPException(status_code=500, detail="Error fetching products for specified retailer and ad period.") 
+
+@router.get("/filter/", response_model=List[ProductWithDetails]) # Added response_model
+async def get_filtered_products_endpoint(
+    store_ids: str = Query(None, description="Comma-separated list of store IDs. E.g., '1,2,3'"),
+    categories: str = Query(None, description="Comma-separated list of categories. E.g., 'Dairy,Meats'"),
+    db: Session = Depends(get_db),
+    limit: int = Query(100, ge=1, le=500, description="Maximum number of products to return."),
+    offset: int = Query(0, ge=0, description="Offset for pagination.")
+):
+    """
+    Endpoint to get products based on selected store IDs and/or categories.
+    Filters are optional. If no filters are provided, it might return an empty list or all current products based on service logic.
+    """
+    parsed_store_ids = store_ids.split(',') if store_ids else []
+    parsed_categories = categories.split(',') if categories else []
+
+    try:
+        filtered_products = await product_service.get_products_by_filter(
+            db=db,
+            store_ids=parsed_store_ids,
+            categories=parsed_categories,
+            limit=limit,
+            offset=offset
+        )
+        # FastAPI will automatically handle serialization with response_model
+        return filtered_products
+    except HTTPException as http_exc:
+        raise http_exc
+    except ValueError as ve:
+        # Specific error for invalid integer conversion from service layer
+        raise HTTPException(status_code=400, detail=str(ve))
+    except Exception as e:
+        print(f"Unexpected error in get_filtered_products_endpoint: {e}")
+        raise HTTPException(status_code=500, detail="Internal server error while filtering products.") 

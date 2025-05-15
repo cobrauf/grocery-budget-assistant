@@ -10,6 +10,8 @@ import { useTheme as useAppTheme } from "./hooks/useTheme"; // Renamed import to
 import { useSearch } from "./hooks/useSearch"; // Import search hook
 import { useRetailers } from "./hooks/useRetailers"; // Import retailers hook
 import { useAppTab } from "./hooks/useAppTab"; // Import useAppTab
+import { fetchProductsByFilter as apiFetchProductsByFilter } from "./services/api"; // Import the new API function
+import { Product } from "./types/product"; // Ensure Product type is imported
 
 // --- Theme Context ---
 interface ThemeContextType {
@@ -58,10 +60,18 @@ function App() {
     isLoadingLogoVerification,
     isLoadingRetailerProducts,
     retailerApiError,
-    handleRetailerClick: fetchRetailerProductsLogic,
+    handleRetailerClick: fetchSingleRetailerProductsLogic, // Renamed for clarity
     clearSelectedRetailer,
     getLogoPath,
   } = useRetailers(isSearchActive);
+
+  // State for multi-filter browse results
+  const [filteredBrowseProducts, setFilteredBrowseProducts] = useState<
+    Product[]
+  >([]);
+  const [isLoadingFilteredBrowseProducts, setIsLoadingFilteredBrowseProducts] =
+    useState(false);
+  // Add error state if needed: const [filteredBrowseError, setFilteredBrowseError] = useState<string | null>(null);
 
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
@@ -83,9 +93,31 @@ function App() {
     setActiveTab("search");
   };
 
-  const handleRetailerLogoClick = async (retailerId: number) => {
-    await fetchRetailerProductsLogic(retailerId);
-    console.log("Retailer logo clicked, ID:", retailerId, "Tab:", activeTab);
+  // For single retailer selection (maintains existing logic)
+  const handleSingleRetailerLogoClick = async (retailerId: number) => {
+    setFilteredBrowseProducts([]); // Clear multi-filter results when single retailer is clicked
+    await fetchSingleRetailerProductsLogic(retailerId);
+    // No need to setActiveTab, browse tab is already active
+  };
+
+  // For multi-filter selection from DefaultBrowseView
+  const handleFetchProductsByFilter = async (
+    storeIds: string[],
+    categories: string[]
+  ) => {
+    clearSelectedRetailer(); // Clear single retailer results
+    setIsLoadingFilteredBrowseProducts(true);
+    setFilteredBrowseProducts([]);
+    // setFilteredBrowseError(null); // Reset error
+    try {
+      const products = await apiFetchProductsByFilter(storeIds, categories);
+      setFilteredBrowseProducts(products);
+    } catch (error) {
+      console.error("Error fetching filtered products:", error);
+      // setFilteredBrowseError("Failed to fetch products based on your filters.");
+    } finally {
+      setIsLoadingFilteredBrowseProducts(false);
+    }
   };
 
   const clearSearchLocal = () => {
@@ -98,6 +130,7 @@ function App() {
     setActiveTab("browse");
     resetSearch();
     clearSelectedRetailer();
+    setFilteredBrowseProducts([]); // Clear filtered browse results when going home
   };
 
   return (
@@ -126,11 +159,17 @@ function App() {
           verifiedRetailers={verifiedRetailers}
           isLoadingApiRetailers={isLoadingApiRetailers}
           isLoadingLogoVerification={isLoadingLogoVerification}
-          onRetailerClick={handleRetailerLogoClick}
+          onSingleRetailerClick={handleSingleRetailerLogoClick} // Updated prop name
           retailerApiError={retailerApiError}
           getLogoPath={getLogoPath}
-          retailerProducts={selectedRetailerProducts}
-          isLoadingRetailerProducts={isLoadingRetailerProducts}
+          // For single retailer selection results
+          singleRetailerProducts={selectedRetailerProducts}
+          isLoadingSingleRetailerProducts={isLoadingRetailerProducts}
+          // For multi-filter results
+          onFetchProductsByFilter={handleFetchProductsByFilter}
+          filteredBrowseProducts={filteredBrowseProducts}
+          isLoadingFilteredBrowseProducts={isLoadingFilteredBrowseProducts}
+          // filteredBrowseError={filteredBrowseError} // Pass error if using
         />
         <BottomNav activeTab={activeTab} setActiveTab={setActiveTab} />
         <SideBar

@@ -114,3 +114,75 @@ async def search_products(
     except Exception as e:
         print(f"Error during product search service: {e}")
         raise HTTPException(status_code=500, detail=f"Internal server error during product search: {str(e)}")
+
+async def get_products_by_filter(
+    db: Session,
+    store_ids: List[str] = None, # Made optional, default to None
+    categories: List[str] = None, # Made optional, default to None
+    limit: int = 100,
+    offset: int = 0
+) -> List[ProductWithDetails]:
+    if not store_ids and not categories:
+        # If no filters are provided, perhaps return empty or raise error, depending on desired behavior
+        # For now, returning empty list as per frontend expectation for /filter? with no params
+        return []
+
+    query = (
+        db.query(ProductModel)
+        .join(WeeklyAdModel, ProductModel.weekly_ad_id == WeeklyAdModel.id)
+        .join(RetailerModel, ProductModel.retailer_id == RetailerModel.id) # Ensure Retailer is joined for retailer_name
+    )
+
+    if store_ids:
+        # Convert string IDs to integers if your ProductModel.retailer_id is an integer
+        # Assuming retailer_id in ProductModel is an integer. If it's string, no conversion needed.
+        try:
+            int_store_ids = [int(id_str) for id_str in store_ids]
+            query = query.filter(ProductModel.retailer_id.in_(int_store_ids))
+        except ValueError:
+            raise HTTPException(status_code=400, detail="Invalid store ID format. Store IDs must be integers.")
+
+    if categories:
+        query = query.filter(ProductModel.category.in_(categories))
+    
+    # Always apply ad_period = 'current' for browse/filter functionality
+    # This aligns with how single retailer products are fetched. 
+    # If this needs to be dynamic, it should be passed as a parameter.
+    query = query.filter(WeeklyAdModel.ad_period == "current")
+
+    products_orm = (
+        query.options(
+            joinedload(ProductModel.retailer),
+            joinedload(ProductModel.weekly_ad)
+        )
+        .offset(offset)
+        .limit(limit)
+        .all()
+    )
+
+    products_with_details: List[ProductWithDetails] = []
+    for p_orm in products_orm:
+        details = ProductWithDetails(
+            id=p_orm.id,
+            name=p_orm.name,
+            price=p_orm.price,
+            original_price=p_orm.original_price,
+            unit=p_orm.unit,
+            description=p_orm.description,
+            category=p_orm.category,
+            promotion_details=p_orm.promotion_details,
+            promotion_from=p_orm.promotion_from,
+            promotion_to=p_orm.promotion_to,
+            is_frontpage=p_orm.is_frontpage,
+            emoji=p_orm.emoji,
+            retailer=p_orm.retailer.name if p_orm.retailer else "N/A",
+            retailer_id=p_orm.retailer_id,
+            weekly_ad_id=p_orm.weekly_ad_id,
+            retailer_name=p_orm.retailer.name if p_orm.retailer else "N/A",
+            weekly_ad_valid_from=p_orm.weekly_ad.valid_from if p_orm.weekly_ad else None,
+            weekly_ad_valid_to=p_orm.weekly_ad.valid_to if p_orm.weekly_ad else None,
+            weekly_ad_ad_period=p_orm.weekly_ad.ad_period if p_orm.weekly_ad else None,
+        )
+        products_with_details.append(details)
+    
+    return products_with_details

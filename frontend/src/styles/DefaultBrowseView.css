@@ -85,10 +85,21 @@
   cursor: pointer;
   margin-right: 0.5rem;
   font-size: 0.9rem;
+  transition: background-color 0.3s ease, color 0.3s ease,
+    border-color 0.3s ease;
 }
 
 .filter-button:hover {
   background-color: #ddd;
+}
+
+.filter-button.active-filter {
+  background-color: var(
+    --theme-primary,
+    #007bff
+  ); /* Example: Use theme primary color */
+  color: white;
+  border-color: var(--theme-primary, #007bff);
 }
 
 .section-title {

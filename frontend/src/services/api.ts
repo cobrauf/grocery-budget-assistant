@@ -43,3 +43,21 @@ export const fetchProductsByRetailer = async (
 //   );
 //   return response.data;
 // };
+
+export const fetchProductsByFilter = async (
+  storeIds: string[],
+  categories: string[]
+): Promise<Product[]> => {
+  const params = new URLSearchParams();
+  if (storeIds.length > 0) {
+    params.append("store_ids", storeIds.join(","));
+  }
+  if (categories.length > 0) {
+    params.append("categories", categories.join(","));
+  }
+
+  const response = await api.get<Product[]>(
+    `/products/filter?${params.toString()}`
+  );
+  return response.data;
+};

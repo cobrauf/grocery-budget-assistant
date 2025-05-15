@@ -1,8 +1,10 @@
 import React, { useState } from "react";
 import { Retailer } from "../types/retailer";
+import { Product } from "../types/product";
 import "../styles/DefaultBrowseView.css";
 import StoreFilterModal from "../components/modals/StoreFilterModal";
 import CategoryFilterModal from "../components/modals/CategoryFilterModal";
+import BrowseResultsView from "./BrowseResultsView";
 
 interface DefaultBrowseViewProps {
   rawRetailers: Retailer[];
@@ -10,9 +12,16 @@ interface DefaultBrowseViewProps {
   isLoadingApiRetailers: boolean;
   isLoadingLogoVerification: boolean;
   retailerApiError: string | null;
-  handleRetailerClick: (id: number) => void;
+  handleSingleRetailerClick: (id: number) => void;
   getLogoPath: (name: string) => string;
-  children?: React.ReactNode;
+  singleRetailerProducts: Product[];
+  isLoadingSingleRetailerProducts: boolean;
+  handleFetchProductsByFilter: (
+    storeIds: string[],
+    categories: string[]
+  ) => void;
+  filteredBrowseProducts: Product[];
+  isLoadingFilteredBrowseProducts: boolean;
 }
 
 const PRODUCT_CATEGORIES_WITH_ICONS: { name: string; icon: string }[] = [
@@ -51,9 +60,13 @@ const DefaultBrowseView: React.FC<DefaultBrowseViewProps> = ({
   isLoadingApiRetailers,
   isLoadingLogoVerification,
   retailerApiError,
-  handleRetailerClick,
+  handleSingleRetailerClick,
   getLogoPath,
-  // children prop is not used anymore, can be removed from props if desired
+  singleRetailerProducts,
+  isLoadingSingleRetailerProducts,
+  handleFetchProductsByFilter,
+  filteredBrowseProducts,
+  isLoadingFilteredBrowseProducts,
 }) => {
   const [selectedStoreIds, setSelectedStoreIds] = useState<Set<number>>(
     new Set()
@@ -65,7 +78,8 @@ const DefaultBrowseView: React.FC<DefaultBrowseViewProps> = ({
   const [isStoreModalOpen, setIsStoreModalOpen] = useState(false);
   const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
 
-  const isLoading = isLoadingApiRetailers || isLoadingLogoVerification;
+  const isLoadingInitialData =
+    isLoadingApiRetailers || isLoadingLogoVerification;
 
   const toggleStoreSelection = (id: number) => {
     setSelectedStoreIds((prev) => {
@@ -92,23 +106,20 @@ const DefaultBrowseView: React.FC<DefaultBrowseViewProps> = ({
   };
 
   const handleShowItems = () => {
-    if (selectedStoreIds.size === 1 && selectedCategories.size === 0) {
+    const isSingleStoreOnly =
+      selectedStoreIds.size === 1 && selectedCategories.size === 0;
+    const isMultiFilter =
+      selectedStoreIds.size > 0 || selectedCategories.size > 0;
+
+    if (isSingleStoreOnly) {
       const storeId = Array.from(selectedStoreIds)[0];
-      handleRetailerClick(storeId);
-    } else if (selectedStoreIds.size === 0 && selectedCategories.size === 0) {
-      console.log("Show Items clicked with no selection.");
+      handleSingleRetailerClick(storeId);
+    } else if (isMultiFilter) {
+      const storeIdsAsString = Array.from(selectedStoreIds).map(String);
+      const categoryNames = Array.from(selectedCategories);
+      handleFetchProductsByFilter(storeIdsAsString, categoryNames);
     } else {
-      console.log(
-        "Show Items clicked with MULTIPLE stores/categories selected:",
-        {
-          stores: Array.from(selectedStoreIds),
-          categories: Array.from(selectedCategories),
-        }
-      );
-      alert(
-        "Multi-filter 'Show Items' (for multiple stores/categories) not fully implemented yet. " +
-          "Currently, it only processes a single selected store if no categories are chosen."
-      );
+      console.log("Show Items clicked with no selection.");
     }
   };
 
@@ -129,95 +140,130 @@ const DefaultBrowseView: React.FC<DefaultBrowseViewProps> = ({
   const retailersToDisplay = verifiedRetailers;
   const categoriesToDisplay = PRODUCT_CATEGORIES_WITH_ICONS;
 
+  const storeFilterButtonText =
+    selectedStoreIds.size > 0
+      ? `Stores (${selectedStoreIds.size})`
+      : "+ Add store Filter";
+  const categoryFilterButtonText =
+    selectedCategories.size > 0
+      ? `Categories (${selectedCategories.size})`
+      : "+ Add Category Filter";
+
+  const showFilteredResults =
+    filteredBrowseProducts.length > 0 || isLoadingFilteredBrowseProducts;
+  const showSingleRetailerResults =
+    singleRetailerProducts.length > 0 || isLoadingSingleRetailerProducts;
+
+  const displayProducts = showFilteredResults
+    ? filteredBrowseProducts
+    : singleRetailerProducts;
+  const isLoadingDisplayProducts = showFilteredResults
+    ? isLoadingFilteredBrowseProducts
+    : isLoadingSingleRetailerProducts;
+
+  const showAnyResults = showFilteredResults || showSingleRetailerResults;
+
   return (
     <div className="default-browse-view">
       <div className="filters-header">
         <span>Filters:</span>
         <button
-          className="filter-button"
+          className={`filter-button ${
+            selectedStoreIds.size > 0 ? "active-filter" : ""
+          }`}
           onClick={() => setIsStoreModalOpen(true)}
         >
-          + Add store Filter
+          {storeFilterButtonText}
         </button>
         <button
-          className="filter-button"
+          className={`filter-button ${
+            selectedCategories.size > 0 ? "active-filter" : ""
+          }`}
           onClick={() => setIsCategoryModalOpen(true)}
         >
-          + Add Category Filter
+          {categoryFilterButtonText}
         </button>
       </div>
 
-      {/* Retailer Logos Section */}
-      <div className="section-title">Stores</div>
-      {isLoading && <p>Loading retailers...</p>}
-      {retailerApiError && (
-        <p className="error-message">
-          Error loading retailers: {retailerApiError}
-        </p>
-      )}
-      {!isLoading && !retailerApiError && retailersToDisplay.length === 0 && (
-        <p>No stores available.</p>
-      )}
-      {retailersToDisplay.length > 0 && (
-        <div className="logo-scroll-container horizontal-scroll">
-          <div className="two-row-grid">
-            {retailersToDisplay.map((retailer) => (
-              <div
-                key={retailer.id}
-                className={`logo-item-card ${
-                  selectedStoreIds.has(retailer.id) ? "selected" : ""
-                }`}
-                onClick={() => {
-                  toggleStoreSelection(retailer.id);
-                  handleRetailerClick(retailer.id);
-                }}
-              >
-                <img
-                  src={getLogoPath(retailer.name)}
-                  alt={retailer.name}
-                  className="logo-image"
-                />
-                <span className="logo-label">{retailer.name}</span>
+      {showAnyResults ? (
+        <BrowseResultsView
+          items={displayProducts}
+          isLoading={isLoadingDisplayProducts}
+          error={null}
+        />
+      ) : (
+        <>
+          <div className="section-title">Stores</div>
+          {isLoadingInitialData && <p>Loading retailers...</p>}
+          {retailerApiError && (
+            <p className="error-message">
+              Error loading retailers: {retailerApiError}
+            </p>
+          )}
+          {!isLoadingInitialData &&
+            !retailerApiError &&
+            retailersToDisplay.length === 0 && <p>No stores available.</p>}
+          {retailersToDisplay.length > 0 && (
+            <div className="logo-scroll-container horizontal-scroll">
+              <div className="two-row-grid">
+                {retailersToDisplay.map((retailer) => (
+                  <div
+                    key={retailer.id}
+                    className={`logo-item-card ${
+                      selectedStoreIds.has(retailer.id) ? "selected" : ""
+                    }`}
+                    onClick={() => {
+                      toggleStoreSelection(retailer.id);
+                    }}
+                  >
+                    <img
+                      src={getLogoPath(retailer.name)}
+                      alt={retailer.name}
+                      className="logo-image"
+                    />
+                    <span className="logo-label">{retailer.name}</span>
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
+            </div>
+          )}
+
+          <div className="section-title">Categories</div>
+          {categoriesToDisplay.length > 0 && (
+            <div className="logo-scroll-container horizontal-scroll">
+              <div className="two-row-grid">
+                {categoriesToDisplay.map((category) => (
+                  <div
+                    key={category.name}
+                    className={`logo-item-card category-item ${
+                      selectedCategories.has(category.name) ? "selected" : ""
+                    }`}
+                    onClick={() => toggleCategorySelection(category.name)}
+                  >
+                    <span className="logo-image category-icon">
+                      {category.icon}
+                    </span>
+                    <span className="logo-label">{category.name}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </>
+      )}
+
+      {!showAnyResults && (
+        <div className="show-items-button-container">
+          <button
+            className="show-items-button"
+            onClick={handleShowItems}
+            disabled={!canShowItems}
+          >
+            Show Items
+          </button>
         </div>
       )}
 
-      {/* Category Icons Section */}
-      <div className="section-title">Categories</div>
-      {categoriesToDisplay.length > 0 && (
-        <div className="logo-scroll-container horizontal-scroll">
-          <div className="two-row-grid">
-            {categoriesToDisplay.map((category) => (
-              <div
-                key={category.name}
-                className={`logo-item-card category-item ${
-                  selectedCategories.has(category.name) ? "selected" : ""
-                }`}
-                onClick={() => toggleCategorySelection(category.name)}
-              >
-                <span className="logo-image category-icon">
-                  {category.icon}
-                </span>
-                <span className="logo-label">{category.name}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      <div className="show-items-button-container">
-        <button
-          className="show-items-button"
-          onClick={handleShowItems}
-          disabled={!canShowItems}
-        >
-          Show Items
-        </button>
-      </div>
-
-      {/* Modals */}
       <StoreFilterModal
         isOpen={isStoreModalOpen}
         onClose={() => setIsStoreModalOpen(false)}
