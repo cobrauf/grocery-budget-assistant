@@ -13,5 +13,5 @@ router = APIRouter(
 
 @router.get("/") # Changed path to "/" as prefix is "/retailers"
 async def read_all_retailers(db: Session = Depends(get_db)):
-    retailers = await retailer_service.get_all_retailers(db=db)
+    retailers = retailer_service.get_all_retailers(db=db)
     return retailers 
