@@ -1,6 +1,6 @@
 import { useState, useCallback, useEffect } from "react";
 
-export type AppView = "retailerLogos" | "searchResults" | "retailerProducts"; // Add other views as needed
+export type AppView = "defaultBrowse" | "searchResults" | "retailerProducts";
 
 export interface ViewState {
   type: AppView;
@@ -8,7 +8,7 @@ export interface ViewState {
   retailerId?: number;
 }
 
-const INITIAL_VIEW_STATE: ViewState = { type: "retailerLogos" };
+const INITIAL_VIEW_STATE: ViewState = { type: "defaultBrowse" };
 
 export const useAppView = () => {
   const [currentViewState, setCurrentViewState] =

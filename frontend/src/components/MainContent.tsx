@@ -1,6 +1,6 @@
 import React from "react";
 import SearchResultsView from "../views/SearchResultsView";
-import RetailerLogosView from "../views/RetailerLogosView";
+import DefaultBrowseView from "../views/DefaultBrowseView";
 import { Product } from "../types/product";
 import { Retailer } from "../types/retailer";
 import { AppView } from "../hooks/useAppView";
@@ -83,10 +83,10 @@ const MainContent: React.FC<MainContentProps> = ({
             loadMore={() => {}}
           />
         );
-      case "retailerLogos":
+      case "defaultBrowse":
       default:
         return (
-          <RetailerLogosView
+          <DefaultBrowseView
             rawRetailers={rawRetailers}
             verifiedRetailers={verifiedRetailers}
             isLoadingApiRetailers={isLoadingApiRetailers}
@@ -96,7 +96,7 @@ const MainContent: React.FC<MainContentProps> = ({
             getLogoPath={getLogoPath}
           >
             {children}
-          </RetailerLogosView>
+          </DefaultBrowseView>
         );
     }
   };

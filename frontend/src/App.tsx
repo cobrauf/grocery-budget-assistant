@@ -98,27 +98,49 @@ function App() {
     }
   };
 
-  // Effect for managing browser history and unload/popstate events
+  // Log view changes
   useEffect(() => {
-    // --- Handle Browser History (Pushing State) ---
-    if (
-      window.history.state?.type !== currentViewState.type ||
-      window.history.state?.searchQuery !== currentViewState.searchQuery ||
-      window.history.state?.retailerId !== currentViewState.retailerId
-    ) {
-      window.history.pushState(
-        {
-          type: currentViewState.type,
-          searchQuery: currentViewState.searchQuery,
-          retailerId: currentViewState.retailerId,
-        },
-        ""
-        // Optional: Update URL fragment for bookmarking/sharing
-        // `#${currentViewState.type}${currentViewState.searchQuery ? `?q=${currentViewState.searchQuery}` : ''}${currentViewState.retailerId ? `&retailer=${currentViewState.retailerId}`: ''}`
-      );
-    }
+    console.log("[useAppView] View changed to:", currentViewState);
 
-    // --- Popstate Listener (Browser Back/Forward) ---
+    // --- Handle Browser History (Pushing State) ---
+    // Only push state if it's a new navigation, not on initial load or popstate
+    // (popstate is handled separately to decide if we goHome or allow natural back)
+    // Avoid pushing if already on the target state to prevent duplicate history entries.
+    if (
+      (currentViewState.type === "searchResults" &&
+        window.history.state?.searchQuery !== currentViewState.searchQuery) ||
+      (currentViewState.type === "retailerProducts" &&
+        window.history.state?.retailerId !== currentViewState.retailerId) ||
+      (currentViewState.type === "defaultBrowse" &&
+        window.history.state?.type !== "defaultBrowse")
+    ) {
+      if (currentViewState.type === "searchResults") {
+        window.history.pushState(
+          {
+            type: "searchResults",
+            searchQuery: currentViewState.searchQuery,
+          },
+          "" /* #searchResults/${currentViewState.searchQuery} */
+        );
+      } else if (currentViewState.type === "retailerProducts") {
+        window.history.pushState(
+          {
+            type: "retailerProducts",
+            retailerId: currentViewState.retailerId,
+          },
+          "" /* #retailerProducts/${currentViewState.retailerId} */
+        );
+      } else if (currentViewState.type === "defaultBrowse") {
+        window.history.pushState(
+          { type: "defaultBrowse" },
+          "" /* #defaultBrowse */
+        );
+      }
+    }
+  }, [currentViewState]);
+
+  // --- Popstate Listener (Browser Back/Forward) ---
+  useEffect(() => {
     const handlePopstate = (event: PopStateEvent) => {
       console.log(
         "Popstate event. Current app view type:",
@@ -126,28 +148,25 @@ function App() {
         "History state:",
         event.state
       );
-      // If the current view in the app is NOT the home view (retailerLogos),
+      // If the current view in the app is NOT the home view (defaultBrowse),
       // then any 'popstate' (usually from browser back) should take us home.
-      if (currentViewState.type !== "retailerLogos") {
-        // event.preventDefault(); // preventDefault in popstate is not reliably effective
+      if (currentViewState.type !== "defaultBrowse") {
         goHome(); // Navigate app to home view
 
-        // We need to push the 'retailerLogos' state again because the browser
+        // We need to push the 'defaultBrowse' state again because the browser
         // already popped to the *previous* state. We want the *next* back
-        // press from 'retailerLogos' to trigger beforeunload or exit.
+        // press from 'defaultBrowse' to trigger beforeunload or exit.
         window.history.pushState(
-          { type: "retailerLogos" },
-          "" /* #retailerLogos */
+          { type: "defaultBrowse" },
+          "" /* #defaultBrowse */
         );
       }
-      // If currentViewState.type IS 'retailerLogos', popstate means the user is trying
+      // If currentViewState.type IS 'defaultBrowse', popstate means the user is trying
       // to go back *from* the home view. `beforeunload` will handle the exit confirmation.
     };
     window.addEventListener("popstate", handlePopstate);
 
     // --- Beforeunload Listener (Refresh, Close Tab, True Exit) ---
-    // This listener was added in a previous step, ensure it's not duplicated or remove the old one.
-    // For this exercise, I'm assuming the previous one is removed by this new useEffect's cleanup.
     const handleBeforeUnload = (event: BeforeUnloadEvent) => {
       const confirmationMessage = "Are you sure you want to leave or refresh?";
       event.preventDefault();
@@ -160,11 +179,11 @@ function App() {
       window.removeEventListener("popstate", handlePopstate);
       window.removeEventListener("beforeunload", handleBeforeUnload);
     };
-  }, [currentViewState, goHome]); // Removed navigateToView from deps as per prompt's final version
+  }, [currentViewState.type, goHome]); // Depend on currentViewState.type for popstate logic
 
   // Effect to reset states when navigating to home
   useEffect(() => {
-    if (currentViewState.type === "retailerLogos") {
+    if (currentViewState.type === "defaultBrowse") {
       resetSearch();
       clearSelectedRetailer();
     }

@@ -1,8 +1,8 @@
 import React from "react";
 import { Retailer } from "../types/retailer"; // Assuming Retailer type is defined here
-import "../styles/RetailerLogosView.css"; // Import the CSS file
+import "../styles/DefaultBrowseView.css"; // Import the CSS file
 
-interface RetailerLogosViewProps {
+interface DefaultBrowseViewProps {
   rawRetailers: Retailer[];
   verifiedRetailers: Retailer[];
   isLoadingApiRetailers: boolean;
@@ -13,7 +13,7 @@ interface RetailerLogosViewProps {
   children?: React.ReactNode; // For potential future use or placeholders like the "test backend button"
 }
 
-const RetailerLogosView: React.FC<RetailerLogosViewProps> = ({
+const DefaultBrowseView: React.FC<DefaultBrowseViewProps> = ({
   rawRetailers,
   verifiedRetailers,
   isLoadingApiRetailers,
@@ -75,4 +75,4 @@ const RetailerLogosView: React.FC<RetailerLogosViewProps> = ({
   );
 };
 
-export default RetailerLogosView;
+export default DefaultBrowseView;
