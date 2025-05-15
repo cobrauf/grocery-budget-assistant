@@ -41,7 +41,7 @@
   bottom: 5px; /* Position underline slightly above the bottom edge */
   left: 20%; /* Adjust to center the underline */
   right: 20%; /* Adjust to center the underline */
-  height: 3px; /* Thickness of the underline */
+  height: 2px; /* Thickness of the underline */
   background-color: #ffffff; /* White underline */
   border-radius: 2px;
 }

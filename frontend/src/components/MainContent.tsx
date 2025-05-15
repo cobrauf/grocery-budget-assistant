@@ -3,16 +3,13 @@ import SearchResultsView from "../views/SearchResultsView";
 import DefaultSearchView from "../views/DefaultSearchView";
 import DefaultBrowseView from "../views/DefaultBrowseView";
 import { Product } from "../types/product";
-import { Retailer } from "../types/retailer";
-// import { AppView } from "../hooks/useAppView";
 import { AppTab } from "../hooks/useAppTab"; // Import AppTab
 
 interface MainContentProps {
   children?: React.ReactNode;
-  // currentViewType: AppView; // Remove old prop
-  activeTab: AppTab; // Add new prop
+  activeTab: AppTab;
 
-  // Props that will be used by specific tab views later
+  // Props that will be used by specific tab views later //TODO understand this
   searchQuery: string;
   searchResults: Product[];
   totalResults: number;
@@ -43,7 +40,6 @@ interface MainContentProps {
 
 const MainContent: React.FC<MainContentProps> = ({
   children,
-  // currentViewType,
   activeTab,
   searchQuery,
   searchResults,
@@ -74,14 +70,10 @@ const MainContent: React.FC<MainContentProps> = ({
   const renderContent = () => {
     switch (activeTab) {
       case "browse":
-        // Placeholder for Browse content. Will later use DefaultBrowseView and BrowseResultsView.
         return (
           <div style={{ textAlign: "center", paddingTop: "20px" }}>
             <h2>Browse Tab</h2>
-            <p>
-              This is where browsing content will go (e.g., DefaultBrowseView).
-            </p>
-            {/* <DefaultBrowseView 
+            <DefaultBrowseView
               rawRetailers={rawRetailers}
               verifiedRetailers={verifiedRetailers}
               isLoadingApiRetailers={isLoadingApiRetailers}
@@ -89,7 +81,7 @@ const MainContent: React.FC<MainContentProps> = ({
               retailerApiError={retailerApiError}
               handleRetailerClick={onRetailerClick}
               getLogoPath={getLogoPath}
-            /> */}
+            />
           </div>
         );
       case "search":
@@ -112,7 +104,7 @@ const MainContent: React.FC<MainContentProps> = ({
         return (
           <div style={{ textAlign: "center", paddingTop: "20px" }}>
             <h2>AI (WIP) Tab</h2>
-            <p>AI features are a work in progress.</p>
+            <p>AI features coming soon.</p>
           </div>
         );
       default:

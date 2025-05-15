@@ -1,6 +1,6 @@
 import React from "react";
-import { Retailer } from "../types/retailer"; // Assuming Retailer type is defined here
-import "../styles/DefaultBrowseView.css"; // Import the CSS file
+import { Retailer } from "../types/retailer";
+import "../styles/DefaultBrowseView.css";
 
 interface DefaultBrowseViewProps {
   rawRetailers: Retailer[];
@@ -10,7 +10,7 @@ interface DefaultBrowseViewProps {
   retailerApiError: string | null;
   handleRetailerClick: (id: number) => void;
   getLogoPath: (name: string) => string;
-  children?: React.ReactNode; // For potential future use or placeholders like the "test backend button"
+  children?: React.ReactNode;
 }
 
 const DefaultBrowseView: React.FC<DefaultBrowseViewProps> = ({
@@ -21,16 +21,16 @@ const DefaultBrowseView: React.FC<DefaultBrowseViewProps> = ({
   retailerApiError,
   handleRetailerClick,
   getLogoPath,
-  children, // Receive children
+  children,
 }) => {
   const isLoading = isLoadingApiRetailers || isLoadingLogoVerification;
 
   return (
     <>
       {/* Placeholder for Flash Deals Section */}
-      <div className="flash-deals-placeholder">
+      {/* <div className="flash-deals-placeholder">
         Front Page Section (Coming Soon)
-      </div>
+      </div> */}
 
       {retailerApiError && (
         <p className="retailer-error-message">{retailerApiError}</p>

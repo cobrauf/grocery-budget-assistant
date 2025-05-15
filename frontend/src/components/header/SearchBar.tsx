@@ -169,7 +169,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
   const searchBarStyle: React.CSSProperties = {
     display: "flex",
     flexDirection: "column", // To stack input and history
-    padding: "0.5rem 1rem",
+    padding: "0.5rem 2rem",
     position: "relative", // For potential history dropdown later
   };
 
