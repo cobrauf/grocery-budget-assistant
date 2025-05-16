@@ -65,9 +65,9 @@ export const useRetailers = (isSearchActive: boolean) => {
           const logoPath = getLogoPath(retailer.name);
           img.onload = () => resolve(retailer);
           img.onerror = () => {
-            console.warn(
-              `Logo verification failed for: ${retailer.name}, path: ${logoPath}`
-            );
+            // console.warn(
+            //   `Logo verification failed for: ${retailer.name}, path: ${logoPath}`
+            // );
             resolve(null);
           };
           img.src = logoPath;

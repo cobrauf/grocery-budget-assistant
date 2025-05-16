@@ -31,7 +31,7 @@ interface MainContentProps {
   getLogoPath: (name: string) => string;
   // Props for single retailer product display
   singleRetailerProducts: Product[];
-  isLoadingSingleRetailerProducts: boolean;
+  isLoadingSingleRetailer: boolean;
   // retailerProductsError: string | null; // If there's a specific error for single product fetching
 
   // Props for multi-filter product display
@@ -65,7 +65,7 @@ const MainContent: React.FC<MainContentProps> = ({
   getLogoPath,
   // Single retailer products
   singleRetailerProducts,
-  isLoadingSingleRetailerProducts,
+  isLoadingSingleRetailer,
   // Multi-filter products
   onFetchProductsByFilter,
   filteredBrowseProducts,
@@ -97,7 +97,7 @@ const MainContent: React.FC<MainContentProps> = ({
             getLogoPath={getLogoPath}
             // Single retailer products
             singleRetailerProducts={singleRetailerProducts}
-            isLoadingSingleRetailerProducts={isLoadingSingleRetailerProducts}
+            isLoadingSingleRetailerProducts={isLoadingSingleRetailer}
             // Multi-filter products & handler
             handleFetchProductsByFilter={onFetchProductsByFilter}
             filteredBrowseProducts={filteredBrowseProducts}

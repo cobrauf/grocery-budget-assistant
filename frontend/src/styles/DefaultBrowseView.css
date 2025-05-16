@@ -74,9 +74,10 @@
   border-bottom: 1px solid #eee;
 }
 
+/* this is for the filter title */
 .filters-header span {
   /* font-weight: bold; */
-  margin-right: 0.25rem;
+  margin-right: 0.5rem;
 }
 
 .filter-button {
@@ -85,7 +86,7 @@
   padding: 0.4rem 1rem;
   border-radius: 50px;
   cursor: pointer;
-  margin-right: 0.25rem;
+  margin-right: 0.5rem;
   font-size: 1rem;
   transition: background-color 0.3s ease, color 0.3s ease,
     border-color 0.3s ease;

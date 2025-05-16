@@ -71,7 +71,8 @@ function App() {
   >([]);
   const [isLoadingFilteredBrowseProducts, setIsLoadingFilteredBrowseProducts] =
     useState(false);
-  // Add error state if needed: const [filteredBrowseError, setFilteredBrowseError] = useState<string | null>(null);
+  const [appIsLoadingSingleRetailer, setAppIsLoadingSingleRetailer] =
+    useState(false);
 
   // State to manage if the detailed browse results view is active vs. filter selection view
   const [isBrowseResultsActive, setIsBrowseResultsActive] = useState(false);
@@ -113,15 +114,18 @@ function App() {
 
   // For single retailer selection (maintains existing logic)
   const handleSingleRetailerLogoClick = async (retailerId: number) => {
-    setFilteredBrowseProducts([]); // Clear multi-filter results
-    // For single retailer, we typically always fetch, or cache if desired (key would be retailerId:string)
-    // For simplicity with current request, let's assume single retailer click implies a fresh view/fetch for now
-    // and it will show results directly.
-    // To cache single retailer:
-    // const cacheKey = `retailer:${retailerId}`;
-    // if (browseResultsCache.has(cacheKey)) { setSingleRetailerProducts(browseResultsCache.get(cacheKey)); setIsLoadingRetailerProducts(false); } else { fetch... then cache }
-    await fetchSingleRetailerProductsLogic(retailerId);
-    setIsBrowseResultsActive(true); // Show results view
+    clearSelectedRetailer();
+    setFilteredBrowseProducts([]);
+    setAppIsLoadingSingleRetailer(true); // Controlled by App for this action
+    setIsBrowseResultsActive(true);
+    try {
+      await fetchSingleRetailerProductsLogic(retailerId); // Hook updates selectedRetailerProducts
+    } catch (error) {
+      console.error("Error during single retailer fetch logic:", error);
+      // Potentially set an error state to display in UI
+    } finally {
+      setAppIsLoadingSingleRetailer(false);
+    }
   };
 
   // For multi-filter selection from DefaultBrowseView
@@ -132,16 +136,17 @@ function App() {
     clearSelectedRetailer(); // Clear single retailer products/state
 
     const cacheKey = generateBrowseCacheKey(storeIds, categories);
+
     if (browseResultsCache.has(cacheKey)) {
       setFilteredBrowseProducts(browseResultsCache.get(cacheKey)!);
       setIsLoadingFilteredBrowseProducts(false);
-      setIsBrowseResultsActive(true); // Show results view
+      setIsBrowseResultsActive(true);
       return;
     }
 
+    setIsBrowseResultsActive(true);
     setIsLoadingFilteredBrowseProducts(true);
     setFilteredBrowseProducts([]);
-    // setFilteredBrowseError(null);
     try {
       const products = await apiFetchProductsByFilter(storeIds, categories);
       setFilteredBrowseProducts(products);
@@ -150,7 +155,6 @@ function App() {
       ); // Update cache
     } catch (error) {
       console.error("Error fetching filtered products:", error);
-      // setFilteredBrowseError("Failed to fetch products based on your filters.");
     } finally {
       setIsLoadingFilteredBrowseProducts(false);
       setIsBrowseResultsActive(true); // Show results view regardless of fetch outcome (empty/error handled by view)
@@ -207,7 +211,7 @@ function App() {
           retailerApiError={retailerApiError}
           getLogoPath={getLogoPath}
           singleRetailerProducts={selectedRetailerProducts}
-          isLoadingSingleRetailerProducts={isLoadingRetailerProducts}
+          isLoadingSingleRetailer={appIsLoadingSingleRetailer}
           onFetchProductsByFilter={handleFetchProductsByFilter}
           filteredBrowseProducts={filteredBrowseProducts}
           isLoadingFilteredBrowseProducts={isLoadingFilteredBrowseProducts}
