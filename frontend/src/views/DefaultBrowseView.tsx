@@ -167,22 +167,7 @@ const DefaultBrowseView: React.FC<DefaultBrowseViewProps> = ({
 
   const handleForwardArrowClick = () => {
     if (canShowItems) {
-      const hasCurrentResults =
-        (filteredBrowseProducts.length > 0 &&
-          !isLoadingFilteredBrowseProducts) ||
-        (singleRetailerProducts.length > 0 && !isLoadingSingleRetailerProducts);
-
-      const isSingleStoreOnly =
-        selectedStoreIds.size === 1 && selectedCategories.size === 0;
-      const currentProducts = isSingleStoreOnly
-        ? singleRetailerProducts
-        : filteredBrowseProducts;
-
-      if (hasCurrentResults && displayProducts.length > 0) {
-        onToggleBrowseView();
-      } else {
-        handleShowItems();
-      }
+      handleShowItems();
     } else {
       onToggleBrowseView();
     }
