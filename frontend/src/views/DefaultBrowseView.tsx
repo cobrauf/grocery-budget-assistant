@@ -181,7 +181,7 @@ const DefaultBrowseView: React.FC<DefaultBrowseViewProps> = ({
             onClick={onToggleBrowseView}
             className="browse-nav-arrow back-arrow"
           >
-            &#x2190;
+            {"<"}
           </button>
         )}
         <span className={isBrowseResultsActive ? "filters-title-indented" : ""}>
@@ -208,7 +208,7 @@ const DefaultBrowseView: React.FC<DefaultBrowseViewProps> = ({
             onClick={handleForwardArrowClick}
             className="browse-nav-arrow forward-arrow"
           >
-            &#x2192;
+            {">"}
           </button>
         )}
       </div>

@@ -70,13 +70,13 @@
   padding: 0.25rem;
   padding-bottom: 1rem;
   background-color: #e3000000;
-  border-radius: 50px;
+  border-radius: 0px;
   border-bottom: 1px solid #eee;
 }
 
 .filters-header span {
   /* font-weight: bold; */
-  margin-right: 1rem;
+  margin-right: 0.25rem;
 }
 
 .filter-button {
@@ -85,7 +85,7 @@
   padding: 0.4rem 1rem;
   border-radius: 50px;
   cursor: pointer;
-  margin-right: 0.5rem;
+  margin-right: 0.25rem;
   font-size: 1rem;
   transition: background-color 0.3s ease, color 0.3s ease,
     border-color 0.3s ease;
@@ -227,15 +227,14 @@
   padding: 1rem;
 }
 
-/* Styles for Back/Forward arrows in browse view */
 .browse-nav-arrow {
   background: none;
   border: none;
   font-size: 1.8rem; /* Larger for icon feel */
   color: var(--theme-primary, #007bff);
   cursor: pointer;
-  padding: 0 0.5rem;
-  line-height: 1; /* Adjust for vertical alignment if needed */
+  padding: 0 0rem;
+  line-height: 0;
 }
 
 .browse-nav-arrow:hover {
@@ -243,14 +242,9 @@
 }
 
 .back-arrow {
-  margin-right: 0.5rem;
+  margin-right: 1rem;
 }
 
 .forward-arrow {
   margin-left: auto; /* Pushes it to the right */
-}
-
-.filters-title-indented {
-  /* Add margin if back arrow is present, or rely on flex spacing */
-  /* margin-left: 1rem; */ /* Example if needed, but flex spacing might be enough */
 }
