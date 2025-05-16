@@ -67,14 +67,18 @@ export const useRetailers = (isSearchActive: boolean) => {
       }
     };
 
-    // Load retailers if search is not active and no retailer products are selected, or if rawRetailers is empty.
+    // Load retailers only if:
+    // 1. Search is not active
+    // 2. No specific retailer products are selected/shown
+    // 3. The rawRetailers list is currently empty (i.e., not yet loaded)
     if (
-      (!isSearchActive && selectedRetailerProducts.length === 0) ||
+      !isSearchActive &&
+      selectedRetailerProducts.length === 0 &&
       rawRetailers.length === 0
     ) {
       loadInitialRetailers();
     }
-  }, [isSearchActive, selectedRetailerProducts.length, rawRetailers.length]); // Added rawRetailers.length to dependencies
+  }, [isSearchActive, selectedRetailerProducts.length, rawRetailers.length]);
 
   // Effect to verify logos once raw retailers are fetched
   useEffect(() => {

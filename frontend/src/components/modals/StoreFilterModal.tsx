@@ -119,7 +119,7 @@ const StoreFilterModal: React.FC<StoreFilterModalProps> = ({
           <label htmlFor={`store-${retailer.id}`}>{retailer.name}</label>
         </div>
       ))}
-      {retailers.length === 0 && <p>No stores available to filter.</p>}
+      {/* {retailers.length === 0 && <p>No stores available to filter.</p>} */}
     </ModalBase>
   );
 };

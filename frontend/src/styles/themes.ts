@@ -37,7 +37,7 @@ export const themes: Theme[] = [
   {
     name: "Light",
     colors: {
-      background: "#ffffff",
+      background: "#F5EFFF",
       text: "#212529",
       primary: "#7b2cbf",
       secondary: "#6c757d",

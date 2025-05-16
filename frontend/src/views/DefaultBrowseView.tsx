@@ -209,15 +209,15 @@ const DefaultBrowseView: React.FC<DefaultBrowseViewProps> = ({
       ) : (
         <>
           <div className="section-title">Stores</div>
-          {isLoadingInitialData && <p>Loading retailers...</p>}
+          {/* {isLoadingInitialData && <p>Loading retailers...</p>} */}
           {retailerApiError && (
             <p className="error-message">
               Error loading retailers: {retailerApiError}
             </p>
           )}
-          {!isLoadingInitialData &&
+          {/* {!isLoadingInitialData &&
             !retailerApiError &&
-            retailersToDisplay.length === 0 && <p>No stores available.</p>}
+            retailersToDisplay.length === 0 && <p> </p>} */}
           {retailersToDisplay.length > 0 && (
             <div className="logo-scroll-container horizontal-scroll">
               <div className="two-row-grid">
