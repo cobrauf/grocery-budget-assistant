@@ -35,7 +35,7 @@
 
 .modal-title {
   margin: 0;
-  font-size: 1.5rem;
+  font-size: 1rem;
   color: var(--theme-text, #333);
 }
 
@@ -103,6 +103,30 @@
   margin-right: 10px;
   width: 30px;
   text-align: center;
+}
+
+/* Styling for the 'Select All' item */
+.modal-select-all-item {
+  display: flex;
+  align-items: center;
+  padding: 8px 0;
+  /* border-bottom: 1px solid #e0e0e0;  */
+  margin-bottom: 10px; /* Space before the list starts */
+}
+
+.modal-select-all-item input[type="checkbox"] {
+  margin-right: 10px;
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+}
+
+.modal-select-all-item label {
+  font-size: 1rem;
+  /* font-weight: bold;  */
+  color: var(--theme-text, #333);
+  cursor: pointer;
+  flex-grow: 1;
 }
 
 /* Basic styles for modal buttons, can be themed later */

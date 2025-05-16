@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import ModalBase from "../common/ModalBase";
 
 interface CategoryItem {
@@ -24,6 +24,7 @@ const CategoryFilterModal: React.FC<CategoryFilterModalProps> = ({
   const [selectedNames, setSelectedNames] = useState<Set<string>>(
     new Set(initialSelectedCategories)
   );
+  const selectAllCheckboxRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     setSelectedNames(new Set(initialSelectedCategories));
@@ -40,6 +41,25 @@ const CategoryFilterModal: React.FC<CategoryFilterModalProps> = ({
       return next;
     });
   };
+
+  const handleSelectAllToggle = () => {
+    if (selectedNames.size === categories.length) {
+      setSelectedNames(new Set());
+    } else {
+      setSelectedNames(new Set(categories.map((c) => c.name)));
+    }
+  };
+
+  const isAllSelected =
+    categories.length > 0 && selectedNames.size === categories.length;
+  const isIndeterminate =
+    selectedNames.size > 0 && selectedNames.size < categories.length;
+
+  useEffect(() => {
+    if (selectAllCheckboxRef.current) {
+      selectAllCheckboxRef.current.indeterminate = isIndeterminate;
+    }
+  }, [isIndeterminate]);
 
   const handleConfirm = () => {
     onConfirmSelections(selectedNames);
@@ -68,6 +88,18 @@ const CategoryFilterModal: React.FC<CategoryFilterModalProps> = ({
       title="Filter by Categories"
       footer={footer}
     >
+      {categories.length > 0 && (
+        <div className="modal-select-all-item">
+          <input
+            type="checkbox"
+            id="select-all-categories"
+            ref={selectAllCheckboxRef}
+            checked={isAllSelected}
+            onChange={handleSelectAllToggle}
+          />
+          <label htmlFor="select-all-categories">Select All</label>
+        </div>
+      )}
       {categories.map((category) => (
         <div key={category.name} className="modal-filter-item">
           <input

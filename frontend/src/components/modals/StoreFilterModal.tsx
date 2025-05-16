@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import ModalBase from "../common/ModalBase";
 import { Retailer } from "../../types/retailer";
 // Assuming getLogoPath is available or passed, or we just show names
@@ -23,6 +23,7 @@ const StoreFilterModal: React.FC<StoreFilterModalProps> = ({
   const [selectedIds, setSelectedIds] = useState<Set<number>>(
     new Set(initialSelectedStoreIds)
   );
+  const selectAllCheckboxRef = useRef<HTMLInputElement>(null);
 
   // Reset temporary selections if modal is reopened with different initial selections
   useEffect(() => {
@@ -40,6 +41,28 @@ const StoreFilterModal: React.FC<StoreFilterModalProps> = ({
       return next;
     });
   };
+
+  const handleSelectAllToggle = () => {
+    if (selectedIds.size === retailers.length) {
+      // If all are selected, deselect all
+      setSelectedIds(new Set());
+    } else {
+      // Otherwise (none or some selected), select all
+      setSelectedIds(new Set(retailers.map((r) => r.id)));
+    }
+  };
+
+  const isAllSelected =
+    retailers.length > 0 && selectedIds.size === retailers.length;
+  const isIndeterminate =
+    selectedIds.size > 0 && selectedIds.size < retailers.length;
+
+  // Effect to set indeterminate state on the checkbox
+  useEffect(() => {
+    if (selectAllCheckboxRef.current) {
+      selectAllCheckboxRef.current.indeterminate = isIndeterminate;
+    }
+  }, [isIndeterminate]);
 
   const handleConfirm = () => {
     onConfirmSelections(selectedIds);
@@ -68,6 +91,18 @@ const StoreFilterModal: React.FC<StoreFilterModalProps> = ({
       title="Filter by Stores"
       footer={footer}
     >
+      {retailers.length > 0 && (
+        <div className="modal-select-all-item">
+          <input
+            type="checkbox"
+            id="select-all-stores"
+            ref={selectAllCheckboxRef}
+            checked={isAllSelected}
+            onChange={handleSelectAllToggle}
+          />
+          <label htmlFor="select-all-stores">Select All</label>
+        </div>
+      )}
       {retailers.map((retailer) => (
         <div key={retailer.id} className="modal-filter-item">
           <input
