@@ -66,10 +66,12 @@
 .filters-header {
   display: flex;
   align-items: center;
-  margin-bottom: 1rem;
-  padding: 0.5rem;
+  margin-bottom: 0rem;
+  padding: 0.25rem;
+  padding-bottom: 1rem;
   background-color: #e3000000;
   border-radius: 4px;
+  border-bottom: 1px solid #eee;
 }
 
 .filters-header span {
@@ -107,18 +109,21 @@
 }
 
 .section-title {
-  font-size: 1.2rem;
+  font-size: 0rem;
   font-weight: bold;
-  margin-top: 1.5rem;
-  margin-bottom: 0.75rem;
+  /* margin-top: 1.5rem;
+  margin-bottom: 0.75rem; */
   color: var(--theme-text);
 }
 
 .logo-scroll-container {
   display: flex; /* This will be the outer scroller */
   overflow-x: auto;
-  padding-bottom: 10px; /* For scrollbar visibility if not hidden */
-  margin-bottom: 10px;
+  /* padding-bottom: 10px; */
+  /* margin-bottom: 10px; */
+  padding-top: 5px;
+  padding-bottom: 5px;
+  border-bottom: 1px solid #eee;
   /* Remove gap from here, apply to grid items if needed or let grid handle it */
 }
 
@@ -131,6 +136,7 @@
   ); /* Creates two rows of automatic height */
   gap: 10px; /* Spacing between all grid items */
   /* The width of this grid will be determined by its content (columns) */
+  padding: 0.5rem;
 }
 
 /* Hide scrollbar for a cleaner look, but still scrollable */
@@ -147,11 +153,11 @@
   flex-direction: column;
   align-items: center;
   justify-content: center; /* Better centering for fixed height items */
-  padding: 10px;
-  border: 1px solid #ddd;
+  padding: 5px;
+  border: 0px solid #ddd;
   border-radius: 8px;
-  width: 100px; /* Fixed width for items in the grid */
-  height: 100px; /* Fixed height for items in the grid, adjusted from 120px for better 2-row fit */
+  width: 70px; /* Fixed width for items in the grid */
+  height: 80px; /* Fixed height for items in the grid, adjusted from 120px for better 2-row fit */
   cursor: pointer;
   transition: border-color 0.3s ease, box-shadow 0.3s ease;
   text-align: center;
@@ -162,7 +168,7 @@
 
 .logo-item-card:hover {
   border-color: var(--theme-primary, #007bff);
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  /* box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); */
 }
 
 .logo-item-card.selected {
@@ -172,19 +178,19 @@
 }
 
 .logo-image {
-  width: 45px; /* Adjusted for smaller card */
-  height: 45px; /* Adjusted for smaller card */
+  width: 50px; /* Adjusted for smaller card */
+  height: 50px; /* Adjusted for smaller card */
   object-fit: contain;
-  margin-bottom: 5px; /* Adjusted margin */
+  margin-bottom: 2px;
 }
 
 .category-icon {
-  font-size: 30px; /* Adjusted for smaller card */
-  line-height: 45px; /* Adjusted for smaller card */
+  font-size: 35px; /* Adjusted for smaller card */
+  line-height: 45px;
 }
 
 .logo-label {
-  font-size: 0.75rem; /* Slightly smaller to fit */
+  font-size: 0.85rem; /* Slightly smaller to fit */
   color: #333;
   white-space: nowrap;
   overflow: hidden;
@@ -195,9 +201,9 @@
 .show-items-button-container {
   display: flex;
   justify-content: center;
-  padding: 1.5rem 0;
+  /* padding: 0rem 0; */
   margin-top: 1rem;
-  border-top: 1px solid #eee;
+  /* border-top: 1px solid #eee; */
 }
 
 .show-items-button {

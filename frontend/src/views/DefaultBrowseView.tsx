@@ -141,13 +141,11 @@ const DefaultBrowseView: React.FC<DefaultBrowseViewProps> = ({
   const categoriesToDisplay = PRODUCT_CATEGORIES_WITH_ICONS;
 
   const storeFilterButtonText =
-    selectedStoreIds.size > 0
-      ? `Stores (${selectedStoreIds.size})`
-      : "+ Store Filter";
+    selectedStoreIds.size > 0 ? `Stores (${selectedStoreIds.size})` : "+ Store";
   const categoryFilterButtonText =
     selectedCategories.size > 0
       ? `Categories (${selectedCategories.size})`
-      : "+ Category Filter";
+      : "+ Category";
 
   const showFilteredResults =
     filteredBrowseProducts.length > 0 || isLoadingFilteredBrowseProducts;
