@@ -29,6 +29,7 @@ const SearchResultsView: React.FC<SearchResultsViewProps> = ({
   const resultsContainerStyle: React.CSSProperties = {
     height: "calc(100vh - 120px)", // Example: Adjust based on header/footer height
     overflowY: "auto", // Make the container scrollable
+    padding: "1rem",
   };
 
   const infoTextStyle: React.CSSProperties = {
@@ -78,7 +79,6 @@ const SearchResultsView: React.FC<SearchResultsViewProps> = ({
           gap: "1rem",
           width: "100%",
           overflow: "visible",
-          padding: "1rem",
         }}
       >
         {items.map((item) => (

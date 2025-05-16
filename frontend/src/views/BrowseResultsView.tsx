@@ -26,7 +26,7 @@ const BrowseResultsView: React.FC<BrowseResultsViewProps> = ({
 
   const resultsContainerStyle: React.CSSProperties = {
     height: "calc(100vh - 120px)", // Adjust based on header/footer height
-    overflowY: "hidden",
+    overflowY: "auto",
     padding: "1rem",
   };
 
