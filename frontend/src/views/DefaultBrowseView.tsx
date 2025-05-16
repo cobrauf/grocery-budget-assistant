@@ -22,6 +22,8 @@ interface DefaultBrowseViewProps {
   ) => void;
   filteredBrowseProducts: Product[];
   isLoadingFilteredBrowseProducts: boolean;
+  isBrowseResultsActive: boolean;
+  onToggleBrowseView: () => void;
 }
 
 const PRODUCT_CATEGORIES_WITH_ICONS: { name: string; icon: string }[] = [
@@ -67,6 +69,8 @@ const DefaultBrowseView: React.FC<DefaultBrowseViewProps> = ({
   handleFetchProductsByFilter,
   filteredBrowseProducts,
   isLoadingFilteredBrowseProducts,
+  isBrowseResultsActive,
+  onToggleBrowseView,
 }) => {
   const [selectedStoreIds, setSelectedStoreIds] = useState<Set<number>>(
     new Set()
@@ -159,12 +163,45 @@ const DefaultBrowseView: React.FC<DefaultBrowseViewProps> = ({
     ? isLoadingFilteredBrowseProducts
     : isLoadingSingleRetailerProducts;
 
-  const showAnyResults = showFilteredResults || showSingleRetailerResults;
+  const showForwardArrow = !isBrowseResultsActive && canShowItems;
+
+  const handleForwardArrowClick = () => {
+    if (canShowItems) {
+      const hasCurrentResults =
+        (filteredBrowseProducts.length > 0 &&
+          !isLoadingFilteredBrowseProducts) ||
+        (singleRetailerProducts.length > 0 && !isLoadingSingleRetailerProducts);
+
+      const isSingleStoreOnly =
+        selectedStoreIds.size === 1 && selectedCategories.size === 0;
+      const currentProducts = isSingleStoreOnly
+        ? singleRetailerProducts
+        : filteredBrowseProducts;
+
+      if (hasCurrentResults && displayProducts.length > 0) {
+        onToggleBrowseView();
+      } else {
+        handleShowItems();
+      }
+    } else {
+      onToggleBrowseView();
+    }
+  };
 
   return (
     <div className="default-browse-view">
       <div className="filters-header">
-        <span>Filters:</span>
+        {isBrowseResultsActive && (
+          <button
+            onClick={onToggleBrowseView}
+            className="browse-nav-arrow back-arrow"
+          >
+            &#x2190;
+          </button>
+        )}
+        <span className={isBrowseResultsActive ? "filters-title-indented" : ""}>
+          Filters:
+        </span>
         <button
           className={`filter-button ${
             selectedStoreIds.size > 0 ? "active-filter" : ""
@@ -181,9 +218,17 @@ const DefaultBrowseView: React.FC<DefaultBrowseViewProps> = ({
         >
           {categoryFilterButtonText}
         </button>
+        {showForwardArrow && (
+          <button
+            onClick={handleForwardArrowClick}
+            className="browse-nav-arrow forward-arrow"
+          >
+            &#x2192;
+          </button>
+        )}
       </div>
 
-      {showAnyResults ? (
+      {isBrowseResultsActive ? (
         <BrowseResultsView
           items={displayProducts}
           isLoading={isLoadingDisplayProducts}
@@ -250,7 +295,7 @@ const DefaultBrowseView: React.FC<DefaultBrowseViewProps> = ({
         </>
       )}
 
-      {!showAnyResults && (
+      {!isBrowseResultsActive && (
         <div className="show-items-button-container">
           <button
             className="show-items-button"

@@ -39,6 +39,10 @@ interface MainContentProps {
   filteredBrowseProducts: Product[];
   isLoadingFilteredBrowseProducts: boolean;
   // filteredBrowseError: string | null; // If there's a specific error for multi-filter fetching
+
+  // Browse view state management
+  isBrowseResultsActive: boolean;
+  onToggleBrowseView: () => void;
 }
 
 const MainContent: React.FC<MainContentProps> = ({
@@ -66,6 +70,9 @@ const MainContent: React.FC<MainContentProps> = ({
   onFetchProductsByFilter,
   filteredBrowseProducts,
   isLoadingFilteredBrowseProducts,
+  // Browse view state
+  isBrowseResultsActive,
+  onToggleBrowseView,
 }) => {
   const mainContentStyle: React.CSSProperties = {
     padding: "0",
@@ -97,6 +104,9 @@ const MainContent: React.FC<MainContentProps> = ({
             isLoadingFilteredBrowseProducts={isLoadingFilteredBrowseProducts}
             // retailerProductsError={retailerProductsError} // if available
             // filteredBrowseError={filteredBrowseError} // if available
+            // Pass browse view state props
+            isBrowseResultsActive={isBrowseResultsActive}
+            onToggleBrowseView={onToggleBrowseView}
           />
         );
       case "search":

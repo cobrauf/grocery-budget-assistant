@@ -226,3 +226,31 @@
   text-align: center;
   padding: 1rem;
 }
+
+/* Styles for Back/Forward arrows in browse view */
+.browse-nav-arrow {
+  background: none;
+  border: none;
+  font-size: 1.8rem; /* Larger for icon feel */
+  color: var(--theme-primary, #007bff);
+  cursor: pointer;
+  padding: 0 0.5rem;
+  line-height: 1; /* Adjust for vertical alignment if needed */
+}
+
+.browse-nav-arrow:hover {
+  opacity: 0.7;
+}
+
+.back-arrow {
+  margin-right: 0.5rem;
+}
+
+.forward-arrow {
+  margin-left: auto; /* Pushes it to the right */
+}
+
+.filters-title-indented {
+  /* Add margin if back arrow is present, or rely on flex spacing */
+  /* margin-left: 1rem; */ /* Example if needed, but flex spacing might be enough */
+}

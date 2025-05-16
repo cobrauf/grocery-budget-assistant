@@ -73,6 +73,24 @@ function App() {
     useState(false);
   // Add error state if needed: const [filteredBrowseError, setFilteredBrowseError] = useState<string | null>(null);
 
+  // State to manage if the detailed browse results view is active vs. filter selection view
+  const [isBrowseResultsActive, setIsBrowseResultsActive] = useState(false);
+
+  // Cache for browse results
+  const [browseResultsCache, setBrowseResultsCache] = useState<
+    Map<string, Product[]>
+  >(new Map());
+
+  // Helper to generate cache key
+  const generateBrowseCacheKey = (
+    storeIds: string[],
+    categories: string[]
+  ): string => {
+    const sortedStoreIds = [...storeIds].sort().join(",");
+    const sortedCategories = [...categories].sort().join(",");
+    return `stores:${sortedStoreIds}_categories:${sortedCategories}`;
+  };
+
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
   };
@@ -95,9 +113,15 @@ function App() {
 
   // For single retailer selection (maintains existing logic)
   const handleSingleRetailerLogoClick = async (retailerId: number) => {
-    setFilteredBrowseProducts([]); // Clear multi-filter results when single retailer is clicked
+    setFilteredBrowseProducts([]); // Clear multi-filter results
+    // For single retailer, we typically always fetch, or cache if desired (key would be retailerId:string)
+    // For simplicity with current request, let's assume single retailer click implies a fresh view/fetch for now
+    // and it will show results directly.
+    // To cache single retailer:
+    // const cacheKey = `retailer:${retailerId}`;
+    // if (browseResultsCache.has(cacheKey)) { setSingleRetailerProducts(browseResultsCache.get(cacheKey)); setIsLoadingRetailerProducts(false); } else { fetch... then cache }
     await fetchSingleRetailerProductsLogic(retailerId);
-    // No need to setActiveTab, browse tab is already active
+    setIsBrowseResultsActive(true); // Show results view
   };
 
   // For multi-filter selection from DefaultBrowseView
@@ -105,19 +129,36 @@ function App() {
     storeIds: string[],
     categories: string[]
   ) => {
-    clearSelectedRetailer(); // Clear single retailer results
+    clearSelectedRetailer(); // Clear single retailer products/state
+
+    const cacheKey = generateBrowseCacheKey(storeIds, categories);
+    if (browseResultsCache.has(cacheKey)) {
+      setFilteredBrowseProducts(browseResultsCache.get(cacheKey)!);
+      setIsLoadingFilteredBrowseProducts(false);
+      setIsBrowseResultsActive(true); // Show results view
+      return;
+    }
+
     setIsLoadingFilteredBrowseProducts(true);
     setFilteredBrowseProducts([]);
-    // setFilteredBrowseError(null); // Reset error
+    // setFilteredBrowseError(null);
     try {
       const products = await apiFetchProductsByFilter(storeIds, categories);
       setFilteredBrowseProducts(products);
+      setBrowseResultsCache((prevCache) =>
+        new Map(prevCache).set(cacheKey, products)
+      ); // Update cache
     } catch (error) {
       console.error("Error fetching filtered products:", error);
       // setFilteredBrowseError("Failed to fetch products based on your filters.");
     } finally {
       setIsLoadingFilteredBrowseProducts(false);
+      setIsBrowseResultsActive(true); // Show results view regardless of fetch outcome (empty/error handled by view)
     }
+  };
+
+  const toggleBrowseView = () => {
+    setIsBrowseResultsActive((prev) => !prev);
   };
 
   const clearSearchLocal = () => {
@@ -130,7 +171,10 @@ function App() {
     setActiveTab("browse");
     resetSearch();
     clearSelectedRetailer();
-    setFilteredBrowseProducts([]); // Clear filtered browse results when going home
+    setFilteredBrowseProducts([]);
+    setIsBrowseResultsActive(false); // Reset to filter selection view
+    // Optionally clear cache if desired when going fully "home"
+    // setBrowseResultsCache(new Map());
   };
 
   return (
@@ -159,17 +203,17 @@ function App() {
           verifiedRetailers={verifiedRetailers}
           isLoadingApiRetailers={isLoadingApiRetailers}
           isLoadingLogoVerification={isLoadingLogoVerification}
-          onSingleRetailerClick={handleSingleRetailerLogoClick} // Updated prop name
+          onSingleRetailerClick={handleSingleRetailerLogoClick}
           retailerApiError={retailerApiError}
           getLogoPath={getLogoPath}
-          // For single retailer selection results
           singleRetailerProducts={selectedRetailerProducts}
           isLoadingSingleRetailerProducts={isLoadingRetailerProducts}
-          // For multi-filter results
           onFetchProductsByFilter={handleFetchProductsByFilter}
           filteredBrowseProducts={filteredBrowseProducts}
           isLoadingFilteredBrowseProducts={isLoadingFilteredBrowseProducts}
-          // filteredBrowseError={filteredBrowseError} // Pass error if using
+          // Browse view state management
+          isBrowseResultsActive={isBrowseResultsActive}
+          onToggleBrowseView={toggleBrowseView}
         />
         <BottomNav activeTab={activeTab} setActiveTab={setActiveTab} />
         <SideBar
