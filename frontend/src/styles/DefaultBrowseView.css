@@ -70,7 +70,7 @@
   padding: 0.25rem;
   padding-bottom: 1rem;
   background-color: #e3000000;
-  border-radius: 4px;
+  border-radius: 50px;
   border-bottom: 1px solid #eee;
 }
 
@@ -82,11 +82,11 @@
 .filter-button {
   background-color: #aeadad;
   border: 1px solid #ccc;
-  padding: 0.5rem 1rem;
-  border-radius: 4px;
+  padding: 0.4rem 1rem;
+  border-radius: 50px;
   cursor: pointer;
   margin-right: 0.5rem;
-  font-size: 0.9rem;
+  font-size: 1rem;
   transition: background-color 0.3s ease, color 0.3s ease,
     border-color 0.3s ease;
   font-family: inherit;
@@ -94,7 +94,6 @@
 
 .filter-button:hover {
   background-color: #ddd;
-  border-radius: 4px;
   cursor: pointer;
   font-family: inherit;
 }
@@ -153,7 +152,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: center; /* Better centering for fixed height items */
-  padding: 5px;
+  padding: 2px;
   border: 0px solid #ddd;
   border-radius: 8px;
   width: 70px; /* Fixed width for items in the grid */
@@ -207,12 +206,12 @@
 }
 
 .show-items-button {
-  padding: 0.75rem 2rem;
+  padding: 0.75rem 5rem;
   font-size: 1rem;
   background-color: var(--theme-primary, #007bff);
   color: white;
   border: none;
-  border-radius: 4px;
+  border-radius: 50px;
   cursor: pointer;
   font-family: inherit;
 }

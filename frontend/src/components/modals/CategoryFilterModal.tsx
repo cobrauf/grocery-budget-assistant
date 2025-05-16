@@ -52,7 +52,7 @@ const CategoryFilterModal: React.FC<CategoryFilterModalProps> = ({
         Cancel
       </button>
       <button onClick={handleConfirm} className="modal-button-confirm">
-        Show Items
+        View Sales
       </button>
     </>
   );
