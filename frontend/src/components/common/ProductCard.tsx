@@ -17,8 +17,12 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
 
   const getRetailerLogoPath = (retailerName: string | undefined): string => {
     if (!retailerName) return "";
-    console.log(`public/assets/logos/${retailerName}.png`);
-    return `public/assets/logos/${retailerName}.png`; // Adjusted path assuming assets are served from public root
+    const imageName = retailerName
+      .toLowerCase()
+      .replace(/\s+/g, "")
+      .replace(/&/g, "and");
+    console.log(`+++public/assets/logos/${imageName}.png`);
+    return `public/assets/logos/${imageName}.png`; // Adjusted path assuming assets are served from public root
   };
 
   return (

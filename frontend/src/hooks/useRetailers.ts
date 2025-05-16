@@ -3,31 +3,31 @@ import { Product } from "../types/product";
 import { Retailer } from "../types/retailer";
 import { fetchRetailers, fetchProductsByRetailer } from "../services/api";
 
-// Define the known retailers list here
-const PREDEFINED_RETAILERS: Retailer[] = [
-  { id: 1, name: "Tokyo Central", logo_url: null },
-  { id: 2, name: "Albertsons", logo_url: null },
-  { id: 3, name: "Food4Less", logo_url: null },
-  { id: 4, name: "Vons", logo_url: null },
-  { id: 5, name: "Ralphs", logo_url: null },
-  { id: 6, name: "Trader Joe's", logo_url: null },
-  { id: 7, name: "Aldi", logo_url: null },
-  { id: 8, name: "Sprouts", logo_url: null },
-  { id: 9, name: "Jons", logo_url: null },
-  { id: 10, name: "Costco", logo_url: null },
-  { id: 11, name: "Sam's Club", logo_url: null },
-  { id: 12, name: "99 Ranch", logo_url: null },
-  { id: 13, name: "Mitsuwa", logo_url: null },
-  { id: 14, name: "Superior", logo_url: null },
-  { id: 15, name: "H-mart", logo_url: null },
-  { id: 16, name: "Hannam Chain", logo_url: null },
-  { id: 17, name: "Northgate", logo_url: null },
-  { id: 18, name: "Vallarta", logo_url: null },
+// Define the known retailers list here - this can be used for reference or typing if needed
+// but the actual data with correct IDs will come from the API.
+const PREDEFINED_RETAILER_NAMES: Omit<Retailer, "id" | "logo_url">[] = [
+  { name: "Tokyo Central" },
+  { name: "Albertsons" },
+  { name: "Food4Less" },
+  { name: "Vons" },
+  { name: "Ralphs" },
+  { name: "Trader Joe's" },
+  { name: "Aldi" },
+  { name: "Sprouts" },
+  { name: "Jons" },
+  { name: "Costco" },
+  { name: "Sam's Club" },
+  { name: "99 Ranch" },
+  { name: "Mitsuwa" },
+  { name: "Superior" },
+  { name: "H-mart" },
+  { name: "Hannam Chain" },
+  { name: "Northgate" },
+  { name: "Vallarta" },
 ];
 
 export const useRetailers = (isSearchActive: boolean) => {
-  const [rawRetailers, setRawRetailers] =
-    useState<Retailer[]>(PREDEFINED_RETAILERS);
+  const [rawRetailers, setRawRetailers] = useState<Retailer[]>([]); // Initialize with empty array
   const [verifiedRetailers, setVerifiedRetailers] = useState<Retailer[]>([]);
   const [selectedRetailerProducts, setSelectedRetailerProducts] = useState<
     Product[]
@@ -46,20 +46,12 @@ export const useRetailers = (isSearchActive: boolean) => {
       ".png";
     // Ensure the path starts from the public directory correctly
     // Assuming the build process places assets at the root level accessible via '/'
+    console.log(`---public/assets/logos/${imageName}.png`);
     return `public/assets/logos/${imageName}`;
   }, []);
 
   // Effect to fetch initial retailers list
   useEffect(() => {
-    // Set raw retailers from the predefined list on initial component mount
-    // The API call is bypassed for initial load but kept for potential future use.
-    setRawRetailers(PREDEFINED_RETAILERS);
-    setIsLoadingApiRetailers(false); // No API call, so set loading to false.
-    setRetailerApiError(null); // No API call, so clear any potential errors.
-
-    // The original API fetching logic is commented out below but preserved
-    // in case it's needed in the future, e.g., for a manual refresh.
-    /*
     const loadInitialRetailers = async () => {
       setIsLoadingApiRetailers(true);
       setRetailerApiError(null);
@@ -69,18 +61,20 @@ export const useRetailers = (isSearchActive: boolean) => {
       } catch (error) {
         console.error("Error fetching retailers from API:", error);
         setRetailerApiError("Failed to load retailers list.");
-        setRawRetailers([]);
+        setRawRetailers([]); // Set to empty array on error
       } finally {
         setIsLoadingApiRetailers(false);
       }
     };
 
-    // Load retailers only if search is not active and no retailer products are selected
-    if (!isSearchActive && selectedRetailerProducts.length === 0) {
-      // loadInitialRetailers(); // Original call commented out
+    // Load retailers if search is not active and no retailer products are selected, or if rawRetailers is empty.
+    if (
+      (!isSearchActive && selectedRetailerProducts.length === 0) ||
+      rawRetailers.length === 0
+    ) {
+      loadInitialRetailers();
     }
-    */
-  }, [isSearchActive, selectedRetailerProducts.length]);
+  }, [isSearchActive, selectedRetailerProducts.length, rawRetailers.length]); // Added rawRetailers.length to dependencies
 
   // Effect to verify logos once raw retailers are fetched
   useEffect(() => {
