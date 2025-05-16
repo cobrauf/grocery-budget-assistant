@@ -17,7 +17,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
 
   const getRetailerLogoPath = (retailerName: string | undefined): string => {
     if (!retailerName) return "";
-    // console.log(`public/assets/logos/${retailerName}.png`);
+    console.log(`public/assets/logos/${retailerName}.png`);
     return `public/assets/logos/${retailerName}.png`; // Adjusted path assuming assets are served from public root
   };
 
@@ -44,7 +44,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
               {product.is_frontpage && (
                 <span className="product-card-frontpage-indicator">
                   {" "}
-                  ⭐ Front Page
+                  Front Page
                 </span>
               )}
             </div>

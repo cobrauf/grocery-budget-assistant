@@ -3,6 +3,7 @@ import { Product } from "../types/product"; // Adjust path if necessary
 import ProductCard from "../components/common/ProductCard"; // Adjust path if necessary
 import LoadingSpinner from "../components/common/LoadingSpinner"; // Adjust path if necessary
 import InfiniteScroll from "react-infinite-scroll-component";
+import "../styles/ResultsView.css";
 
 interface SearchResultsViewProps {
   searchQuery: string;
@@ -33,7 +34,7 @@ const SearchResultsView: React.FC<SearchResultsViewProps> = ({
   const infoTextStyle: React.CSSProperties = {
     width: "100%",
     textAlign: "center",
-    padding: "2rem 0",
+    padding: "0rem 0",
     color: "#555",
   };
 

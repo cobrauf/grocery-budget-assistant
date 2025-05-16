@@ -3,6 +3,7 @@ import { Product } from "../types/product";
 import ProductCard from "../components/common/ProductCard";
 import LoadingSpinner from "../components/common/LoadingSpinner";
 import InfiniteScroll from "react-infinite-scroll-component";
+import "../styles/ResultsView.css";
 
 interface BrowseResultsViewProps {
   items: Product[];
@@ -25,14 +26,14 @@ const BrowseResultsView: React.FC<BrowseResultsViewProps> = ({
 
   const resultsContainerStyle: React.CSSProperties = {
     height: "calc(100vh - 120px)", // Adjust based on header/footer height
-    overflowY: "auto",
+    overflowY: "hidden",
     padding: "1rem",
   };
 
   const infoTextStyle: React.CSSProperties = {
     width: "100%",
     textAlign: "center",
-    padding: "2rem 0",
+    padding: "0rem 0",
     color: "#555",
   };
 
