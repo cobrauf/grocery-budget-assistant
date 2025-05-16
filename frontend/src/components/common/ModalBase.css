@@ -104,3 +104,41 @@
   width: 30px;
   text-align: center;
 }
+
+/* Basic styles for modal buttons, can be themed later */
+.modal-button-confirm,
+.modal-button-cancel {
+  padding: 10px 20px;
+  border-radius: 50px;
+  border: none;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.modal-button-confirm {
+  background-color: var(--theme-primary, #007bff); /* Example primary color */
+  color: var(--theme-primary-action-text, white);
+}
+
+.modal-button-confirm:hover {
+  background-color: var(--theme-primary-action-hover, #0056b3);
+}
+
+.modal-button-confirm:disabled {
+  background-color: #ccc; /* Grey out when disabled */
+  color: var(--theme-primary-action-text, white);
+  cursor: not-allowed;
+}
+
+.modal-button-cancel {
+  background-color: var(
+    --theme-secondary-action,
+    #6c757d
+  ); /* Example secondary/cancel color */
+  color: var(--theme-secondary-action-text, white);
+}
+
+.modal-button-cancel:hover {
+  background-color: var(--theme-secondary-action-hover, #545b62);
+}

@@ -51,7 +51,11 @@ const StoreFilterModal: React.FC<StoreFilterModalProps> = ({
       {/* <button onClick={onClose} className="modal-button-cancel">
         Cancel
       </button> */}
-      <button onClick={handleConfirm} className="modal-button-confirm">
+      <button
+        onClick={handleConfirm}
+        className="modal-button-confirm"
+        disabled={selectedIds.size === 0} // Disable if no IDs are selected
+      >
         View Sales
       </button>
     </>

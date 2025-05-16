@@ -51,7 +51,11 @@ const CategoryFilterModal: React.FC<CategoryFilterModalProps> = ({
       {/* <button onClick={onClose} className="modal-button-cancel">
         Cancel
       </button> */}
-      <button onClick={handleConfirm} className="modal-button-confirm">
+      <button
+        onClick={handleConfirm}
+        className="modal-button-confirm"
+        disabled={selectedNames.size === 0}
+      >
         View Sales
       </button>
     </>
