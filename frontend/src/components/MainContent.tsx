@@ -43,6 +43,16 @@ interface MainContentProps {
   // Browse view state management
   isBrowseResultsActive: boolean;
   onToggleBrowseView: () => void;
+
+  // Lifted state and handlers for browse filters from App.tsx
+  selectedStoreIds: Set<number>;
+  selectedCategories: Set<string>;
+  onToggleStoreSelection: (id: number) => void;
+  onToggleCategorySelection: (categoryName: string) => void;
+  onStoreModalConfirm: (newSelectedIds: Set<number>) => void;
+  onCategoryModalConfirm: (newSelectedNames: Set<string>) => void;
+  // setSelectedStoreIds: (ids: Set<number>) => void; // Only if direct clearing from DBV is needed
+  // setSelectedCategories: (categories: Set<string>) => void; // Only if direct clearing from DBV is needed
 }
 
 const MainContent: React.FC<MainContentProps> = ({
@@ -73,6 +83,15 @@ const MainContent: React.FC<MainContentProps> = ({
   // Browse view state
   isBrowseResultsActive,
   onToggleBrowseView,
+  // Destructure new browse filter props
+  selectedStoreIds,
+  selectedCategories,
+  onToggleStoreSelection,
+  onToggleCategorySelection,
+  onStoreModalConfirm,
+  onCategoryModalConfirm,
+  // setSelectedStoreIds, // Only if direct clearing from DBV is needed
+  // setSelectedCategories, // Only if direct clearing from DBV is needed
 }) => {
   const mainContentStyle: React.CSSProperties = {
     padding: "0",
@@ -107,6 +126,15 @@ const MainContent: React.FC<MainContentProps> = ({
             // Pass browse view state props
             isBrowseResultsActive={isBrowseResultsActive}
             onToggleBrowseView={onToggleBrowseView}
+            // Pass down lifted filter state and handlers
+            selectedStoreIds={selectedStoreIds}
+            selectedCategories={selectedCategories}
+            onToggleStoreSelection={onToggleStoreSelection}
+            onToggleCategorySelection={onToggleCategorySelection}
+            onStoreModalConfirm={onStoreModalConfirm}
+            onCategoryModalConfirm={onCategoryModalConfirm}
+            // setSelectedStoreIds={setSelectedStoreIds} // Only if direct clearing from DBV is needed
+            // setSelectedCategories={setSelectedCategories} // Only if direct clearing from DBV is needed
           />
         );
       case "search":

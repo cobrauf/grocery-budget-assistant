@@ -48,9 +48,9 @@ const StoreFilterModal: React.FC<StoreFilterModalProps> = ({
 
   const footer = (
     <>
-      <button onClick={onClose} className="modal-button-cancel">
+      {/* <button onClick={onClose} className="modal-button-cancel">
         Cancel
-      </button>
+      </button> */}
       <button onClick={handleConfirm} className="modal-button-confirm">
         View Sales
       </button>

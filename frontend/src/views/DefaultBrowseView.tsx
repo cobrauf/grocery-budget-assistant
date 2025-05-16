@@ -24,6 +24,12 @@ interface DefaultBrowseViewProps {
   isLoadingFilteredBrowseProducts: boolean;
   isBrowseResultsActive: boolean;
   onToggleBrowseView: () => void;
+  selectedStoreIds: Set<number>;
+  selectedCategories: Set<string>;
+  onToggleStoreSelection: (id: number) => void;
+  onToggleCategorySelection: (categoryName: string) => void;
+  onStoreModalConfirm: (newSelectedIds: Set<number>) => void;
+  onCategoryModalConfirm: (newSelectedNames: Set<string>) => void;
 }
 
 const PRODUCT_CATEGORIES_WITH_ICONS: { name: string; icon: string }[] = [
@@ -71,14 +77,13 @@ const DefaultBrowseView: React.FC<DefaultBrowseViewProps> = ({
   isLoadingFilteredBrowseProducts,
   isBrowseResultsActive,
   onToggleBrowseView,
+  selectedStoreIds,
+  selectedCategories,
+  onToggleStoreSelection,
+  onToggleCategorySelection,
+  onStoreModalConfirm,
+  onCategoryModalConfirm,
 }) => {
-  const [selectedStoreIds, setSelectedStoreIds] = useState<Set<number>>(
-    new Set()
-  );
-  const [selectedCategories, setSelectedCategories] = useState<Set<string>>(
-    new Set()
-  );
-
   const [isStoreModalOpen, setIsStoreModalOpen] = useState(false);
   const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
 
@@ -86,27 +91,11 @@ const DefaultBrowseView: React.FC<DefaultBrowseViewProps> = ({
     isLoadingApiRetailers || isLoadingLogoVerification;
 
   const toggleStoreSelection = (id: number) => {
-    setSelectedStoreIds((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) {
-        next.delete(id);
-      } else {
-        next.add(id);
-      }
-      return next;
-    });
+    onToggleStoreSelection(id);
   };
 
   const toggleCategorySelection = (categoryName: string) => {
-    setSelectedCategories((prev) => {
-      const next = new Set(prev);
-      if (next.has(categoryName)) {
-        next.delete(categoryName);
-      } else {
-        next.add(categoryName);
-      }
-      return next;
-    });
+    onToggleCategorySelection(categoryName);
   };
 
   const handleShowItems = () => {
@@ -130,15 +119,13 @@ const DefaultBrowseView: React.FC<DefaultBrowseViewProps> = ({
   const canShowItems = selectedStoreIds.size > 0 || selectedCategories.size > 0;
 
   const handleStoreModalConfirm = (newSelectedIds: Set<number>) => {
-    setSelectedStoreIds(newSelectedIds);
     setIsStoreModalOpen(false);
-    handleShowItems();
+    onStoreModalConfirm(newSelectedIds);
   };
 
   const handleCategoryModalConfirm = (newSelectedNames: Set<string>) => {
-    setSelectedCategories(newSelectedNames);
     setIsCategoryModalOpen(false);
-    handleShowItems();
+    onCategoryModalConfirm(newSelectedNames);
   };
 
   const retailersToDisplay = verifiedRetailers;

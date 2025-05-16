@@ -65,6 +65,7 @@
 
 .filters-header {
   display: flex;
+  font-size: 0.9rem;
   align-items: center;
   margin-bottom: 0rem;
   padding: 0.25rem;
@@ -87,10 +88,11 @@
   border-radius: 50px;
   cursor: pointer;
   margin-right: 0.5rem;
-  font-size: 1rem;
+  font-size: 0.9rem;
   transition: background-color 0.3s ease, color 0.3s ease,
     border-color 0.3s ease;
   font-family: inherit;
+  white-space: nowrap;
 }
 
 .filter-button:hover {
