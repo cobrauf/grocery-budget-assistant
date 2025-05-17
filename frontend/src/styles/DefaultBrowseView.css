@@ -13,7 +13,7 @@
   padding-bottom: 1rem;
   background-color: #e3000000;
   border-radius: 0px;
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid #b5b5b5;
 }
 
 /* this is for the filter title */
@@ -66,7 +66,7 @@
   /* padding-top: 5px;
   padding-bottom: 5px; */
   padding: 1rem;
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid #b5b5b5;
   /* Remove gap from here, apply to grid items if needed or let grid handle it */
 }
 
