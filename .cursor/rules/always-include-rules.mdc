@@ -1,0 +1,12 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+These are general rules that you should adhere to on every request:
+
+- As you read thru files, try to spot areas where a refactor would help make the project cleaner, then suggest them in ALL CAPS in your end of task summary.
+    This way I can decide if I should take your suggestion to refactor.
+
+
+    
