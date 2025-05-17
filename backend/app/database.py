@@ -23,7 +23,7 @@ if not DATABASE_URL:
     raise ValueError("DATABASE_URL environment variable not set.")
 
 # Create synchronous engine
-engine = create_engine(DATABASE_URL)
+engine = create_engine(DATABASE_URL, pool_recycle=1800, pool_pre_ping=True)
 
 # Create a session factory
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
