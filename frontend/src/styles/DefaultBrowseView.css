@@ -9,7 +9,7 @@
   font-size: 0.9rem;
   align-items: center;
   margin-bottom: 0rem;
-  padding: 0.25rem;
+  padding: 1rem;
   padding-bottom: 1rem;
   background-color: #e3000000;
   border-radius: 0px;
@@ -62,10 +62,10 @@
 .logo-scroll-container {
   display: flex; /* This will be the outer scroller */
   overflow-x: auto;
-  /* padding-bottom: 10px; */
   /* margin-bottom: 10px; */
-  padding-top: 5px;
-  padding-bottom: 5px;
+  /* padding-top: 5px;
+  padding-bottom: 5px; */
+  padding: 1rem;
   border-bottom: 1px solid #eee;
   /* Remove gap from here, apply to grid items if needed or let grid handle it */
 }
@@ -79,7 +79,6 @@
   ); /* Creates two rows of automatic height */
   gap: 10px; /* Spacing between all grid items */
   /* The width of this grid will be determined by its content (columns) */
-  padding: 0.5rem;
 }
 
 /* Hide scrollbar for a cleaner look, but still scrollable */
