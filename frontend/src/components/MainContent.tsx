@@ -2,8 +2,7 @@ import React from "react";
 import SearchResultsView from "../views/SearchResultsView";
 import DefaultSearchView from "../views/DefaultSearchView";
 import DefaultBrowseView from "../views/DefaultBrowseView";
-// BrowseResultsView will now be used by DefaultBrowseView, so not directly here
-// import BrowseResultsView from "../views/BrowseResultsView";
+import BrowseResultsView from "../views/BrowseResultsView";
 import { Product } from "../types/product";
 import { Retailer } from "../types/retailer";
 import { AppTab } from "../hooks/useAppTab";
@@ -104,39 +103,55 @@ const MainContent: React.FC<MainContentProps> = ({
   const renderContent = () => {
     switch (activeTab) {
       case "browse":
-        // DefaultBrowseView now handles its own content including results
-        return (
-          <DefaultBrowseView
-            rawRetailers={rawRetailers}
-            verifiedRetailers={verifiedRetailers}
-            isLoadingApiRetailers={isLoadingApiRetailers}
-            isLoadingLogoVerification={isLoadingLogoVerification}
-            retailerApiError={retailerApiError}
-            handleSingleRetailerClick={onSingleRetailerClick}
-            getLogoPath={getLogoPath}
-            // Single retailer products
-            singleRetailerProducts={singleRetailerProducts}
-            isLoadingSingleRetailerProducts={isLoadingSingleRetailer}
-            // Multi-filter products & handler
-            handleFetchProductsByFilter={onFetchProductsByFilter}
-            filteredBrowseProducts={filteredBrowseProducts}
-            isLoadingFilteredBrowseProducts={isLoadingFilteredBrowseProducts}
-            // retailerProductsError={retailerProductsError} // if available
-            // filteredBrowseError={filteredBrowseError} // if available
-            // Pass browse view state props
-            isBrowseResultsActive={isBrowseResultsActive}
-            onToggleBrowseView={onToggleBrowseView}
-            // Pass down lifted filter state and handlers
-            selectedStoreIds={selectedStoreIds}
-            selectedCategories={selectedCategories}
-            onToggleStoreSelection={onToggleStoreSelection}
-            onToggleCategorySelection={onToggleCategorySelection}
-            onStoreModalConfirm={onStoreModalConfirm}
-            onCategoryModalConfirm={onCategoryModalConfirm}
-            // setSelectedStoreIds={setSelectedStoreIds} // Only if direct clearing from DBV is needed
-            // setSelectedCategories={setSelectedCategories} // Only if direct clearing from DBV is needed
-          />
-        );
+        const showFilteredResults =
+          filteredBrowseProducts.length > 0 || isLoadingFilteredBrowseProducts;
+
+        const displayProducts = showFilteredResults
+          ? filteredBrowseProducts
+          : singleRetailerProducts;
+
+        const isLoadingDisplayProducts = showFilteredResults
+          ? isLoadingFilteredBrowseProducts
+          : isLoadingSingleRetailer;
+
+        if (isBrowseResultsActive) {
+          return (
+            <BrowseResultsView
+              items={displayProducts}
+              isLoading={isLoadingDisplayProducts}
+              error={null} // Specific product fetching errors not currently passed to MainContent for browse
+              // Props like totalResults, hasMore, loadMore will use defaults in BrowseResultsView/ResultsView or need to be plumbed if desired
+              // totalResults={undefined} // Example: if we had this data
+              // hasMore={false}
+              // loadMore={() => {}}
+            />
+          );
+        } else {
+          return (
+            <DefaultBrowseView
+              rawRetailers={rawRetailers}
+              verifiedRetailers={verifiedRetailers}
+              isLoadingApiRetailers={isLoadingApiRetailers}
+              isLoadingLogoVerification={isLoadingLogoVerification}
+              retailerApiError={retailerApiError}
+              handleSingleRetailerClick={onSingleRetailerClick}
+              getLogoPath={getLogoPath}
+              singleRetailerProducts={singleRetailerProducts}
+              isLoadingSingleRetailerProducts={isLoadingSingleRetailer}
+              handleFetchProductsByFilter={onFetchProductsByFilter}
+              filteredBrowseProducts={filteredBrowseProducts}
+              isLoadingFilteredBrowseProducts={isLoadingFilteredBrowseProducts}
+              isBrowseResultsActive={isBrowseResultsActive}
+              onToggleBrowseView={onToggleBrowseView}
+              selectedStoreIds={selectedStoreIds}
+              selectedCategories={selectedCategories}
+              onToggleStoreSelection={onToggleStoreSelection}
+              onToggleCategorySelection={onToggleCategorySelection}
+              onStoreModalConfirm={onStoreModalConfirm}
+              onCategoryModalConfirm={onCategoryModalConfirm}
+            />
+          );
+        }
       case "search":
         if (searchQuery || searchResults.length > 0 || isLoadingSearch) {
           return (
