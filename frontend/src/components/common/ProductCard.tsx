@@ -34,7 +34,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
         <div className="product-card-title-row">
           <div className="product-card-text-details">
             <div className="product-card-description">
-              {truncateText(product.name, 25)}
+              {truncateText(product.name, 20)}
             </div>
             <div className="product-price-line">
               <div>

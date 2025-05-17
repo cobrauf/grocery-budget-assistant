@@ -90,6 +90,22 @@ function App() {
     new Set()
   );
 
+  // Add effect for beforeunload confirmation
+  useEffect(() => {
+    const handleBeforeUnload = (event: BeforeUnloadEvent) => {
+      event.preventDefault();
+      // Standard for most browsers, but Chrome requires returnValue to be set.
+      event.returnValue = "";
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+
+    // Cleanup the event listener on component unmount
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+    };
+  }, []); // Empty dependency array means this effect runs once on mount and cleanup on unmount
+
   // Helper to generate cache key
   const generateBrowseCacheKey = (
     storeIds: string[],

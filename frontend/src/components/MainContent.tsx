@@ -156,8 +156,8 @@ const MainContent: React.FC<MainContentProps> = ({
       case "ai":
         return (
           <div style={{ textAlign: "center", paddingTop: "20px" }}>
-            <h2>AI (WIP) Tab</h2>
-            <p>AI features are a work in progress.</p>
+            <h2>AI Tab</h2>
+            <p>(Coming soon)</p>
           </div>
         );
       default:

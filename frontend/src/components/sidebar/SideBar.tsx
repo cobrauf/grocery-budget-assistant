@@ -53,8 +53,8 @@ const SideBar: React.FC<SideBarProps> = ({
       action: () => setIsFontsExpanded(!isFontsExpanded),
       expandable: true,
     },
-    { name: "Settings", action: () => console.log("Settings clicked") },
-    { name: "User", action: () => console.log("User clicked") },
+    // { name: "Settings", action: () => console.log("Settings clicked") },
+    // { name: "User", action: () => console.log("User clicked") },
   ];
 
   if (!isOpen && !document.body.classList.contains("sidebar-was-open")) {
