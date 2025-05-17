@@ -20,24 +20,18 @@ interface MainContentProps {
   hasMoreResults: boolean;
   loadMoreResults: () => void;
 
-  // Props for DefaultBrowseView (which will now also handle results display)
+  // Props for DefaultBrowseView
   rawRetailers: Retailer[];
   verifiedRetailers: Retailer[];
   isLoadingApiRetailers: boolean;
   isLoadingLogoVerification: boolean;
   retailerApiError: string | null;
-  onSingleRetailerClick: (retailerId: number) => void;
   getLogoPath: (name: string) => string;
-  // Props for single retailer product display
-  singleRetailerProducts: Product[];
-  isLoadingSingleRetailer: boolean;
-  // retailerProductsError: string | null; // If there's a specific error for single product fetching
 
-  // Props for multi-filter product display
+  // Props for product display (now unified for browse)
   onFetchProductsByFilter: (storeIds: string[], categories: string[]) => void;
   filteredBrowseProducts: Product[];
   isLoadingFilteredBrowseProducts: boolean;
-  // filteredBrowseError: string | null; // If there's a specific error for multi-filter fetching
 
   // Browse view state management
   isBrowseResultsActive: boolean;
@@ -50,8 +44,6 @@ interface MainContentProps {
   onToggleCategorySelection: (categoryName: string) => void;
   onStoreModalConfirm: (newSelectedIds: Set<number>) => void;
   onCategoryModalConfirm: (newSelectedNames: Set<string>) => void;
-  // setSelectedStoreIds: (ids: Set<number>) => void; // Only if direct clearing from DBV is needed
-  // setSelectedCategories: (categories: Set<string>) => void; // Only if direct clearing from DBV is needed
 }
 
 const MainContent: React.FC<MainContentProps> = ({
@@ -70,12 +62,8 @@ const MainContent: React.FC<MainContentProps> = ({
   isLoadingApiRetailers,
   isLoadingLogoVerification,
   retailerApiError,
-  onSingleRetailerClick,
   getLogoPath,
-  // Single retailer products
-  singleRetailerProducts,
-  isLoadingSingleRetailer,
-  // Multi-filter products
+  // Unified product props for browse
   onFetchProductsByFilter,
   filteredBrowseProducts,
   isLoadingFilteredBrowseProducts,
@@ -89,8 +77,6 @@ const MainContent: React.FC<MainContentProps> = ({
   onToggleCategorySelection,
   onStoreModalConfirm,
   onCategoryModalConfirm,
-  // setSelectedStoreIds, // Only if direct clearing from DBV is needed
-  // setSelectedCategories, // Only if direct clearing from DBV is needed
 }) => {
   const mainContentStyle: React.CSSProperties = {
     padding: "0",
@@ -103,27 +89,17 @@ const MainContent: React.FC<MainContentProps> = ({
   const renderContent = () => {
     switch (activeTab) {
       case "browse":
-        const showFilteredResults =
-          filteredBrowseProducts.length > 0 || isLoadingFilteredBrowseProducts;
-
-        const displayProducts = showFilteredResults
-          ? filteredBrowseProducts
-          : singleRetailerProducts;
-
-        const isLoadingDisplayProducts = showFilteredResults
-          ? isLoadingFilteredBrowseProducts
-          : isLoadingSingleRetailer;
+        // Product display logic now solely uses filteredBrowseProducts
+        const displayProducts = filteredBrowseProducts;
+        const isLoadingDisplayProducts = isLoadingFilteredBrowseProducts;
 
         if (isBrowseResultsActive) {
           return (
             <BrowseResultsView
               items={displayProducts}
               isLoading={isLoadingDisplayProducts}
-              error={null} // Specific product fetching errors not currently passed to MainContent for browse
-              // Props like totalResults, hasMore, loadMore will use defaults in BrowseResultsView/ResultsView or need to be plumbed if desired
-              // totalResults={undefined} // Example: if we had this data
-              // hasMore={false}
-              // loadMore={() => {}}
+              error={null}
+              // totalResults, hasMore, loadMore would need to be sourced from filteredBrowseProducts state if available
             />
           );
         } else {
@@ -134,13 +110,8 @@ const MainContent: React.FC<MainContentProps> = ({
               isLoadingApiRetailers={isLoadingApiRetailers}
               isLoadingLogoVerification={isLoadingLogoVerification}
               retailerApiError={retailerApiError}
-              handleSingleRetailerClick={onSingleRetailerClick}
               getLogoPath={getLogoPath}
-              singleRetailerProducts={singleRetailerProducts}
-              isLoadingSingleRetailerProducts={isLoadingSingleRetailer}
               handleFetchProductsByFilter={onFetchProductsByFilter}
-              filteredBrowseProducts={filteredBrowseProducts}
-              isLoadingFilteredBrowseProducts={isLoadingFilteredBrowseProducts}
               isBrowseResultsActive={isBrowseResultsActive}
               onToggleBrowseView={onToggleBrowseView}
               selectedStoreIds={selectedStoreIds}

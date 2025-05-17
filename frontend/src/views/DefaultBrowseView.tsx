@@ -1,11 +1,8 @@
 import React, { useState } from "react";
 import { Retailer } from "../types/retailer";
-// Product type might still be needed if any logic depends on it, but not for BrowseResultsView
-// import { Product } from "../types/product";
 import "../styles/DefaultBrowseView.css";
 import StoreFilterModal from "../components/modals/StoreFilterModal";
 import CategoryFilterModal from "../components/modals/CategoryFilterModal";
-// import BrowseResultsView from "./BrowseResultsView"; // Removed: MainContent now handles this
 
 interface DefaultBrowseViewProps {
   rawRetailers: Retailer[];
@@ -13,18 +10,12 @@ interface DefaultBrowseViewProps {
   isLoadingApiRetailers: boolean;
   isLoadingLogoVerification: boolean;
   retailerApiError: string | null;
-  handleSingleRetailerClick: (id: number) => void;
   getLogoPath: (name: string) => string;
-  // Removed props related to direct product display, as MainContent handles BrowseResultsView
-  // singleRetailerProducts: Product[];
-  // isLoadingSingleRetailerProducts: boolean;
   handleFetchProductsByFilter: (
     storeIds: string[],
     categories: string[]
   ) => void;
-  // filteredBrowseProducts: Product[];
-  // isLoadingFilteredBrowseProducts: boolean;
-  isBrowseResultsActive: boolean; // Still needed for header conditional rendering (back arrow)
+  isBrowseResultsActive: boolean; // needed for header conditional rendering (back arrow)
   onToggleBrowseView: () => void;
   selectedStoreIds: Set<number>;
   selectedCategories: Set<string>;
@@ -67,10 +58,7 @@ const PRODUCT_CATEGORIES_WITH_ICONS: { name: string; icon: string }[] = [
 
 const DefaultBrowseView: React.FC<DefaultBrowseViewProps> = ({
   verifiedRetailers,
-  isLoadingApiRetailers, // Retained for potential loading states in this view
-  isLoadingLogoVerification, // Retained for potential loading states in this view
   retailerApiError,
-  handleSingleRetailerClick,
   getLogoPath,
   handleFetchProductsByFilter,
   isBrowseResultsActive, // Used for header display logic
@@ -85,9 +73,6 @@ const DefaultBrowseView: React.FC<DefaultBrowseViewProps> = ({
   const [isStoreModalOpen, setIsStoreModalOpen] = useState(false);
   const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
 
-  // isLoadingInitialData can still be relevant for this view if it shows its own loaders
-  // const isLoadingInitialData = isLoadingApiRetailers || isLoadingLogoVerification;
-
   const toggleStoreSelection = (id: number) => {
     onToggleStoreSelection(id);
   };
@@ -97,24 +82,14 @@ const DefaultBrowseView: React.FC<DefaultBrowseViewProps> = ({
   };
 
   const handleShowItems = () => {
-    const isSingleStoreOnly =
-      selectedStoreIds.size === 1 && selectedCategories.size === 0;
-    const isMultiFilter =
-      selectedStoreIds.size > 0 || selectedCategories.size > 0;
-
-    if (isSingleStoreOnly) {
-      const storeId = Array.from(selectedStoreIds)[0];
-      handleSingleRetailerClick(storeId); // This should trigger data fetching in App.tsx / MainContent
-      onToggleBrowseView(); // Switch to results view
-    } else if (isMultiFilter) {
+    // Unified logic: always use handleFetchProductsByFilter
+    if (selectedStoreIds.size > 0 || selectedCategories.size > 0) {
       const storeIdsAsString = Array.from(selectedStoreIds).map(String);
       const categoryNames = Array.from(selectedCategories);
-      handleFetchProductsByFilter(storeIdsAsString, categoryNames); // This triggers data fetching
+      handleFetchProductsByFilter(storeIdsAsString, categoryNames);
       onToggleBrowseView(); // Switch to results view
     } else {
       console.log("Show Items clicked with no selection.");
-      // Optionally, directly toggle if there's nothing to fetch
-      // onToggleBrowseView();
     }
   };
 
@@ -140,35 +115,12 @@ const DefaultBrowseView: React.FC<DefaultBrowseViewProps> = ({
       ? `Categories (${selectedCategories.size})`
       : "+ Category";
 
-  // Logic for displayProducts and isLoadingDisplayProducts is removed
-  // const showFilteredResults =
-  //   filteredBrowseProducts.length > 0 || isLoadingFilteredBrowseProducts;
-  // const showSingleRetailerResults =
-  //   singleRetailerProducts.length > 0 || isLoadingSingleRetailerProducts;
-  // const displayProducts = showFilteredResults
-  //   ? filteredBrowseProducts
-  //   : singleRetailerProducts;
-  // const isLoadingDisplayProducts = showFilteredResults
-  //   ? isLoadingFilteredBrowseProducts
-  //   : isLoadingSingleRetailerProducts;
-
-  // This button is now the primary way to trigger view change AFTER selection
   const showForwardArrow = !isBrowseResultsActive && canShowItems;
-
-  // handleForwardArrowClick is effectively replaced by direct calls in handleShowItems
-  // or if it was meant for just toggling view without action, its purpose changes.
-  // For now, let's assume the "View Sales" button or direct filter interaction leads to handleShowItems.
 
   // The header forward arrow logic changes: it should call handleShowItems
   const handleHeaderForwardArrowClick = () => {
     if (canShowItems) {
-      handleShowItems(); // This will also call onToggleBrowseView
-    } else {
-      // If no items selected, perhaps it should not toggle or just be disabled.
-      // For now, let's assume it calls handleShowItems which handles the no-selection case.
-      // Or, if the button is meant to *just* navigate if items are shown elsewhere:
-      // onToggleBrowseView();
-      // However, the current logic is that handleShowItems triggers the fetch AND the view toggle.
+      handleShowItems();
     }
   };
 
