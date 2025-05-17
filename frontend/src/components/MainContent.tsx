@@ -60,6 +60,9 @@ interface MainContentProps {
   verifiedRetailers: Retailer[]; // For StoreFilterModal & DefaultBrowseView
   isLoadingApiRetailers: boolean;
   isLoadingLogoVerification: boolean;
+  onSingleRetailerClick: (retailerId: number) => void;
+  singleRetailerProducts: Product[];
+  isLoadingSingleRetailer: boolean;
   retailerApiError: string | null;
   getLogoPath: (name: string) => string;
 
@@ -91,6 +94,9 @@ const MainContent: React.FC<MainContentProps> = ({
   verifiedRetailers,
   isLoadingApiRetailers,
   isLoadingLogoVerification,
+  onSingleRetailerClick,
+  singleRetailerProducts,
+  isLoadingSingleRetailer,
   retailerApiError,
   getLogoPath,
   onFetchProductsByFilter,
@@ -131,9 +137,6 @@ const MainContent: React.FC<MainContentProps> = ({
       const storeIdsAsString = Array.from(selectedStoreIds).map(String);
       const categoryNames = Array.from(selectedCategories);
       onFetchProductsByFilter(storeIdsAsString, categoryNames);
-      if (!isBrowseResultsActive) {
-        onToggleBrowseView();
-      }
     } else {
       console.log("Show Items clicked with no selection.");
     }
@@ -204,14 +207,23 @@ const MainContent: React.FC<MainContentProps> = ({
   const renderContent = () => {
     switch (activeTab) {
       case "browse":
+        const browseDisplayProducts =
+          singleRetailerProducts.length > 0
+            ? singleRetailerProducts
+            : filteredBrowseProducts;
+        const isLoadingBrowseDisplay =
+          singleRetailerProducts.length > 0
+            ? isLoadingSingleRetailer
+            : isLoadingFilteredBrowseProducts;
+
         return (
           <>
             {renderBrowseFilterHeader()}
             <div style={browseContentContainerStyle}>
               {isBrowseResultsActive ? (
                 <BrowseResultsView
-                  items={filteredBrowseProducts}
-                  isLoading={isLoadingFilteredBrowseProducts}
+                  items={browseDisplayProducts}
+                  isLoading={isLoadingBrowseDisplay}
                   error={null}
                 />
               ) : (
