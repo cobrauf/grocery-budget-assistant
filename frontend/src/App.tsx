@@ -55,13 +55,9 @@ function App() {
   const {
     rawRetailers,
     verifiedRetailers,
-    selectedRetailerProducts,
     isLoadingApiRetailers,
     isLoadingLogoVerification,
-    isLoadingRetailerProducts,
     retailerApiError,
-    handleRetailerClick: fetchSingleRetailerProductsLogic, // Renamed for clarity
-    clearSelectedRetailer,
     getLogoPath,
   } = useRetailers(isSearchActive);
 
@@ -70,8 +66,6 @@ function App() {
     Product[]
   >([]);
   const [isLoadingFilteredBrowseProducts, setIsLoadingFilteredBrowseProducts] =
-    useState(false);
-  const [appIsLoadingSingleRetailer, setAppIsLoadingSingleRetailer] =
     useState(false);
 
   // State to manage if the detailed browse results view is active vs. filter selection view
@@ -136,29 +130,10 @@ function App() {
     setActiveTab("search");
   };
 
-  // For single retailer selection (maintains existing logic)
-  const handleSingleRetailerLogoClick = async (retailerId: number) => {
-    clearSelectedRetailer();
-    setFilteredBrowseProducts([]);
-    setAppIsLoadingSingleRetailer(true); // Controlled by App for this action
-    setIsBrowseResultsActive(true);
-    try {
-      await fetchSingleRetailerProductsLogic(retailerId); // Hook updates selectedRetailerProducts
-    } catch (error) {
-      console.error("Error during single retailer fetch logic:", error);
-      // Potentially set an error state to display in UI
-    } finally {
-      setAppIsLoadingSingleRetailer(false);
-    }
-  };
-
-  // For multi-filter selection from DefaultBrowseView
   const handleFetchProductsByFilter = async (
     storeIds: string[],
     categories: string[]
   ) => {
-    clearSelectedRetailer(); // Clear single retailer products/state
-
     const cacheKey = generateBrowseCacheKey(storeIds, categories);
 
     if (browseResultsCache.has(cacheKey)) {
@@ -218,48 +193,31 @@ function App() {
     currentStoreIds: Set<number>,
     currentCategories: Set<string>
   ) => {
-    const isSingleStoreOnly =
-      currentStoreIds.size === 1 && currentCategories.size === 0;
-    const isMultiFilter =
-      currentStoreIds.size > 0 || currentCategories.size > 0;
+    const storeIdsAsString = Array.from(currentStoreIds).map(String);
+    const categoryNames = Array.from(currentCategories);
 
-    if (isSingleStoreOnly) {
-      const storeId = Array.from(currentStoreIds)[0];
-      handleSingleRetailerLogoClick(storeId);
-    } else if (isMultiFilter) {
-      const storeIdsAsString = Array.from(currentStoreIds).map(String);
-      const categoryNames = Array.from(currentCategories);
+    if (storeIdsAsString.length > 0 || categoryNames.length > 0) {
       handleFetchProductsByFilter(storeIdsAsString, categoryNames);
     } else {
-      // No selection, might want to clear results or stay on selection view
       setFilteredBrowseProducts([]);
-      // ensure selectedRetailerProducts are also cleared if necessary
-      // clearSelectedRetailer(); // This is already in handleFetchProductsByFilter and handleSingleRetailerLogoClick
-      setIsBrowseResultsActive(false); // Stay on filter selection view
+      setIsBrowseResultsActive(false);
     }
   };
 
   const handleStoreModalConfirm = (newStoreIds: Set<number>) => {
     setSelectedStoreIds(newStoreIds);
-    // Use newStoreIds and current selectedCategories from state for the search
     executeBrowseSearch(newStoreIds, selectedCategories);
   };
 
   const handleCategoryModalConfirm = (newCategories: Set<string>) => {
     setSelectedCategories(newCategories);
-    // Use current selectedStoreIds from state and newCategories for the search
     executeBrowseSearch(selectedStoreIds, newCategories);
   };
 
   const clearSearchLocal = () => {
     setSearchQuery("");
-    // if (activeTab === "search") { // Original comment, keep if intended
-    // }
     setFilteredBrowseProducts([]);
-    setIsBrowseResultsActive(false); // Reset to filter selection view
-    // Optionally clear cache if desired when going fully "home"
-    // setBrowseResultsCache(new Map());
-    // Clear lifted filter selections
+    setIsBrowseResultsActive(false);
     setSelectedStoreIds(new Set());
     setSelectedCategories(new Set());
   };
@@ -267,11 +225,10 @@ function App() {
   const goHome = () => {
     setActiveTab("browse");
     resetSearch();
-    clearSelectedRetailer();
     setFilteredBrowseProducts([]);
-    setIsBrowseResultsActive(false); // Reset to filter selection view
-    // Optionally clear cache if desired when going fully "home"
-    // setBrowseResultsCache(new Map());
+    setIsBrowseResultsActive(false);
+    setSelectedStoreIds(new Set());
+    setSelectedCategories(new Set());
   };
 
   return (
@@ -300,28 +257,19 @@ function App() {
           verifiedRetailers={verifiedRetailers}
           isLoadingApiRetailers={isLoadingApiRetailers}
           isLoadingLogoVerification={isLoadingLogoVerification}
-          onSingleRetailerClick={handleSingleRetailerLogoClick}
           retailerApiError={retailerApiError}
           getLogoPath={getLogoPath}
-          singleRetailerProducts={selectedRetailerProducts}
-          isLoadingSingleRetailer={appIsLoadingSingleRetailer}
           onFetchProductsByFilter={handleFetchProductsByFilter}
           filteredBrowseProducts={filteredBrowseProducts}
           isLoadingFilteredBrowseProducts={isLoadingFilteredBrowseProducts}
-          // Browse view state management
           isBrowseResultsActive={isBrowseResultsActive}
           onToggleBrowseView={toggleBrowseView}
-          // Pass lifted filter state and handlers
           selectedStoreIds={selectedStoreIds}
           selectedCategories={selectedCategories}
           onToggleStoreSelection={toggleStoreSelection}
           onToggleCategorySelection={toggleCategorySelection}
           onStoreModalConfirm={handleStoreModalConfirm}
           onCategoryModalConfirm={handleCategoryModalConfirm}
-          // Pass setters if DefaultBrowseView needs to clear them directly (e.g. a "Clear All" button)
-          // For now, goHome handles clearing. Individual toggles and modals manage selections.
-          // setSelectedStoreIds={setSelectedStoreIds}
-          // setSelectedCategories={setSelectedCategories}
         />
         <BottomNav activeTab={activeTab} setActiveTab={setActiveTab} />
         <SideBar
@@ -331,7 +279,7 @@ function App() {
           onSelectTheme={setCurrentThemeName}
           currentFont={currentFont}
           onSelectFont={setCurrentFont}
-          onGoHome={() => goHome()}
+          onGoHome={goHome}
         />
         <FullOverlay isOpen={isSidebarOpen} onClick={toggleSidebar} />
       </div>

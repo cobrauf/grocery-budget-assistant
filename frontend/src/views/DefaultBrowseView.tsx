@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { Retailer } from "../types/retailer";
 import "../styles/DefaultBrowseView.css";
 
@@ -59,14 +59,6 @@ const DefaultBrowseView: React.FC<DefaultBrowseViewProps> = ({
   onToggleStoreSelection,
   onToggleCategorySelection,
 }) => {
-  const toggleStoreSelection = (id: number) => {
-    onToggleStoreSelection(id);
-  };
-
-  const toggleCategorySelection = (categoryName: string) => {
-    onToggleCategorySelection(categoryName);
-  };
-
   const canShowItems = selectedStoreIds.size > 0 || selectedCategories.size > 0;
 
   const retailersToDisplay = verifiedRetailers;
@@ -95,7 +87,7 @@ const DefaultBrowseView: React.FC<DefaultBrowseViewProps> = ({
                 className={`logo-item-card ${
                   selectedStoreIds.has(retailer.id) ? "selected" : ""
                 }`}
-                onClick={() => toggleStoreSelection(retailer.id)}
+                onClick={() => onToggleStoreSelection(retailer.id)}
               >
                 <img
                   src={getLogoPath(retailer.name)}
@@ -119,7 +111,7 @@ const DefaultBrowseView: React.FC<DefaultBrowseViewProps> = ({
                 className={`logo-item-card category-item ${
                   selectedCategories.has(category.name) ? "selected" : ""
                 }`}
-                onClick={() => toggleCategorySelection(category.name)}
+                onClick={() => onToggleCategorySelection(category.name)}
               >
                 <span className="logo-image category-icon">
                   {category.icon}
