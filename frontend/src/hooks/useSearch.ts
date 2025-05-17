@@ -1,15 +1,40 @@
 import { useState, useCallback } from "react";
 import { api } from "../services/api";
 import { Product } from "../types/product";
+import {
+  saveToLocalStorage,
+  loadFromLocalStorage,
+  removeFromLocalStorage,
+  LS_LAST_SEARCH_QUERY,
+  LS_LAST_SEARCH_RESULTS,
+} from "../utils/localStorageUtils";
 
 export const useSearch = () => {
-  const [searchQuery, setSearchQuery] = useState<string>("");
-  const [searchResults, setSearchResults] = useState<Product[]>([]);
-  const [totalResults, setTotalResults] = useState<number>(0);
+  const [searchQuery, setSearchQuery] = useState<string>(() => {
+    return loadFromLocalStorage<string>(LS_LAST_SEARCH_QUERY, "");
+  });
+  const [searchResults, setSearchResults] = useState<Product[]>(() => {
+    return loadFromLocalStorage<Product[]>(LS_LAST_SEARCH_RESULTS, []);
+  });
+  const [totalResults, setTotalResults] = useState<number>(() => {
+    // Initialize based on cached results if they exist
+    const cachedResults = loadFromLocalStorage<Product[]>(
+      LS_LAST_SEARCH_RESULTS,
+      []
+    );
+    return cachedResults.length;
+  });
   const [isLoadingSearch, setIsLoadingSearch] = useState<boolean>(false);
   const [searchError, setSearchError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState<number>(1);
-  const [hasMoreResults, setHasMoreResults] = useState<boolean>(false); // Keep track if more results are available
+  const [hasMoreResults, setHasMoreResults] = useState<boolean>(() => {
+    // If results are from cache, assume it's the complete set for that query (no more pages)
+    const cachedResults = loadFromLocalStorage<Product[]>(
+      LS_LAST_SEARCH_RESULTS,
+      []
+    );
+    return cachedResults.length > 0 ? false : false; // False if cached, false if no cache initially
+  });
 
   const resetSearch = useCallback(() => {
     setSearchQuery("");
@@ -18,6 +43,9 @@ export const useSearch = () => {
     setCurrentPage(1);
     setHasMoreResults(false);
     setSearchError(null);
+    // Clear from local storage
+    removeFromLocalStorage(LS_LAST_SEARCH_QUERY);
+    removeFromLocalStorage(LS_LAST_SEARCH_RESULTS);
   }, []); // Empty dependency array as setters are stable
 
   const performSearch = async (query: string, page: number = 1) => {
@@ -47,6 +75,19 @@ export const useSearch = () => {
       // const total = response.headers['x-total-count']; // Example header
       // setTotalResults(Number(total));
       // setHasMoreResults(page * 20 < Number(total)); // Example check
+
+      // Save last search query and results to local storage
+      if (page === 1) {
+        // Only save if it's a new search initiating query
+        saveToLocalStorage(LS_LAST_SEARCH_QUERY, query);
+        saveToLocalStorage(LS_LAST_SEARCH_RESULTS, products);
+      } else {
+        // If loading more, append to existing cached results for the same query
+        // This assumes products is the new page, and we want to save the full list
+        const currentFullResults = [...searchResults, ...products];
+        saveToLocalStorage(LS_LAST_SEARCH_RESULTS, currentFullResults);
+        // LS_LAST_SEARCH_QUERY would already be set from page 1
+      }
 
       setSearchResults((prevResults) =>
         page === 1 ? products : [...prevResults, ...products]

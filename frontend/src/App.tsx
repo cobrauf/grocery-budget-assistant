@@ -12,6 +12,15 @@ import { useRetailers } from "./hooks/useRetailers"; // Import retailers hook
 import { useAppTab } from "./hooks/useAppTab"; // Import useAppTab
 import { fetchProductsByFilter as apiFetchProductsByFilter } from "./services/api"; // Import the new API function
 import { Product } from "./types/product"; // Ensure Product type is imported
+import {
+  saveToLocalStorage,
+  loadFromLocalStorage,
+  removeFromLocalStorage,
+  LS_SELECTED_STORE_IDS,
+  LS_SELECTED_CATEGORIES,
+  LS_LAST_BROWSE_FILTER_KEY,
+  LS_LAST_BROWSE_PRODUCTS,
+} from "./utils/localStorageUtils"; // Import localStorage utilities
 
 // --- Theme Context ---
 interface ThemeContextType {
@@ -77,12 +86,66 @@ function App() {
   >(new Map());
 
   // Lifted state for Browse Tab filter selections
-  const [selectedStoreIds, setSelectedStoreIds] = useState<Set<number>>(
-    new Set()
-  );
+  const [selectedStoreIds, setSelectedStoreIds] = useState<Set<number>>(() => {
+    const storedIds = loadFromLocalStorage<number[]>(LS_SELECTED_STORE_IDS, []);
+    return new Set(storedIds);
+  });
   const [selectedCategories, setSelectedCategories] = useState<Set<string>>(
-    new Set()
+    () => {
+      const storedCategories = loadFromLocalStorage<string[]>(
+        LS_SELECTED_CATEGORIES,
+        []
+      );
+      return new Set(storedCategories);
+    }
   );
+
+  // Save selectedStoreIds to local storage
+  useEffect(() => {
+    saveToLocalStorage(LS_SELECTED_STORE_IDS, Array.from(selectedStoreIds));
+  }, [selectedStoreIds]);
+
+  // Save selectedCategories to local storage
+  useEffect(() => {
+    saveToLocalStorage(LS_SELECTED_CATEGORIES, Array.from(selectedCategories));
+  }, [selectedCategories]);
+
+  // Effect to load cached browse results on app init
+  useEffect(() => {
+    // Ensure this runs after selectedStoreIds and selectedCategories are initialized from LS
+    // This check is a proxy for that, assuming non-empty sets if filters were saved.
+    // A more robust way might involve a separate state variable indicating hydration completion.
+    const currentFilterKey = generateBrowseCacheKey(
+      Array.from(selectedStoreIds).map(String),
+      Array.from(selectedCategories)
+    );
+    const lastFilterKey = loadFromLocalStorage<string | null>(
+      LS_LAST_BROWSE_FILTER_KEY,
+      null
+    );
+    const lastProducts = loadFromLocalStorage<Product[]>(
+      LS_LAST_BROWSE_PRODUCTS,
+      []
+    );
+
+    if (
+      lastFilterKey &&
+      lastProducts &&
+      lastProducts.length > 0 &&
+      lastFilterKey === currentFilterKey
+    ) {
+      console.log("Loading browse results from local storage cache");
+      setFilteredBrowseProducts(lastProducts);
+      setIsBrowseResultsActive(true);
+      // Optionally, update memory cache as well if it's not already populated
+      // This ensures consistency if App.tsx's memory cache logic runs later for some reason
+      if (!browseResultsCache.has(currentFilterKey)) {
+        setBrowseResultsCache((prevCache) =>
+          new Map(prevCache).set(currentFilterKey, lastProducts)
+        );
+      }
+    }
+  }, [selectedStoreIds, selectedCategories]); // Dependencies to ensure it runs after LS hydration of filters
 
   // Add effect for beforeunload confirmation
   useEffect(() => {
@@ -137,9 +200,13 @@ function App() {
     const cacheKey = generateBrowseCacheKey(storeIds, categories);
 
     if (browseResultsCache.has(cacheKey)) {
-      setFilteredBrowseProducts(browseResultsCache.get(cacheKey)!);
+      const cachedProducts = browseResultsCache.get(cacheKey)!;
+      setFilteredBrowseProducts(cachedProducts);
       setIsLoadingFilteredBrowseProducts(false);
       setIsBrowseResultsActive(true);
+      // Save to local storage as well, as this might be a cache hit from memory cache
+      saveToLocalStorage(LS_LAST_BROWSE_FILTER_KEY, cacheKey);
+      saveToLocalStorage(LS_LAST_BROWSE_PRODUCTS, cachedProducts);
       return;
     }
 
@@ -151,7 +218,10 @@ function App() {
       setFilteredBrowseProducts(products);
       setBrowseResultsCache((prevCache) =>
         new Map(prevCache).set(cacheKey, products)
-      ); // Update cache
+      ); // Update memory cache
+      // Save to local storage
+      saveToLocalStorage(LS_LAST_BROWSE_FILTER_KEY, cacheKey);
+      saveToLocalStorage(LS_LAST_BROWSE_PRODUCTS, products);
     } catch (error) {
       console.error("Error fetching filtered products:", error);
     } finally {
@@ -229,6 +299,10 @@ function App() {
     setIsBrowseResultsActive(false);
     setSelectedStoreIds(new Set());
     setSelectedCategories(new Set());
+
+    // Explicitly clear last browse results and filter key from local storage
+    removeFromLocalStorage(LS_LAST_BROWSE_FILTER_KEY);
+    removeFromLocalStorage(LS_LAST_BROWSE_PRODUCTS);
   };
 
   return (

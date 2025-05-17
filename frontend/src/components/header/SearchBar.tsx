@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef } from "react";
 import { api } from "../../services/api"; // Import the api service
+import { LS_SEARCH_HISTORY } from "../../utils/localStorageUtils"; // Import the constant
 
-const LOCAL_STORAGE_KEY = "searchHistory";
+const LOCAL_STORAGE_KEY = LS_SEARCH_HISTORY; // Use the imported constant
 const PLACEHOLDER_TEXTS = [
   "Search for weekly ad items",
   // "What's on sale in bread?",
@@ -104,7 +105,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
     const newHistory = [
       trimmedTerm,
       ...searchHistory.filter((t) => t !== trimmedTerm),
-    ].slice(0, 10); // Keep latest 10, unique
+    ].slice(0, 20); // Keep latest 20, unique (changed from 10 to 20)
     updateHistory(newHistory);
   };
 
