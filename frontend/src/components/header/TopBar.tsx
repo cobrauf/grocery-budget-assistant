@@ -3,9 +3,10 @@ import CartIcon from "./CartIcon";
 
 interface TopBarProps {
   onMenuClick: () => void;
+  isShrunk?: boolean; // Added prop to control shrunken state
 }
 
-const TopBar: React.FC<TopBarProps> = ({ onMenuClick }) => {
+const TopBar: React.FC<TopBarProps> = ({ onMenuClick, isShrunk }) => {
   const topBarStyle: React.CSSProperties = {
     display: "flex",
     justifyContent: "space-between",
@@ -16,19 +17,27 @@ const TopBar: React.FC<TopBarProps> = ({ onMenuClick }) => {
     height: "56px", // Standard app bar height
   };
 
+  const shrunkenTopBarStyle: React.CSSProperties = {
+    height: "20px",
+    backgroundColor: "var(--theme-header-background, #0071dc)", // Or a different color if preferred
+    width: "100%",
+  };
+
   const menuIconStyle: React.CSSProperties = {
     fontSize: "2rem",
     cursor: "pointer",
     padding: "0.5rem",
   };
 
+  if (isShrunk) {
+    return <div style={shrunkenTopBarStyle}></div>;
+  }
+
   return (
     <div style={topBarStyle}>
       <span onClick={onMenuClick} style={menuIconStyle} title="Open menu">
         ☰
       </span>
-      {/* Using a text placeholder for the logo for now */}
-      {/* <img src="https://via.placeholder.com/100x30?text=Walmart" alt="Walmart Logo" style={logoStyle} /> */}
       <span style={{ fontWeight: "bold", fontSize: "1.2rem" }}>
         Grocery-Assistant
       </span>

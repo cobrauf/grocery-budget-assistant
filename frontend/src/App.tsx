@@ -243,6 +243,7 @@ function App() {
           onClearSearch={clearSearchLocal}
           initialSearchQuery={searchQuery}
           activeTab={activeTab}
+          isInBrowseResultsView={isBrowseResultsActive}
         />
         <MainContent
           activeTab={activeTab}
