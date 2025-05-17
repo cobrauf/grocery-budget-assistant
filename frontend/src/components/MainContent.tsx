@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import SearchResultsView from "../views/SearchResultsView";
 import DefaultSearchView from "../views/DefaultSearchView";
 import DefaultBrowseView from "../views/DefaultBrowseView";
@@ -6,6 +6,41 @@ import BrowseResultsView from "../views/BrowseResultsView";
 import { Product } from "../types/product";
 import { Retailer } from "../types/retailer";
 import { AppTab } from "../hooks/useAppTab";
+import StoreFilterModal from "./modals/StoreFilterModal";
+import CategoryFilterModal from "./modals/CategoryFilterModal";
+import "../styles/DefaultBrowseView.css";
+
+// This should ideally be in a shared constants file
+const PRODUCT_CATEGORIES_WITH_ICONS: { name: string; icon: string }[] = [
+  { name: "Fresh Produce", icon: "🥦" },
+  { name: "Fruits", icon: "🍓" },
+  { name: "Dairy", icon: "🥛" },
+  { name: "Meats", icon: "🥩" },
+  { name: "Seafood", icon: "🐟" },
+  { name: "Baked Goods", icon: "🍞" },
+  { name: "Snacks", icon: "🥨" },
+  { name: "Beverages", icon: "🥤" },
+  { name: "Frozen Foods", icon: "🧊" },
+  { name: "Dry Goods", icon: "🥫" },
+  { name: "Deli", icon: "🥪" },
+  { name: "Alcoholic Bev", icon: "🍹" },
+  { name: "Breakfast", icon: "🥞" },
+  { name: "Canned Goods", icon: "🥫" },
+  { name: "Condiments", icon: "🧂" },
+  { name: "Baking", icon: "🍰" },
+  { name: "Household Prod", icon: "🧼" },
+  { name: "Personal Care", icon: "🧴" },
+  { name: "Pet Products", icon: "🐾" },
+  { name: "Candy", icon: "🍬" },
+  { name: "Gifts", icon: "🎁" },
+  { name: "Flowers-Plants", icon: "💐" },
+  { name: "Garden", icon: "🪴" },
+  { name: "Outdoors", icon: "🏕️" },
+  { name: "Kitchen", icon: "🍳" },
+  { name: "Kids", icon: "🧸" },
+  { name: "Furniture", icon: "🛋️" },
+  { name: "Other", icon: "❓" },
+];
 
 interface MainContentProps {
   children?: React.ReactNode;
@@ -20,35 +55,31 @@ interface MainContentProps {
   hasMoreResults: boolean;
   loadMoreResults: () => void;
 
-  // Props for DefaultBrowseView
-  rawRetailers: Retailer[];
-  verifiedRetailers: Retailer[];
+  // Props for Browse Tab (some used by header, some by DefaultBrowseView/BrowseResultsView)
+  rawRetailers: Retailer[]; // For StoreFilterModal
+  verifiedRetailers: Retailer[]; // For StoreFilterModal & DefaultBrowseView
   isLoadingApiRetailers: boolean;
   isLoadingLogoVerification: boolean;
   retailerApiError: string | null;
   getLogoPath: (name: string) => string;
 
-  // Props for product display (now unified for browse)
   onFetchProductsByFilter: (storeIds: string[], categories: string[]) => void;
   filteredBrowseProducts: Product[];
   isLoadingFilteredBrowseProducts: boolean;
 
-  // Browse view state management
   isBrowseResultsActive: boolean;
   onToggleBrowseView: () => void;
 
-  // Lifted state and handlers for browse filters from App.tsx
   selectedStoreIds: Set<number>;
   selectedCategories: Set<string>;
-  onToggleStoreSelection: (id: number) => void;
-  onToggleCategorySelection: (categoryName: string) => void;
-  onStoreModalConfirm: (newSelectedIds: Set<number>) => void;
-  onCategoryModalConfirm: (newSelectedNames: Set<string>) => void;
+  onToggleStoreSelection: (id: number) => void; // For DefaultBrowseView
+  onToggleCategorySelection: (categoryName: string) => void; // For DefaultBrowseView
+  onStoreModalConfirm: (newSelectedIds: Set<number>) => void; // For StoreFilterModal
+  onCategoryModalConfirm: (newSelectedNames: Set<string>) => void; // For CategoryFilterModal
 }
 
 const MainContent: React.FC<MainContentProps> = ({
   activeTab,
-  // Search props
   searchQuery,
   searchResults,
   totalResults,
@@ -56,21 +87,17 @@ const MainContent: React.FC<MainContentProps> = ({
   searchError,
   hasMoreResults,
   loadMoreResults,
-  // Browse props for DefaultBrowseView
   rawRetailers,
   verifiedRetailers,
   isLoadingApiRetailers,
   isLoadingLogoVerification,
   retailerApiError,
   getLogoPath,
-  // Unified product props for browse
   onFetchProductsByFilter,
   filteredBrowseProducts,
   isLoadingFilteredBrowseProducts,
-  // Browse view state
   isBrowseResultsActive,
   onToggleBrowseView,
-  // Destructure new browse filter props
   selectedStoreIds,
   selectedCategories,
   onToggleStoreSelection,
@@ -78,51 +105,148 @@ const MainContent: React.FC<MainContentProps> = ({
   onStoreModalConfirm,
   onCategoryModalConfirm,
 }) => {
+  const [isStoreModalOpen, setIsStoreModalOpen] = useState(false);
+  const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
+
   const mainContentStyle: React.CSSProperties = {
     padding: "0",
     paddingBottom: "60px",
     flexGrow: 1,
     backgroundColor: "var(--theme-background, #fff)",
     position: "relative",
+    display: "flex",
+    flexDirection: "column",
+  };
+
+  const browseContentContainerStyle: React.CSSProperties = {
+    flexGrow: 1,
+    overflowY: "auto",
+    position: "relative",
+  };
+
+  const canShowItems = selectedStoreIds.size > 0 || selectedCategories.size > 0;
+
+  const handleShowItemsClick = () => {
+    if (canShowItems) {
+      const storeIdsAsString = Array.from(selectedStoreIds).map(String);
+      const categoryNames = Array.from(selectedCategories);
+      onFetchProductsByFilter(storeIdsAsString, categoryNames);
+      if (!isBrowseResultsActive) {
+        onToggleBrowseView();
+      }
+    } else {
+      console.log("Show Items clicked with no selection.");
+    }
+  };
+
+  const storeButtonText =
+    selectedStoreIds.size > 0 ? `Stores (${selectedStoreIds.size})` : "+ Store";
+  const categoryButtonText =
+    selectedCategories.size > 0
+      ? `Categories (${selectedCategories.size})`
+      : "+ Category";
+
+  const showHeaderBackArrow = isBrowseResultsActive;
+  const showHeaderForwardArrow = !isBrowseResultsActive && canShowItems;
+
+  const handleLocalStoreModalConfirm = (newSelectedIds: Set<number>) => {
+    setIsStoreModalOpen(false);
+    onStoreModalConfirm(newSelectedIds);
+  };
+
+  const handleLocalCategoryModalConfirm = (newSelectedNames: Set<string>) => {
+    setIsCategoryModalOpen(false);
+    onCategoryModalConfirm(newSelectedNames);
+  };
+
+  const renderBrowseFilterHeader = () => {
+    return (
+      <div className="filters-header">
+        {showHeaderBackArrow && (
+          <button
+            onClick={onToggleBrowseView}
+            className="browse-nav-arrow back-arrow"
+          >
+            {"<"}
+          </button>
+        )}
+        <span className={isBrowseResultsActive ? "filters-title-indented" : ""}>
+          Filters:
+        </span>
+        <button
+          className={`filter-button ${
+            selectedStoreIds.size > 0 ? "active-filter" : ""
+          }`}
+          onClick={() => setIsStoreModalOpen(true)}
+        >
+          {storeButtonText}
+        </button>
+        <button
+          className={`filter-button ${
+            selectedCategories.size > 0 ? "active-filter" : ""
+          }`}
+          onClick={() => setIsCategoryModalOpen(true)}
+        >
+          {categoryButtonText}
+        </button>
+        {showHeaderForwardArrow && (
+          <button
+            onClick={handleShowItemsClick}
+            className="browse-nav-arrow forward-arrow"
+          >
+            {">"}
+          </button>
+        )}
+      </div>
+    );
   };
 
   const renderContent = () => {
     switch (activeTab) {
       case "browse":
-        // Product display logic now solely uses filteredBrowseProducts
-        const displayProducts = filteredBrowseProducts;
-        const isLoadingDisplayProducts = isLoadingFilteredBrowseProducts;
-
-        if (isBrowseResultsActive) {
-          return (
-            <BrowseResultsView
-              items={displayProducts}
-              isLoading={isLoadingDisplayProducts}
-              error={null}
-              // totalResults, hasMore, loadMore would need to be sourced from filteredBrowseProducts state if available
-            />
-          );
-        } else {
-          return (
-            <DefaultBrowseView
-              rawRetailers={rawRetailers}
-              verifiedRetailers={verifiedRetailers}
-              isLoadingApiRetailers={isLoadingApiRetailers}
-              isLoadingLogoVerification={isLoadingLogoVerification}
-              retailerApiError={retailerApiError}
+        return (
+          <>
+            {renderBrowseFilterHeader()}
+            <div style={browseContentContainerStyle}>
+              {isBrowseResultsActive ? (
+                <BrowseResultsView
+                  items={filteredBrowseProducts}
+                  isLoading={isLoadingFilteredBrowseProducts}
+                  error={null}
+                />
+              ) : (
+                <DefaultBrowseView
+                  rawRetailers={rawRetailers}
+                  verifiedRetailers={verifiedRetailers}
+                  isLoadingApiRetailers={isLoadingApiRetailers}
+                  isLoadingLogoVerification={isLoadingLogoVerification}
+                  retailerApiError={retailerApiError}
+                  getLogoPath={getLogoPath}
+                  onShowItemsRequest={handleShowItemsClick}
+                  selectedStoreIds={selectedStoreIds}
+                  selectedCategories={selectedCategories}
+                  onToggleStoreSelection={onToggleStoreSelection}
+                  onToggleCategorySelection={onToggleCategorySelection}
+                />
+              )}
+            </div>
+            <StoreFilterModal
+              isOpen={isStoreModalOpen}
+              onClose={() => setIsStoreModalOpen(false)}
+              retailers={verifiedRetailers}
+              initialSelectedStoreIds={selectedStoreIds}
+              onConfirmSelections={handleLocalStoreModalConfirm}
               getLogoPath={getLogoPath}
-              handleFetchProductsByFilter={onFetchProductsByFilter}
-              isBrowseResultsActive={isBrowseResultsActive}
-              onToggleBrowseView={onToggleBrowseView}
-              selectedStoreIds={selectedStoreIds}
-              selectedCategories={selectedCategories}
-              onToggleStoreSelection={onToggleStoreSelection}
-              onToggleCategorySelection={onToggleCategorySelection}
-              onStoreModalConfirm={onStoreModalConfirm}
-              onCategoryModalConfirm={onCategoryModalConfirm}
             />
-          );
-        }
+            <CategoryFilterModal
+              isOpen={isCategoryModalOpen}
+              onClose={() => setIsCategoryModalOpen(false)}
+              categories={PRODUCT_CATEGORIES_WITH_ICONS}
+              initialSelectedCategories={selectedCategories}
+              onConfirmSelections={handleLocalCategoryModalConfirm}
+            />
+          </>
+        );
       case "search":
         if (searchQuery || searchResults.length > 0 || isLoadingSearch) {
           return (

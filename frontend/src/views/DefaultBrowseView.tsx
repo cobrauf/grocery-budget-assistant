@@ -1,8 +1,6 @@
 import React, { useState } from "react";
 import { Retailer } from "../types/retailer";
 import "../styles/DefaultBrowseView.css";
-import StoreFilterModal from "../components/modals/StoreFilterModal";
-import CategoryFilterModal from "../components/modals/CategoryFilterModal";
 
 interface DefaultBrowseViewProps {
   rawRetailers: Retailer[];
@@ -11,18 +9,11 @@ interface DefaultBrowseViewProps {
   isLoadingLogoVerification: boolean;
   retailerApiError: string | null;
   getLogoPath: (name: string) => string;
-  handleFetchProductsByFilter: (
-    storeIds: string[],
-    categories: string[]
-  ) => void;
-  isBrowseResultsActive: boolean; // needed for header conditional rendering (back arrow)
-  onToggleBrowseView: () => void;
+  onShowItemsRequest: () => void;
   selectedStoreIds: Set<number>;
   selectedCategories: Set<string>;
   onToggleStoreSelection: (id: number) => void;
   onToggleCategorySelection: (categoryName: string) => void;
-  onStoreModalConfirm: (newSelectedIds: Set<number>) => void;
-  onCategoryModalConfirm: (newSelectedNames: Set<string>) => void;
 }
 
 const PRODUCT_CATEGORIES_WITH_ICONS: { name: string; icon: string }[] = [
@@ -58,21 +49,16 @@ const PRODUCT_CATEGORIES_WITH_ICONS: { name: string; icon: string }[] = [
 
 const DefaultBrowseView: React.FC<DefaultBrowseViewProps> = ({
   verifiedRetailers,
+  isLoadingApiRetailers,
+  isLoadingLogoVerification,
   retailerApiError,
   getLogoPath,
-  handleFetchProductsByFilter,
-  isBrowseResultsActive, // Used for header display logic
-  onToggleBrowseView, // Used for back button
+  onShowItemsRequest,
   selectedStoreIds,
   selectedCategories,
   onToggleStoreSelection,
   onToggleCategorySelection,
-  onStoreModalConfirm,
-  onCategoryModalConfirm,
 }) => {
-  const [isStoreModalOpen, setIsStoreModalOpen] = useState(false);
-  const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
-
   const toggleStoreSelection = (id: number) => {
     onToggleStoreSelection(id);
   };
@@ -81,189 +67,79 @@ const DefaultBrowseView: React.FC<DefaultBrowseViewProps> = ({
     onToggleCategorySelection(categoryName);
   };
 
-  const handleShowItems = () => {
-    // Unified logic: always use handleFetchProductsByFilter
-    if (selectedStoreIds.size > 0 || selectedCategories.size > 0) {
-      const storeIdsAsString = Array.from(selectedStoreIds).map(String);
-      const categoryNames = Array.from(selectedCategories);
-      handleFetchProductsByFilter(storeIdsAsString, categoryNames);
-      onToggleBrowseView(); // Switch to results view
-    } else {
-      console.log("Show Items clicked with no selection.");
-    }
-  };
-
   const canShowItems = selectedStoreIds.size > 0 || selectedCategories.size > 0;
-
-  const handleStoreModalConfirm = (newSelectedIds: Set<number>) => {
-    setIsStoreModalOpen(false);
-    onStoreModalConfirm(newSelectedIds);
-  };
-
-  const handleCategoryModalConfirm = (newSelectedNames: Set<string>) => {
-    setIsCategoryModalOpen(false);
-    onCategoryModalConfirm(newSelectedNames);
-  };
 
   const retailersToDisplay = verifiedRetailers;
   const categoriesToDisplay = PRODUCT_CATEGORIES_WITH_ICONS;
 
-  const storeFilterButtonText =
-    selectedStoreIds.size > 0 ? `Stores (${selectedStoreIds.size})` : "+ Store";
-  const categoryFilterButtonText =
-    selectedCategories.size > 0
-      ? `Categories (${selectedCategories.size})`
-      : "+ Category";
-
-  const showForwardArrow = !isBrowseResultsActive && canShowItems;
-
-  // The header forward arrow logic changes: it should call handleShowItems
-  const handleHeaderForwardArrowClick = () => {
-    if (canShowItems) {
-      handleShowItems();
-    }
-  };
-
-  // Since MainContent controls rendering this component only when !isBrowseResultsActive,
-  // the top-level conditional rendering of filter UI vs results UI is removed from here.
   return (
-    <div className="default-browse-view">
-      <div className="filters-header">
-        {/* The back arrow appears if isBrowseResultsActive is true, controlled by MainContent for BrowseResultsView. 
-            DefaultBrowseView itself won't show a back arrow leading to itself. 
-            However, the prop isBrowseResultsActive is used to adjust style if MainContent passed it through
-            even when rendering DefaultBrowseView. Let's assume it means "are results the ACTIVE main view?" 
-            If so, this component (filter view) might have a way to go back TO results if that was the flow.
-            Given the refactor, if THIS component is shown, results are NOT active. So the back arrow here is less relevant.
-            The onToggleBrowseView in the header should probably be the forward arrow functionality now.
-        */}
-        {isBrowseResultsActive && ( // This condition seems odd now. If DefaultBrowseView is shown, isBrowseResultsActive should be false.
-          // If it's true, MainContent shows BrowseResultsView instead.
-          // This might be for the brief moment of transition or if the prop meaning is subtle.
-          // Let's keep it for style adjustment of the title for now.
-          <button
-            onClick={onToggleBrowseView} // This would toggle back to results if it was an option FROM filters.
-            className="browse-nav-arrow back-arrow"
-          >
-            {"<"}
-          </button>
-        )}
-        <span className={isBrowseResultsActive ? "filters-title-indented" : ""}>
-          Filters:
-        </span>
-        <button
-          className={`filter-button ${
-            selectedStoreIds.size > 0 ? "active-filter" : ""
-          }`}
-          onClick={() => setIsStoreModalOpen(true)}
-        >
-          {storeFilterButtonText}
-        </button>
-        <button
-          className={`filter-button ${
-            selectedCategories.size > 0 ? "active-filter" : ""
-          }`}
-          onClick={() => setIsCategoryModalOpen(true)}
-        >
-          {categoryFilterButtonText}
-        </button>
-        {/* The forward arrow in header should now trigger showing items if selectable */}
-        {showForwardArrow && (
-          <button
-            onClick={handleHeaderForwardArrowClick}
-            className="browse-nav-arrow forward-arrow"
-          >
-            {">"}
-          </button>
-        )}
-      </div>
-
-      {/* Filter selection UI - This is always shown when DefaultBrowseView is active */}
-      <>
-        <div className="section-title">Stores</div>
-        {/* Optional: Show loader here if retailers are loading 
-        {(isLoadingApiRetailers || isLoadingLogoVerification) && <p>Loading retailers...</p>} 
-        */}
-        {retailerApiError && (
-          <p className="error-message">
-            Error loading retailers: {retailerApiError}
-          </p>
-        )}
-        {retailersToDisplay.length > 0 && (
-          <div className="logo-scroll-container horizontal-scroll">
-            <div className="two-row-grid">
-              {retailersToDisplay.map((retailer) => (
-                <div
-                  key={retailer.id}
-                  className={`logo-item-card ${
-                    selectedStoreIds.has(retailer.id) ? "selected" : ""
-                  }`}
-                  onClick={() => {
-                    toggleStoreSelection(retailer.id);
-                  }}
-                >
-                  <img
-                    src={getLogoPath(retailer.name)}
-                    alt={retailer.name}
-                    className="logo-image"
-                  />
-                  <span className="logo-label">{retailer.name}</span>
-                </div>
-              ))}
-            </div>
+    <div className="default-browse-view-content">
+      <div className="section-title">Stores</div>
+      {(isLoadingApiRetailers || isLoadingLogoVerification) &&
+        !retailerApiError && <p>Loading retailers...</p>}
+      {retailerApiError && (
+        <p className="error-message">
+          Error loading retailers: {retailerApiError}
+        </p>
+      )}
+      {!isLoadingApiRetailers &&
+        !isLoadingLogoVerification &&
+        retailersToDisplay.length === 0 &&
+        !retailerApiError && <p>No retailers available.</p>}
+      {retailersToDisplay.length > 0 && (
+        <div className="logo-scroll-container horizontal-scroll">
+          <div className="two-row-grid">
+            {retailersToDisplay.map((retailer) => (
+              <div
+                key={retailer.id}
+                className={`logo-item-card ${
+                  selectedStoreIds.has(retailer.id) ? "selected" : ""
+                }`}
+                onClick={() => toggleStoreSelection(retailer.id)}
+              >
+                <img
+                  src={getLogoPath(retailer.name)}
+                  alt={retailer.name}
+                  className="logo-image"
+                />
+                <span className="logo-label">{retailer.name}</span>
+              </div>
+            ))}
           </div>
-        )}
+        </div>
+      )}
 
-        <div className="section-title">Categories</div>
-        {categoriesToDisplay.length > 0 && (
-          <div className="logo-scroll-container horizontal-scroll">
-            <div className="two-row-grid">
-              {categoriesToDisplay.map((category) => (
-                <div
-                  key={category.name}
-                  className={`logo-item-card category-item ${
-                    selectedCategories.has(category.name) ? "selected" : ""
-                  }`}
-                  onClick={() => toggleCategorySelection(category.name)}
-                >
-                  <span className="logo-image category-icon">
-                    {category.icon}
-                  </span>
-                  <span className="logo-label">{category.name}</span>
-                </div>
-              ))}
-            </div>
+      <div className="section-title">Categories</div>
+      {categoriesToDisplay.length > 0 && (
+        <div className="logo-scroll-container horizontal-scroll">
+          <div className="two-row-grid">
+            {categoriesToDisplay.map((category) => (
+              <div
+                key={category.name}
+                className={`logo-item-card category-item ${
+                  selectedCategories.has(category.name) ? "selected" : ""
+                }`}
+                onClick={() => toggleCategorySelection(category.name)}
+              >
+                <span className="logo-image category-icon">
+                  {category.icon}
+                </span>
+                <span className="logo-label">{category.name}</span>
+              </div>
+            ))}
           </div>
-        )}
-      </>
+        </div>
+      )}
 
-      {/* The "View Sales" button is always at the bottom of this view */}
       <div className="show-items-button-container">
         <button
           className="show-items-button"
-          onClick={handleShowItems} // This now also handles toggling the view
+          onClick={onShowItemsRequest}
           disabled={!canShowItems}
         >
           View Sales
         </button>
       </div>
-
-      <StoreFilterModal
-        isOpen={isStoreModalOpen}
-        onClose={() => setIsStoreModalOpen(false)}
-        retailers={verifiedRetailers}
-        initialSelectedStoreIds={selectedStoreIds}
-        onConfirmSelections={handleStoreModalConfirm}
-        getLogoPath={getLogoPath}
-      />
-
-      <CategoryFilterModal
-        isOpen={isCategoryModalOpen}
-        onClose={() => setIsCategoryModalOpen(false)}
-        categories={PRODUCT_CATEGORIES_WITH_ICONS}
-        initialSelectedCategories={selectedCategories}
-        onConfirmSelections={handleCategoryModalConfirm}
-      />
     </div>
   );
 };
