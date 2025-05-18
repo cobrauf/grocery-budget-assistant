@@ -116,7 +116,6 @@ export const useSearch = () => {
 
   return {
     searchQuery,
-    setSearchQuery, // Expose setSearchQuery if direct setting is needed, e.g., clearing search
     searchResults,
     totalResults,
     isLoadingSearch,

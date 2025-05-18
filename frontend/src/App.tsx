@@ -15,7 +15,6 @@ import { Product } from "./types/product"; // Ensure Product type is imported
 import {
   saveToLocalStorage,
   loadFromLocalStorage,
-  removeFromLocalStorage,
   LS_SELECTED_STORE_IDS,
   LS_SELECTED_CATEGORIES,
   LS_LAST_BROWSE_FILTER_KEY,
@@ -48,7 +47,6 @@ function App() {
 
   const {
     searchQuery,
-    setSearchQuery,
     searchResults,
     totalResults,
     isLoadingSearch,
@@ -281,27 +279,29 @@ function App() {
     executeBrowseSearch(selectedStoreIds, newCategories);
   };
 
-  const clearSearchLocal = () => {
-    resetSearch();
-  };
-
   const goHome = () => {
     setActiveTab("browse");
+    setIsBrowseResultsActive(false);
   };
 
   return (
     <ThemeContext.Provider
       value={{ themeName: currentThemeName, setThemeName: setCurrentThemeName }}
     >
-      <div className="app-container">
+      <div
+        className="app-container"
+        data-theme={currentThemeName}
+        style={{ fontFamily: currentFont.family }}
+      >
         <Header
           onMenuClick={toggleSidebar}
+          activeTab={activeTab}
           onSearch={handleNewSearch}
           isLoadingSearch={isLoadingSearch}
-          onClearSearch={clearSearchLocal}
+          onClearSearch={resetSearch}
           initialSearchQuery={searchQuery}
-          activeTab={activeTab}
           isInBrowseResultsView={isBrowseResultsActive}
+          onGoHome={goHome}
         />
         <MainContent
           activeTab={activeTab}

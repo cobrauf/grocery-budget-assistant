@@ -12,6 +12,7 @@ interface HeaderProps {
   initialSearchQuery?: string;
   activeTab: AppTab;
   isInBrowseResultsView?: boolean;
+  onGoHome?: () => void;
 }
 
 const Header: React.FC<HeaderProps> = ({
@@ -22,6 +23,7 @@ const Header: React.FC<HeaderProps> = ({
   initialSearchQuery,
   activeTab,
   isInBrowseResultsView,
+  onGoHome,
 }) => {
   const [isSearchFocused, setIsSearchFocused] = useState(false);
   const prevIsLoadingSearchRef = useRef<boolean>(isLoadingSearch);
@@ -67,6 +69,7 @@ const Header: React.FC<HeaderProps> = ({
           onMenuClick={onMenuClick}
           isShrunk={isTopBarShrunk}
           activeTab={activeTab}
+          onGoHome={onGoHome}
         />
         {activeTab === "search" && (
           <SearchBar

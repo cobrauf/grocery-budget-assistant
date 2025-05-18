@@ -4,14 +4,16 @@ import { AppTab } from "../../hooks/useAppTab"; // Import AppTab
 
 interface TopBarProps {
   onMenuClick: () => void;
-  isShrunk?: boolean; // Added prop to control shrunken state
-  activeTab?: AppTab; // Added activeTab prop
+  isShrunk?: boolean;
+  activeTab?: AppTab;
+  onGoHome?: () => void;
 }
 
 const TopBar: React.FC<TopBarProps> = ({
   onMenuClick,
   isShrunk,
   activeTab,
+  onGoHome,
 }) => {
   const topBarStyle: React.CSSProperties = {
     display: "flex",
@@ -24,30 +26,38 @@ const TopBar: React.FC<TopBarProps> = ({
   };
 
   const shrunkenTopBarStyle: React.CSSProperties = {
-    height: "30px",
-    justifyContent: "center",
+    height: "40px",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+    padding: "0 0.5rem",
     backgroundColor: "var(--theme-header-background, #0071dc)",
     width: "100%",
-    display: "flex", // Added for centering content
-    alignItems: "center", // Added for vertical centering
-    color: "var(--theme-header-text, white)", // Ensure text color is applied
+    color: "var(--theme-header-text, white)",
   };
 
   const menuIconStyle: React.CSSProperties = {
     fontSize: "2rem",
     cursor: "pointer",
     padding: "0.5rem",
+    flexShrink: 0, // Prevent shrinking
   };
 
-  // const menuIconStyleShruken: React.CSSProperties = {
-  //   fontSize: "1.5rem",
-  //   cursor: "pointer",
-  //   padding: "1rem",
-  // };
+  const shrunkenHomeIconStyle: React.CSSProperties = {
+    fontSize: "1.2rem",
+    cursor: "pointer",
+    padding: "0.25rem",
+    flexShrink: 0,
+  };
 
   const shrunkenTitleStyle: React.CSSProperties = {
     fontWeight: "bold",
     fontSize: "1rem",
+    flexGrow: 1,
+    textAlign: "center",
+    whiteSpace: "nowrap",
+    overflow: "hidden",
+    textOverflow: "ellipsis",
   };
 
   if (isShrunk) {
@@ -57,7 +67,17 @@ const TopBar: React.FC<TopBarProps> = ({
       : "";
     return (
       <div style={shrunkenTopBarStyle}>
+        {onGoHome && (
+          <span
+            onClick={onGoHome}
+            style={shrunkenHomeIconStyle}
+            title="Go Home"
+          >
+            🏠
+          </span>
+        )}
         <span style={shrunkenTitleStyle}>{capitalizedTabName}</span>
+        <span style={{ minWidth: "24px" }} />
       </div>
     );
   }
