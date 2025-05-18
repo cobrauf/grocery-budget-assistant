@@ -287,15 +287,6 @@ function App() {
 
   const goHome = () => {
     setActiveTab("browse");
-    resetSearch();
-    setFilteredBrowseProducts([]);
-    setIsBrowseResultsActive(false);
-    setSelectedStoreIds(new Set());
-    setSelectedCategories(new Set());
-
-    // Explicitly clear last browse results and filter key from local storage
-    removeFromLocalStorage(LS_LAST_BROWSE_FILTER_KEY);
-    removeFromLocalStorage(LS_LAST_BROWSE_PRODUCTS);
   };
 
   return (
