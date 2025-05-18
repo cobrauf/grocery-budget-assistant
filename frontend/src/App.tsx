@@ -136,9 +136,6 @@ function App() {
     ) {
       console.log("Loading browse results from local storage cache");
       setFilteredBrowseProducts(lastProducts);
-      setIsBrowseResultsActive(true);
-      // Optionally, update memory cache as well if it's not already populated
-      // This ensures consistency if App.tsx's memory cache logic runs later for some reason
       if (!browseResultsCache.has(currentFilterKey)) {
         setBrowseResultsCache((prevCache) =>
           new Map(prevCache).set(currentFilterKey, lastProducts)
