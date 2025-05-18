@@ -24,7 +24,7 @@ const Header: React.FC<HeaderProps> = ({
   isInBrowseResultsView,
 }) => {
   const [isSearchFocused, setIsSearchFocused] = useState(false);
-  const prevIsLoadingSearchRef = useRef<boolean>(isLoadingSearch); // Initialize with isLoadingSearch
+  const prevIsLoadingSearchRef = useRef<boolean>(isLoadingSearch);
 
   useEffect(() => {
     if (prevIsLoadingSearchRef.current === true && !isLoadingSearch) {
@@ -46,19 +46,28 @@ const Header: React.FC<HeaderProps> = ({
     backgroundColor: "var(--theme-header-background, #0071dc)", // To avoid content showing through during blur
   };
 
-  // Determine if the TopBar should be shrunk based on the new prop
-  const isTopBarShrunk = !!isInBrowseResultsView;
+  let isTopBarShrunk: boolean | undefined;
+  switch (activeTab) {
+    case "browse":
+      isTopBarShrunk = isInBrowseResultsView;
+      break;
+    default:
+      isTopBarShrunk = true;
+      break;
+  }
 
-  // Callback to close search/history/overlay
   const handleCloseSearchMode = () => {
     setIsSearchFocused(false);
-    // We rely on SearchBar to blur its input when its isFocused prop becomes false
   };
 
   return (
     <>
       <header style={headerStyle}>
-        <TopBar onMenuClick={onMenuClick} isShrunk={isTopBarShrunk} />
+        <TopBar
+          onMenuClick={onMenuClick}
+          isShrunk={isTopBarShrunk}
+          activeTab={activeTab}
+        />
         {activeTab === "search" && (
           <SearchBar
             isFocused={isSearchFocused}
