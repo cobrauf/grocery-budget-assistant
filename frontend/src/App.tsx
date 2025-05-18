@@ -282,11 +282,7 @@ function App() {
   };
 
   const clearSearchLocal = () => {
-    setSearchQuery("");
-    setFilteredBrowseProducts([]);
-    setIsBrowseResultsActive(false);
-    setSelectedStoreIds(new Set());
-    setSelectedCategories(new Set());
+    resetSearch();
   };
 
   const goHome = () => {
