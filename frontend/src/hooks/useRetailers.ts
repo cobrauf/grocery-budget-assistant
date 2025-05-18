@@ -1,32 +1,16 @@
 import { useState, useEffect, useCallback } from "react";
 import { Retailer } from "../types/retailer";
 import { fetchRetailers } from "../services/api";
-
-// Define the known retailers list here - this can be used for reference or typing if needed
-// but the actual data with correct IDs will come from the API.
-const PREDEFINED_RETAILER_NAMES: Omit<Retailer, "id" | "logo_url">[] = [
-  { name: "Tokyo Central" },
-  { name: "Albertsons" },
-  { name: "Food4Less" },
-  { name: "Vons" },
-  { name: "Ralphs" },
-  { name: "Trader Joe's" },
-  { name: "Aldi" },
-  { name: "Sprouts" },
-  { name: "Jons" },
-  { name: "Costco" },
-  { name: "Sam's Club" },
-  { name: "99 Ranch" },
-  { name: "Mitsuwa" },
-  { name: "Superior" },
-  { name: "H-mart" },
-  { name: "Hannam Chain" },
-  { name: "Northgate" },
-  { name: "Vallarta" },
-];
+import {
+  loadFromLocalStorage,
+  saveToLocalStorage,
+  LS_RETAILERS_CACHE,
+} from "../utils/localStorageUtils";
 
 export const useRetailers = (isSearchActive: boolean) => {
-  const [rawRetailers, setRawRetailers] = useState<Retailer[]>([]);
+  const [rawRetailers, setRawRetailers] = useState<Retailer[]>(() => {
+    return loadFromLocalStorage<Retailer[]>(LS_RETAILERS_CACHE, []);
+  });
   const [verifiedRetailers, setVerifiedRetailers] = useState<Retailer[]>([]);
   const [isLoadingApiRetailers, setIsLoadingApiRetailers] =
     useState<boolean>(false);
@@ -43,25 +27,72 @@ export const useRetailers = (isSearchActive: boolean) => {
   }, []);
 
   useEffect(() => {
-    const loadInitialRetailers = async () => {
-      setIsLoadingApiRetailers(true);
-      setRetailerApiError(null);
+    const fetchAndCompareRetailers = async () => {
+      if (rawRetailers.length === 0) {
+        setIsLoadingApiRetailers(true);
+      }
+      setRetailerApiError(null); // Clear previous errors
+
       try {
         const fetchedRetailers = await fetchRetailers();
-        setRawRetailers(fetchedRetailers);
+
+        // --- Comparison Logic ---
+        const currentRawRetailersSnapshot = rawRetailers;
+
+        let areDifferent = false;
+        if (fetchedRetailers.length !== currentRawRetailersSnapshot.length) {
+          areDifferent = true;
+        } else {
+          // If lengths are the same, check if content is different.
+          // Sort by ID for consistent comparison
+          const sortedFetched = [...fetchedRetailers].sort(
+            (a, b) => a.id - b.id
+          );
+          const sortedCurrent = [...currentRawRetailersSnapshot].sort(
+            (a, b) => a.id - b.id
+          );
+
+          for (let i = 0; i < sortedFetched.length; i++) {
+            if (
+              sortedFetched[i].id !== sortedCurrent[i].id ||
+              sortedFetched[i].name !== sortedCurrent[i].name
+            ) {
+              areDifferent = true;
+              break;
+            }
+          }
+        }
+
+        if (areDifferent) {
+          console.log("Fetched retailers are different from cache. Updating.");
+          setRawRetailers(fetchedRetailers); // This will trigger the logo verification useEffect
+          saveToLocalStorage(LS_RETAILERS_CACHE, fetchedRetailers);
+        } else {
+          console.log(
+            "Fetched retailers are the same as cache. No update to rawRetailers needed."
+          );
+        }
       } catch (error) {
         console.error("Error fetching retailers from API:", error);
-        setRetailerApiError("Failed to load retailers list.");
-        setRawRetailers([]);
+        if (rawRetailers.length === 0) {
+          // Only set error if cache was also empty
+          setRetailerApiError("Failed to load retailers list.");
+        } else {
+          console.warn("API fetch failed, but using cached retailers.");
+        }
       } finally {
         setIsLoadingApiRetailers(false);
       }
     };
 
-    if (!isSearchActive && rawRetailers.length === 0) {
-      loadInitialRetailers();
+    if (!isSearchActive) {
+      fetchAndCompareRetailers();
+    } else {
+      if (rawRetailers.length === 0) {
+        setIsLoadingApiRetailers(false);
+      }
     }
-  }, [isSearchActive, rawRetailers.length]);
+  }, [isSearchActive]);
 
   useEffect(() => {
     if (rawRetailers.length === 0) {

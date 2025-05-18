@@ -39,3 +39,4 @@ export const LS_LAST_BROWSE_PRODUCTS = "appState.browse.lastBrowseProducts";
 export const LS_SEARCH_HISTORY = "appState.search.history";
 export const LS_LAST_SEARCH_QUERY = "appState.search.lastQuery";
 export const LS_LAST_SEARCH_RESULTS = "appState.search.lastResults";
+export const LS_RETAILERS_CACHE = "appState.retailers.cache";
