@@ -10,6 +10,7 @@ import { useTheme as useAppTheme } from "./hooks/useTheme"; // Renamed import to
 import { useSearch } from "./hooks/useSearch"; // Import search hook
 import { useRetailers } from "./hooks/useRetailers"; // Import retailers hook
 import { useAppTab } from "./hooks/useAppTab"; // Import useAppTab
+import { useSort } from "./hooks/useSort"; // Import useSort hook
 import { fetchProductsByFilter as apiFetchProductsByFilter } from "./services/api"; // Import the new API function
 import { Product } from "./types/product"; // Ensure Product type is imported
 import {
@@ -56,6 +57,9 @@ function App() {
     loadMoreResults,
     resetSearch,
   } = useSearch();
+
+  // Initialize sort state and actions
+  const sortProps = useSort(); // This includes all sort state and setters
 
   const isSearchActive = activeTab === "search";
 
@@ -271,12 +275,12 @@ function App() {
 
   const handleStoreModalConfirm = (newStoreIds: Set<number>) => {
     setSelectedStoreIds(newStoreIds);
-    executeBrowseSearch(newStoreIds, selectedCategories);
+    // executeBrowseSearch(newStoreIds, selectedCategories);
   };
 
   const handleCategoryModalConfirm = (newCategories: Set<string>) => {
     setSelectedCategories(newCategories);
-    executeBrowseSearch(selectedStoreIds, newCategories);
+    // executeBrowseSearch(selectedStoreIds, newCategories);
   };
 
   const goHome = () => {
@@ -329,6 +333,7 @@ function App() {
           onToggleCategorySelection={toggleCategorySelection}
           onStoreModalConfirm={handleStoreModalConfirm}
           onCategoryModalConfirm={handleCategoryModalConfirm}
+          sortProps={sortProps}
         />
         <BottomNav activeTab={activeTab} setActiveTab={setActiveTab} />
         <SideBar

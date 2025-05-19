@@ -1,0 +1,21 @@
+.sort-pills-bar {
+  display: flex;
+  gap: 10px;
+  padding: 10px 0;
+  margin-bottom: 10px;
+}
+
+.sort-pill {
+  padding: 8px 15px;
+  border: 1px solid #ccc;
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  background-color: #f0f0f0;
+  color: #333;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Styles for selected/active pill and arrows will be added in Task 2 & 5 */
