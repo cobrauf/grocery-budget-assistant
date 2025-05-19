@@ -28,6 +28,7 @@ const SortPillsBar: React.FC<SortPillsBarProps> = ({
 
   return (
     <div className="sort-pills-bar">
+      <span className="sort-header">Sort by:</span>
       {PILL_CONFIG.map(({ label, field }) => {
         const isSelected = activeSortField === field;
         const direction = getDirectionForField(field);

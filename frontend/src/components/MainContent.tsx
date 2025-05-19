@@ -146,8 +146,8 @@ const MainContent: React.FC<MainContentProps> = ({
     selectedStoreIds.size > 0 ? `Stores (${selectedStoreIds.size})` : "+ Store";
   const categoryButtonText =
     selectedCategories.size > 0
-      ? `Categories (${selectedCategories.size})`
-      : "+ Category";
+      ? `Categ. (${selectedCategories.size})`
+      : "+ Categ.";
 
   const showHeaderBackArrow = isBrowseResultsActive;
   const showHeaderForwardArrow = !isBrowseResultsActive && canShowItems;
@@ -170,7 +170,7 @@ const MainContent: React.FC<MainContentProps> = ({
             onClick={onToggleBrowseView}
             className="browse-nav-arrow back-arrow"
           >
-            {"<"}
+            {"<<"}
           </button>
         )}
         <span className={isBrowseResultsActive ? "filters-title-indented" : ""}>
@@ -197,7 +197,7 @@ const MainContent: React.FC<MainContentProps> = ({
             onClick={handleShowItemsClick}
             className="browse-nav-arrow forward-arrow"
           >
-            {">"}
+            {">>"}
           </button>
         )}
       </div>

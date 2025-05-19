@@ -33,8 +33,8 @@ export interface Theme {
     sortPillText: string;
     sortPillBackgroundActive: string;
     sortPillTextActive: string;
-    sortPillArrowColor: string;
-    sortPillArrowColorActive: string; // Added for active arrow if different
+    // sortPillArrowColor: string;
+    // sortPillArrowColorActive: string; // Added for active arrow if different
 
     // Add more specific component colors as needed
     // e.g., buttonBackground, cardBackground, etc.
@@ -63,12 +63,12 @@ export const themes: Theme[] = [
       bottomNavTextActive: "#ffffff",
       bottomNavIndicatorActive: "#ffffff",
       // Light Theme Sort Pill Colors
-      sortPillBackground: "#e9ecef", // Light grey, distinct from page bg
-      sortPillText: "#495057", // Darker grey text
+      sortPillBackground: "#aeadad", // Light grey, distinct from page bg
+      sortPillText: "#ffffff", // Darker grey text
       sortPillBackgroundActive: "#7b2cbf", // Primary color
       sortPillTextActive: "#ffffff", // White text on active
-      sortPillArrowColor: "#495057", // Same as pill text
-      sortPillArrowColorActive: "#ffffff", // Same as active pill text
+      // sortPillArrowColor: "#495057", // Same as pill text
+      // sortPillArrowColorActive: "#ffffff", // Same as active pill text
     },
   },
   {
@@ -92,12 +92,12 @@ export const themes: Theme[] = [
       bottomNavTextActive: "#ffffff",
       bottomNavIndicatorActive: "#00aaff",
       // Dark Theme Sort Pill Colors
-      sortPillBackground: "#343a40", // Dark grey
-      sortPillText: "#f8f9fa", // Light text
+      sortPillBackground: "#aeadad", // Dark grey
+      sortPillText: "#ffffff", // Light text
       sortPillBackgroundActive: "#00aaff", // Primary color (blue)
-      sortPillTextActive: "#1a1a1a", // Dark text on active
-      sortPillArrowColor: "#f8f9fa", // Same as pill text
-      sortPillArrowColorActive: "#1a1a1a", // Same as active pill text
+      sortPillTextActive: "#ffffff", // Dark text on active
+      // sortPillArrowColor: "#f8f9fa", // Same as pill text
+      // sortPillArrowColorActive: "#1a1a1a", // Same as active pill text
     },
   },
   {
@@ -121,12 +121,12 @@ export const themes: Theme[] = [
       bottomNavTextActive: "#ffffff",
       bottomNavIndicatorActive: "#ffffff",
       // Pastel Theme Sort Pill Colors
-      sortPillBackground: "#f0e2d2", // Light beige, same as sidebar
-      sortPillText: "#5d5d5d", // Dark grey text
+      sortPillBackground: "#aeadad", // Light beige, same as sidebar
+      sortPillText: "#ffffff", // Dark grey text
       sortPillBackgroundActive: "#f2a2a0", // Soft pink primary
       sortPillTextActive: "#ffffff", // White text on active
-      sortPillArrowColor: "#5d5d5d", // Same as pill text
-      sortPillArrowColorActive: "#ffffff", // Same as active pill text
+      // sortPillArrowColor: "#5d5d5d", // Same as pill text
+      // sortPillArrowColorActive: "#ffffff", // Same as active pill text
     },
   },
   {
@@ -153,12 +153,12 @@ export const themes: Theme[] = [
       bottomNavTextActive: "#e0e0e0",
       bottomNavIndicatorActive: "#cc0000",
       // Retro Theme Sort Pill Colors
-      sortPillBackground: "#b0b0b0", // Medium-light grey
-      sortPillText: "#212121", // Dark text
+      sortPillBackground: "#aeadad", // Medium-light grey
+      sortPillText: "#ffffff", // Dark text
       sortPillBackgroundActive: "#cc0000", // Red (primary accent)
       sortPillTextActive: "#ffffff", // White text on active
-      sortPillArrowColor: "#212121", // Dark arrow
-      sortPillArrowColorActive: "#ffffff", // White arrow on active
+      // sortPillArrowColor: "#212121", // Dark arrow
+      // sortPillArrowColorActive: "#ffffff", // White arrow on active
     },
   },
 ];
