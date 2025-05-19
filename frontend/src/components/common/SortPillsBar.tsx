@@ -1,15 +1,52 @@
 import React from "react";
-import "./SortPillsBar.css"; // We will create this CSS file next
+import { SortStateAndActions, SortField } from "../../types/sort"; // Adjusted path
+import "./SortPillsBar.css";
 
-// Props will be added in Task 2 for interactivity
-interface SortPillsBarProps {}
+// Define an array for pill configuration to avoid repetition
+const PILL_CONFIG: { label: string; field: SortField }[] = [
+  { label: "Price", field: "price" },
+  { label: "Store", field: "store" },
+  { label: "Categ.", field: "category" },
+];
 
-const SortPillsBar: React.FC<SortPillsBarProps> = () => {
+// Use the SortStateAndActions for props type
+interface SortPillsBarProps extends SortStateAndActions {}
+
+const SortPillsBar: React.FC<SortPillsBarProps> = ({
+  activeSortField,
+  priceSortDirection,
+  storeSortDirection,
+  categorySortDirection,
+  handlePillClick,
+}) => {
+  const getDirectionForField = (field: SortField) => {
+    if (field === "price") return priceSortDirection;
+    if (field === "store") return storeSortDirection;
+    if (field === "category") return categorySortDirection;
+    return "asc"; // Should not happen
+  };
+
   return (
     <div className="sort-pills-bar">
-      <div className="sort-pill">Price</div>
-      <div className="sort-pill">Store</div>
-      <div className="sort-pill">Categ.</div>
+      {PILL_CONFIG.map(({ label, field }) => {
+        const isSelected = activeSortField === field;
+        const direction = getDirectionForField(field);
+        const arrow = direction === "asc" ? "↑" : "↓";
+
+        return (
+          <button
+            key={field}
+            className={`sort-pill ${isSelected ? "selected" : ""}`}
+            onClick={() => handlePillClick(field)}
+            aria-pressed={isSelected}
+            aria-label={`Sort by ${label} ${
+              direction === "asc" ? "ascending" : "descending"
+            }`}
+          >
+            {label} <span className="sort-arrow">{arrow}</span>
+          </button>
+        );
+      })}
     </div>
   );
 };
