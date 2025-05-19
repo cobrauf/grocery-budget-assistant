@@ -31,7 +31,7 @@ const SortPillsBar: React.FC<SortPillsBarProps> = ({
       {PILL_CONFIG.map(({ label, field }) => {
         const isSelected = activeSortField === field;
         const direction = getDirectionForField(field);
-        const arrow = direction === "asc" ? "↑" : "↓";
+        const arrow = direction === "asc" ? "↓" : "↑";
 
         return (
           <button

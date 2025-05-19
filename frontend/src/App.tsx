@@ -1,4 +1,4 @@
-import { useState, useEffect, createContext, useContext } from "react";
+import { useState, useEffect, createContext, useContext, useMemo } from "react";
 import "./styles/app.css";
 // import { api } from "./services/api";
 import Header from "./components/Header";
@@ -13,6 +13,8 @@ import { useAppTab } from "./hooks/useAppTab"; // Import useAppTab
 import { useSort } from "./hooks/useSort"; // Import useSort hook
 import { fetchProductsByFilter as apiFetchProductsByFilter } from "./services/api"; // Import the new API function
 import { Product } from "./types/product"; // Ensure Product type is imported
+import { SortField, SortDirection } from "./types/sort"; // Import sort types
+import { sortProducts } from "./utils/sortingUtils"; // Import sortProducts utility
 import {
   saveToLocalStorage,
   loadFromLocalStorage,
@@ -60,6 +62,12 @@ function App() {
 
   // Initialize sort state and actions
   const sortProps = useSort(); // This includes all sort state and setters
+  const {
+    activeSortField,
+    priceSortDirection,
+    storeSortDirection,
+    categorySortDirection,
+  } = sortProps;
 
   const isSearchActive = activeTab === "search";
 
@@ -288,6 +296,38 @@ function App() {
     setIsBrowseResultsActive(false);
   };
 
+  // --- Derived sorted product lists ---
+  const displayedBrowseProducts = useMemo(() => {
+    let direction: SortDirection;
+    if (activeSortField === "price") direction = priceSortDirection;
+    else if (activeSortField === "store") direction = storeSortDirection;
+    else direction = categorySortDirection; // for 'category'
+
+    return sortProducts(filteredBrowseProducts, activeSortField, direction);
+  }, [
+    filteredBrowseProducts,
+    activeSortField,
+    priceSortDirection,
+    storeSortDirection,
+    categorySortDirection,
+  ]);
+
+  const displayedSearchResults = useMemo(() => {
+    let direction: SortDirection;
+    if (activeSortField === "price") direction = priceSortDirection;
+    else if (activeSortField === "store") direction = storeSortDirection;
+    else direction = categorySortDirection; // for 'category'
+
+    return sortProducts(searchResults, activeSortField, direction);
+  }, [
+    searchResults,
+    activeSortField,
+    priceSortDirection,
+    storeSortDirection,
+    categorySortDirection,
+  ]);
+  // --- End derived sorted product lists ---
+
   return (
     <ThemeContext.Provider
       value={{ themeName: currentThemeName, setThemeName: setCurrentThemeName }}
@@ -310,7 +350,7 @@ function App() {
         <MainContent
           activeTab={activeTab}
           searchQuery={searchQuery}
-          searchResults={searchResults}
+          searchResults={displayedSearchResults}
           totalResults={totalResults}
           isLoadingSearch={isLoadingSearch}
           searchError={searchError}
@@ -323,7 +363,7 @@ function App() {
           retailerApiError={retailerApiError}
           getLogoPath={getLogoPath}
           onFetchProductsByFilter={handleFetchProductsByFilter}
-          filteredBrowseProducts={filteredBrowseProducts}
+          filteredBrowseProducts={displayedBrowseProducts}
           isLoadingFilteredBrowseProducts={isLoadingFilteredBrowseProducts}
           isBrowseResultsActive={isBrowseResultsActive}
           onToggleBrowseView={toggleBrowseView}
