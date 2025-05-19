@@ -7,12 +7,12 @@
 
 .sort-pill {
   padding: 8px 12px;
-  border: 1px solid #ccc;
+  border: 1px solid var(--theme-secondary);
   border-radius: 20px;
   cursor: pointer;
   font-size: 0.9rem;
-  background-color: #f0f0f0;
-  color: #333;
+  background-color: var(--theme-sort-pill-background);
+  color: var(--theme-sort-pill-text);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -22,14 +22,13 @@
 }
 
 .sort-pill:hover {
-  background-color: #e0e0e0;
-  border-color: #bbb;
+  filter: brightness(95%);
 }
 
 .sort-pill.selected {
-  background-color: #007bff;
-  color: white;
-  border-color: #0056b3;
+  background-color: var(--theme-sort-pill-background-active);
+  color: var(--theme-sort-pill-text-active);
+  border-color: var(--theme-sort-pill-background-active);
   font-weight: bold;
 }
 
@@ -37,6 +36,11 @@
   margin-left: 6px;
   font-size: 0.9em;
   line-height: 1;
+  color: var(--theme-sort-pill-arrow-color);
+}
+
+.sort-pill.selected .sort-arrow {
+  color: var(--theme-sort-pill-arrow-color-active);
 }
 
 /* Styles for selected/active pill and arrows will be added in Task 2 & 5 */
