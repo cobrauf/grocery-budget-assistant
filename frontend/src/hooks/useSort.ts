@@ -1,10 +1,18 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   SortField,
   SortDirection,
   SortStateAndActions,
   SortOptions,
 } from "../types/sort";
+import {
+  saveToLocalStorage,
+  loadFromLocalStorage,
+  LS_ACTIVE_SORT_FIELD,
+  LS_PRICE_SORT_DIRECTION,
+  LS_STORE_SORT_DIRECTION,
+  LS_CATEGORY_SORT_DIRECTION,
+} from "../utils/localStorageUtils";
 
 const defaultSortOptions: SortOptions = {
   activeSortField: "price",
@@ -13,25 +21,50 @@ const defaultSortOptions: SortOptions = {
   categorySortDirection: "asc",
 };
 
-export const useSort = (
-  initialSortOptions?: Partial<SortOptions>
-): SortStateAndActions => {
-  const [activeSortField, setActiveSortField] = useState<SortField>(
-    initialSortOptions?.activeSortField || defaultSortOptions.activeSortField
+export const useSort = (): SortStateAndActions => {
+  const [activeSortField, setActiveSortField] = useState<SortField>(() =>
+    loadFromLocalStorage<SortField>(
+      LS_ACTIVE_SORT_FIELD,
+      defaultSortOptions.activeSortField
+    )
   );
   const [priceSortDirection, setPriceSortDirection] = useState<SortDirection>(
-    initialSortOptions?.priceSortDirection ||
-      defaultSortOptions.priceSortDirection
+    () =>
+      loadFromLocalStorage<SortDirection>(
+        LS_PRICE_SORT_DIRECTION,
+        defaultSortOptions.priceSortDirection
+      )
   );
   const [storeSortDirection, setStoreSortDirection] = useState<SortDirection>(
-    initialSortOptions?.storeSortDirection ||
-      defaultSortOptions.storeSortDirection
+    () =>
+      loadFromLocalStorage<SortDirection>(
+        LS_STORE_SORT_DIRECTION,
+        defaultSortOptions.storeSortDirection
+      )
   );
   const [categorySortDirection, setCategorySortDirection] =
-    useState<SortDirection>(
-      initialSortOptions?.categorySortDirection ||
+    useState<SortDirection>(() =>
+      loadFromLocalStorage<SortDirection>(
+        LS_CATEGORY_SORT_DIRECTION,
         defaultSortOptions.categorySortDirection
+      )
     );
+
+  useEffect(() => {
+    saveToLocalStorage(LS_ACTIVE_SORT_FIELD, activeSortField);
+  }, [activeSortField]);
+
+  useEffect(() => {
+    saveToLocalStorage(LS_PRICE_SORT_DIRECTION, priceSortDirection);
+  }, [priceSortDirection]);
+
+  useEffect(() => {
+    saveToLocalStorage(LS_STORE_SORT_DIRECTION, storeSortDirection);
+  }, [storeSortDirection]);
+
+  useEffect(() => {
+    saveToLocalStorage(LS_CATEGORY_SORT_DIRECTION, categorySortDirection);
+  }, [categorySortDirection]);
 
   const toggleSortDirection = (field: SortField) => {
     switch (field) {
