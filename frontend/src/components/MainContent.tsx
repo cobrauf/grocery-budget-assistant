@@ -360,7 +360,8 @@ const MainContent: React.FC<MainContentProps> = ({
       case "ai":
         return (
           <div style={{ textAlign: "center", paddingTop: "20px" }}>
-            <h2>AI Tab</h2>
+            <div className="default-fav-items-icon">✨</div>
+            <h2>AI</h2>
             <p>(Coming soon)</p>
           </div>
         );

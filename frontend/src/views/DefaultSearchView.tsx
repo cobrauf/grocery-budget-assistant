@@ -19,8 +19,8 @@ const DefaultSearchView: React.FC = () => {
 
   return (
     <div style={viewStyle}>
-      <h2>Search Tab</h2>
-      {/* <p style={pStyle}>Search for items using the search bar above.</p> */}
+      <h2>Search</h2>
+      <p>Search for items using the search bar above.</p>
     </div>
   );
 };

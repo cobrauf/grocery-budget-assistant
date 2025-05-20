@@ -6,11 +6,8 @@ const DefaultFavItemsView: React.FC = () => {
     <div className="default-fav-items-container">
       <div className="default-fav-items-content">
         <div className="default-fav-items-icon">❤️</div>
-        <h2 className="default-fav-items-title">Favorite Items</h2>
-        <p className="default-fav-items-description">
-          You haven't added any items to your favorites yet. Click the heart
-          icon on any product card to add it to your favorites.
-        </p>
+        <h2 className="default-fav-items-title">Favorites</h2>
+        <p>Click the heart icon in other tabs to view them here.</p>
       </div>
     </div>
   );

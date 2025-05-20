@@ -82,9 +82,7 @@
 .product-card-heart-icon {
   font-size: 1.25rem;
   cursor: pointer;
-  margin-left: 0rem;
   margin-right: 0.5rem;
-  margin-top: 0.3rem;
   /* color handled by isLiked state in component */
   transition: color 0.2s ease-in-out;
 }
