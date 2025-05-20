@@ -4,6 +4,20 @@
   box-sizing: border-box;
 }
 
+.filters-header-wrapper {
+  max-height: 100px;
+  opacity: 1;
+  overflow: hidden;
+  transition: max-height 0.3s ease-in-out, opacity 0.3s ease-in-out;
+  will-change: max-height, opacity;
+}
+
+.filters-header-wrapper-hidden {
+  max-height: 0;
+  opacity: 0;
+  padding: 0;
+}
+
 .filters-header {
   display: flex;
   font-size: 0.9rem;
@@ -24,7 +38,7 @@
 }
 
 .filter-button {
-  background-color: #aeadad;
+  background-color: #7d7d7d;
   /* border: 1px solid #ccc; */
   padding: 0.4rem 1rem;
   border-radius: 50px;
@@ -162,7 +176,7 @@
 }
 
 .show-items-button:disabled {
-  background-color: #aeadad;
+  background-color: #7d7d7d;
   cursor: not-allowed;
 }
 

@@ -56,9 +56,10 @@ const ResultsView: React.FC<ResultsViewProps> = ({
   }, [onScrollUpdate]);
 
   const resultsContainerStyle: React.CSSProperties = {
-    height: "calc(100vh - 120px)", // Adjust based on header/footer height
+    height: "100%", // Take full height of parent flex container
     overflowY: "auto",
     padding: "1rem",
+    flexGrow: 1,
   };
 
   const errorTextStyle: React.CSSProperties = {

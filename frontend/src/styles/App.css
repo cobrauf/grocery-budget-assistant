@@ -49,7 +49,19 @@
 }
 
 .app-header-hidden {
-  transform: translateY(-100%);
+  /* transform: translateY(-100%); */
+  /* using the same as above so it's not hidden during scrolling, not sure which is better */
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  position: sticky;
+  top: 0;
+  z-index: 1001;
+  background-color: var(--theme-header-background);
+  transform: translateY(0);
+  transition: transform 0.3s ease-in-out;
+  will-change: transform;
 }
 
 .counter-card {

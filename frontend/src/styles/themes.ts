@@ -27,6 +27,7 @@ export interface Theme {
     bottomNavTextInactive: string;
     bottomNavTextActive: string;
     bottomNavIndicatorActive: string;
+    bottomNavItemActiveBackground: string; // Added for active tab background
 
     // Sort Pills
     sortPillBackground: string;
@@ -62,8 +63,9 @@ export const themes: Theme[] = [
       bottomNavTextInactive: "rgba(255, 255, 255, 0.7)",
       bottomNavTextActive: "#ffffff",
       bottomNavIndicatorActive: "#ffffff",
+      bottomNavItemActiveBackground: "#7b2cbf", // Matches headerBackground
       // Light Theme Sort Pill Colors
-      sortPillBackground: "#aeadad", // Light grey, distinct from page bg
+      sortPillBackground: "#7d7d7d", // Light grey, distinct from page bg
       sortPillText: "#ffffff", // Darker grey text
       sortPillBackgroundActive: "#7b2cbf", // Primary color
       sortPillTextActive: "#ffffff", // White text on active
@@ -91,8 +93,9 @@ export const themes: Theme[] = [
       bottomNavTextInactive: "rgba(220, 220, 220, 0.7)",
       bottomNavTextActive: "#ffffff",
       bottomNavIndicatorActive: "#00aaff",
+      bottomNavItemActiveBackground: "#005bb5", // Matches headerBackground
       // Dark Theme Sort Pill Colors
-      sortPillBackground: "#aeadad", // Dark grey
+      sortPillBackground: "#7d7d7d", // Dark grey
       sortPillText: "#ffffff", // Light text
       sortPillBackgroundActive: "#00aaff", // Primary color (blue)
       sortPillTextActive: "#ffffff", // Dark text on active
@@ -120,8 +123,9 @@ export const themes: Theme[] = [
       bottomNavTextInactive: "rgba(255, 255, 255, 0.75)",
       bottomNavTextActive: "#ffffff",
       bottomNavIndicatorActive: "#ffffff",
+      bottomNavItemActiveBackground: "#f2bfa0", // Matches headerBackground
       // Pastel Theme Sort Pill Colors
-      sortPillBackground: "#aeadad", // Light beige, same as sidebar
+      sortPillBackground: "#7d7d7d", // Light beige, same as sidebar
       sortPillText: "#ffffff", // Dark grey text
       sortPillBackgroundActive: "#f2a2a0", // Soft pink primary
       sortPillTextActive: "#ffffff", // White text on active
@@ -134,7 +138,7 @@ export const themes: Theme[] = [
     colors: {
       background: "#d3d3d3", // Light Grey (Console body)
       text: "#212121", // Dark Grey/Black (Controller, D-pad)
-      primary: "#cc0000", // Red (A/B Buttons, highlights)
+      primary: "#D91656", // Red (A/B Buttons, highlights)
       secondary: "#424242", // Dark Grey (Controller accents)
 
       headerBackground: "#424242", // Dark Grey (Controller body color)
@@ -142,7 +146,7 @@ export const themes: Theme[] = [
 
       sidebarBackground: "#c0c0c0", // Medium Grey (Slightly darker console body)
       sidebarText: "#212121", // Dark Grey/Black
-      sidebarHighlight: "#cc0000", // Red
+      sidebarHighlight: "#D91656", // Red
       sidebarDivider: "#616161", // A darker dividing line
 
       searchInputBackground: "#ffffff", // White/Off-white (Button text color)
@@ -151,11 +155,12 @@ export const themes: Theme[] = [
       bottomNavBackground: "#2a2a2a",
       bottomNavTextInactive: "rgba(200, 200, 200, 0.7)",
       bottomNavTextActive: "#e0e0e0",
-      bottomNavIndicatorActive: "#cc0000",
+      bottomNavIndicatorActive: "#D91656",
+      bottomNavItemActiveBackground: "#424242", // Matches headerBackground
       // Retro Theme Sort Pill Colors
-      sortPillBackground: "#aeadad", // Medium-light grey
+      sortPillBackground: "#7d7d7d", // Medium-light grey
       sortPillText: "#ffffff", // Dark text
-      sortPillBackgroundActive: "#cc0000", // Red (primary accent)
+      sortPillBackgroundActive: "#D91656", // Red (primary accent)
       sortPillTextActive: "#ffffff", // White text on active
       // sortPillArrowColor: "#212121", // Dark arrow
       // sortPillArrowColorActive: "#ffffff", // White arrow on active

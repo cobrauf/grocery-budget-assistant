@@ -14,9 +14,9 @@ const BottomNav: React.FC<BottomNavProps> = ({
   areNavBarsVisible,
 }) => {
   const navItems: { label: string; tab: AppTab; icon?: string }[] = [
-    { label: "Browse", tab: "browse", icon: "🛒" },
-    { label: "Search", tab: "search", icon: "🔍" },
-    { label: "AI (WIP)", tab: "ai", icon: "✨" },
+    { label: "Browse", tab: "browse", icon: "" },
+    { label: "Search", tab: "search", icon: "" },
+    { label: "AI (WIP)", tab: "ai", icon: "" },
   ];
 
   return (

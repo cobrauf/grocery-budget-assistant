@@ -36,7 +36,7 @@
 .modal-title {
   margin: 0;
   font-size: 1rem;
-  color: var(--theme-text, #333);
+  color: #333;
 }
 
 .modal-close-button {
@@ -86,7 +86,8 @@
 
 .modal-filter-item label {
   font-size: 1rem;
-  color: var(--theme-text, #333);
+  /* color: var(--theme-text, #333); */
+  color: #333;
   cursor: pointer;
   flex-grow: 1;
 }
@@ -124,7 +125,7 @@
 .modal-select-all-item label {
   font-size: 1rem;
   /* font-weight: bold;  */
-  color: var(--theme-text, #333);
+  color: #333;
   cursor: pointer;
   flex-grow: 1;
 }

@@ -48,6 +48,7 @@ interface MainContentProps {
   onResultsViewScroll?: (scrollY: number) => void;
   children?: React.ReactNode;
   activeTab: AppTab;
+  areNavBarsVisible: boolean;
 
   // Search Tab Props
   searchQuery: string;
@@ -86,6 +87,7 @@ interface MainContentProps {
 
 const MainContent: React.FC<MainContentProps> = ({
   activeTab,
+  areNavBarsVisible,
   searchQuery,
   searchResults,
   totalResults,
@@ -134,8 +136,9 @@ const MainContent: React.FC<MainContentProps> = ({
 
   const browseContentContainerStyle: React.CSSProperties = {
     flexGrow: 1,
-    overflowY: "auto",
     position: "relative",
+    display: "flex",
+    flexDirection: "column",
   };
 
   const canShowItems = selectedStoreIds.size > 0 || selectedCategories.size > 0;
@@ -217,8 +220,22 @@ const MainContent: React.FC<MainContentProps> = ({
       case "browse":
         return (
           <>
-            {renderBrowseFilterHeader()}
-            {isBrowseResultsActive && <SortPillsBar {...sortProps} />}
+            <div
+              className={`filters-header-wrapper ${
+                !areNavBarsVisible ? "filters-header-wrapper-hidden" : ""
+              }`}
+            >
+              {renderBrowseFilterHeader()}
+            </div>
+            {isBrowseResultsActive && (
+              <div
+                className={`sort-pills-bar-container ${
+                  !areNavBarsVisible ? "sort-pills-bar-container-hidden" : ""
+                }`}
+              >
+                <SortPillsBar {...sortProps} />
+              </div>
+            )}
             <div style={browseContentContainerStyle}>
               {isBrowseResultsActive ? (
                 <BrowseResultsView
