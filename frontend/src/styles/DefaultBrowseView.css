@@ -9,11 +9,12 @@
   font-size: 0.9rem;
   align-items: center;
   margin-bottom: 0rem;
-  padding: 1rem;
-  padding-bottom: 1rem;
+  padding-top: 0.5rem;
+  padding-bottom: 0rem;
   background-color: #e3000000;
   border-radius: 0px;
-  border-bottom: 1px solid #b5b5b5;
+  justify-content: center;
+  /* border-bottom: 0px solid #b5b5b5; */
 }
 
 /* this is for the filter title */
@@ -24,12 +25,13 @@
 
 .filter-button {
   background-color: #aeadad;
-  border: 1px solid #ccc;
+  /* border: 1px solid #ccc; */
   padding: 0.4rem 1rem;
   border-radius: 50px;
   cursor: pointer;
   margin-right: 0.5rem;
   font-size: 0.9rem;
+  color: #ffffff;
   transition: background-color 0.3s ease, color 0.3s ease,
     border-color 0.3s ease;
   font-family: inherit;
@@ -189,5 +191,5 @@
 }
 
 .forward-arrow {
-  margin-left: auto; /* Pushes it to the right */
+  margin-left: 1rem;
 }

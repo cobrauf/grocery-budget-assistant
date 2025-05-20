@@ -40,3 +40,9 @@ export const LS_SEARCH_HISTORY = "appState.search.history";
 export const LS_LAST_SEARCH_QUERY = "appState.search.lastQuery";
 export const LS_LAST_SEARCH_RESULTS = "appState.search.lastResults";
 export const LS_RETAILERS_CACHE = "appState.retailers.cache";
+
+// Constants for Sort State
+export const LS_ACTIVE_SORT_FIELD = "appState.sort.activeSortField";
+export const LS_PRICE_SORT_DIRECTION = "appState.sort.priceSortDirection";
+export const LS_STORE_SORT_DIRECTION = "appState.sort.storeSortDirection";
+export const LS_CATEGORY_SORT_DIRECTION = "appState.sort.categorySortDirection";

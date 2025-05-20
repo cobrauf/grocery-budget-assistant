@@ -1,7 +1,7 @@
-import { useState, useEffect, createContext, useContext } from "react";
+import { useState, useEffect, createContext, useContext, useMemo } from "react";
 import "./styles/app.css";
 // import { api } from "./services/api";
-import Header from "./components/Header";
+import Header from "./components/header/Header";
 import MainContent from "./components/MainContent";
 import BottomNav from "./components/common/BottomNav";
 import SideBar from "./components/sidebar/SideBar";
@@ -10,8 +10,11 @@ import { useTheme as useAppTheme } from "./hooks/useTheme"; // Renamed import to
 import { useSearch } from "./hooks/useSearch"; // Import search hook
 import { useRetailers } from "./hooks/useRetailers"; // Import retailers hook
 import { useAppTab } from "./hooks/useAppTab"; // Import useAppTab
+import { useSort } from "./hooks/useSort"; // Import useSort hook
 import { fetchProductsByFilter as apiFetchProductsByFilter } from "./services/api"; // Import the new API function
 import { Product } from "./types/product"; // Ensure Product type is imported
+import { SortField, SortDirection } from "./types/sort"; // Import sort types
+import { sortProducts } from "./utils/sortingUtils"; // Import sortProducts utility
 import {
   saveToLocalStorage,
   loadFromLocalStorage,
@@ -56,6 +59,15 @@ function App() {
     loadMoreResults,
     resetSearch,
   } = useSearch();
+
+  // Initialize sort state and actions
+  const sortProps = useSort(); // This includes all sort state and setters
+  const {
+    activeSortField,
+    priceSortDirection,
+    storeSortDirection,
+    categorySortDirection,
+  } = sortProps;
 
   const isSearchActive = activeTab === "search";
 
@@ -271,18 +283,50 @@ function App() {
 
   const handleStoreModalConfirm = (newStoreIds: Set<number>) => {
     setSelectedStoreIds(newStoreIds);
-    executeBrowseSearch(newStoreIds, selectedCategories);
+    // executeBrowseSearch(newStoreIds, selectedCategories);
   };
 
   const handleCategoryModalConfirm = (newCategories: Set<string>) => {
     setSelectedCategories(newCategories);
-    executeBrowseSearch(selectedStoreIds, newCategories);
+    // executeBrowseSearch(selectedStoreIds, newCategories);
   };
 
   const goHome = () => {
     setActiveTab("browse");
     setIsBrowseResultsActive(false);
   };
+
+  // --- Derived sorted product lists ---
+  const displayedBrowseProducts = useMemo(() => {
+    let direction: SortDirection;
+    if (activeSortField === "price") direction = priceSortDirection;
+    else if (activeSortField === "store") direction = storeSortDirection;
+    else direction = categorySortDirection; // for 'category'
+
+    return sortProducts(filteredBrowseProducts, activeSortField, direction);
+  }, [
+    filteredBrowseProducts,
+    activeSortField,
+    priceSortDirection,
+    storeSortDirection,
+    categorySortDirection,
+  ]);
+
+  const displayedSearchResults = useMemo(() => {
+    let direction: SortDirection;
+    if (activeSortField === "price") direction = priceSortDirection;
+    else if (activeSortField === "store") direction = storeSortDirection;
+    else direction = categorySortDirection; // for 'category'
+
+    return sortProducts(searchResults, activeSortField, direction);
+  }, [
+    searchResults,
+    activeSortField,
+    priceSortDirection,
+    storeSortDirection,
+    categorySortDirection,
+  ]);
+  // --- End derived sorted product lists ---
 
   return (
     <ThemeContext.Provider
@@ -306,7 +350,7 @@ function App() {
         <MainContent
           activeTab={activeTab}
           searchQuery={searchQuery}
-          searchResults={searchResults}
+          searchResults={displayedSearchResults}
           totalResults={totalResults}
           isLoadingSearch={isLoadingSearch}
           searchError={searchError}
@@ -319,7 +363,7 @@ function App() {
           retailerApiError={retailerApiError}
           getLogoPath={getLogoPath}
           onFetchProductsByFilter={handleFetchProductsByFilter}
-          filteredBrowseProducts={filteredBrowseProducts}
+          filteredBrowseProducts={displayedBrowseProducts}
           isLoadingFilteredBrowseProducts={isLoadingFilteredBrowseProducts}
           isBrowseResultsActive={isBrowseResultsActive}
           onToggleBrowseView={toggleBrowseView}
@@ -329,6 +373,7 @@ function App() {
           onToggleCategorySelection={toggleCategorySelection}
           onStoreModalConfirm={handleStoreModalConfirm}
           onCategoryModalConfirm={handleCategoryModalConfirm}
+          sortProps={sortProps}
         />
         <BottomNav activeTab={activeTab} setActiveTab={setActiveTab} />
         <SideBar

@@ -1,6 +1,6 @@
 import React from "react";
-import { AppTab } from "../../hooks/useAppTab"; // Keep AppTab type import
-import "./BottomNav.css"; // We'll create this for styling
+import { AppTab } from "../../hooks/useAppTab"; // Ensure correct path
+import "../../styles/BottomNav.css"; // Updated path for CSS
 
 interface BottomNavProps {
   activeTab: AppTab;

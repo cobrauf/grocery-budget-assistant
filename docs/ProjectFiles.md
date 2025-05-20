@@ -53,60 +53,91 @@ grocery-budget-assistant/
 │ │ ├── components/ Directory for reusable React components.
 | | | |=====================================\
 │ │ │ ├── common/ ── Contains general-purpose reusable components.
+| | | | |=====================================\
+│ │ │ │ ├── BottomNav.css ── Styles for BottomNav component.
+│ │ │ │ ├── BottomNav.tsx ── Component for bottom navigation.
+│ │ │ │ ├── FullOverlay.tsx ── Component for displaying full-screen overlays.
+│ │ │ │ ├── LoadingSpinner.css ── Styles for LoadingSpinner component.
 │ │ │ │ ├── LoadingSpinner.tsx ── Component displaying a loading animation.
+│ │ │ │ ├── ModalBase.css ── Styles for ModalBase component.
+│ │ │ │ ├── ModalBase.tsx ── Base component for modals.
+│ │ │ │ ├── ProductCard.css ── Styles for ProductCard component.
 │ │ │ │ ├── ProductCard.tsx ── Component displaying product details.
-│ │ │ │ ├── FullOverlay.tsx ── Component for displaying full-screen overlays (e.g., search results).
+│ │ │ │ ├── ResultsView.css ── Styles for ResultsView component.
+│ │ │ │ ├── ResultsView.tsx ── Component for displaying results.
 │ │ │ │ └── SearchOverlay.tsx ── Component providing a search input overlay.
-| | | |=====================================\
-│ │ │ ├── header/ ── (Likely deprecated, Header.tsx is at components level). NEED UPDATING %%%%%%%%%%%%%%%%%%%%%%%%%%%%
-| | | |=====================================\
+| | | | |=====================================\
+│ │ │ ├── header/ ── Contains components related to the application header.
+| | | | |=====================================\
+│ │ │ │ ├── CartIcon.tsx ── Component for the cart icon in the header.
+│ │ │ │ ├── SearchBar.tsx ── Component for the search bar in the header.
+│ │ │ │ └── TopBar.tsx ── Component for the top bar section of the header.
+| | | | |=====================================\
+│ │ │ ├── modals/ ── Contains modal components.
+| | | | |=====================================\
+│ │ │ │ ├── CategoryFilterModal.tsx ── Modal for filtering products by category.
+│ │ │ │ └── StoreFilterModal.tsx ── Modal for filtering products by store/retailer.
+| | | | |=====================================\
+│ │ │ ├── not_used/ ── Contains components that are currently not in use.
+| | | | |=====================================\
+│ │ │ │ ├── DeliveryOptions.tsx ── Component related to delivery options (not used).
+│ │ │ │ └── SponsoredAd.tsx ── Component for sponsored ads (not used).
+| | | | |=====================================\
 │ │ │ ├── pdf-upload/ ── Contains the PdfUpload component and its related files.
+| | | | |=====================================\
 │ │ │ │ ├── index.ts ── Barrel file exporting the PdfUpload component.
 │ │ │ │ └── PdfUpload.tsx ── React component for handling PDF uploads.
-| | | |=====================================\
+| | | | |=====================================\
 │ │ │ ├── sidebar/ ── Contains components related to the application sidebar.
+| | | | |=====================================\
 │ │ │ │ ├── FontSelector.tsx ── Component for selecting application font.
 │ │ │ │ ├── SideBar.tsx ── Main sidebar component controlling themes, fonts, etc.
 │ │ │ │ └── ThemeSelector.tsx ── Component for selecting application theme.
-│ │ │ ├── BottomNav.tsx ── Component for bottom navigation (potentially placeholder).
-│ │ │ ├── Header.tsx ── Main application header component.
+| | | | |=====================================\
+│ │ │ ├── Header.tsx ── Main application header component (Consider moving to `header/` or clarifying role).
 │ │ │ └── MainContent.tsx ── Component rendering the main application content area.
 | | |=====================================\
 │ │ ├── hooks/ ── Contains custom React hooks for state management and logic.
+│ │ │ ├── useAppTab.ts ── Hook for managing application tab state.
+│ │ │ ├── useRetailers.ts ── Hook managing retailer data fetching and state.
 │ │ │ ├── useSearch.ts ── Hook managing search state and API calls.
-│ │ │ ├── useTheme.ts ── Hook managing application theme and font state.
-│ │ │ └── useRetailers.ts ── Hook managing retailer data fetching and state.
+│ │ │ └── useTheme.ts ── Hook managing application theme and font state.
 | | |=====================================\
 │ │ ├── services/ Contains modules related to external services like API communication.
 │ │ │ └── api.ts ── Configures Axios client for API requests to backend service.
 | | |=====================================\
 │ │ ├── styles/ ── Contains CSS files and style-related TypeScript modules.
-│ │ │ ├── app.css ── General application styles.
-│ │ │ ├── index.css ── Global styles and resets.
-│ │ │ ├── loadingSpinner.css ── Styles for the LoadingSpinner component.
+│ │ │ ├── App.css ── General application styles.
+│ │ │ ├── DefaultBrowseView.css ── Styles for DefaultBrowseView.
 │ │ │ ├── fonts.ts ── Definitions for available application fonts.
+│ │ │ ├── index.css ── Global styles and resets.
+│ │ │ ├── LoadingSpinner.css ── Styles for the LoadingSpinner component.
+│ │ │ ├── ProductCard.css ── Styles for ProductCard component.
+│ │ │ ├── ResultsView.css ── Styles for ResultsView component.
+│ │ │ ├── SideBar.css ── Styles for SideBar component.
 │ │ │ └── themes.ts ── Definitions for available application themes.
 | | |=====================================\
 │ │ ├── types/ ── Contains TypeScript type definitions.
 │ │ │ ├── product.ts ── Type definitions for Product data.
 │ │ │ └── retailer.ts ── Type definitions for Retailer data.
 | | |=====================================\
+│ │ ├── utils/ ── Contains utility functions.
+│ │ │ └── localStorageUtils.ts ── Utility functions for local storage.
+| | |=====================================\
 │ │ ├── views/ ── Contains components representing distinct application views/pages.
-│ │ │ ├── SearchResultsView.tsx ── View displaying search results.
-│ │ │ └── RetailerLogosView.tsx ── View displaying retailer logos.
+│ │ │ ├── BrowseResultsView.tsx ── View for displaying browse results.
+│ │ │ ├── DefaultBrowseView.tsx ── Default view for browsing.
+│ │ │ ├── DefaultSearchView.tsx ── Default view for searching.
+│ │ │ └── SearchResultsView.tsx ── View displaying search results.
 | | |=====================================\
 │ │ ├── App.tsx ── Root React component. Manages layout, routing logic, and global state context.
-│ │ ├── Main.tsx ── Main entry point for React application. Renders root component into the DOM.
+│ │ ├── main.tsx ── Main entry point for React application. Renders root component into the DOM.
 │ │ └── vite-env.d.ts ── TypeScript declaration file for Vite environment variables.
 |---------------------------------------------------------------------------------------------
 │ ├── cypress/ Contains end-to-end tests written using Cypress framework.
 │ │ ├── e2e/ Directory holds end-to-end test specification files.
-│ │ │ └── counter.cy.ts ── Example end-to-end test file.
 │ │ ├── fixtures/ Contains static data used by Cypress tests.
-│ │ │ └── example.json ── Example fixture data file.
 │ │ └── support/ Contains reusable Cypress commands, test setup utilities.
-│ │ ├── commands.ts ── Defines custom, reusable Cypress commands for tests.
-│ │ └── e2e.ts ── Configuration file for Cypress end-to-end test setup.
 |---------------------------------------------------------------------------------------------
 │ ├── .env.example ── Template file showing required environment variables for the frontend.
 │ ├── README.md ── Provides information about the frontend setup and development.
@@ -117,5 +148,6 @@ grocery-budget-assistant/
 │ ├── tsconfig.app.json ── TypeScript configuration specific to app code within src/.
 │ ├── tsconfig.node.json ── TypeScript configuration for Node.js parts like Vite config.
 │ ├── tsconfig.cypress.json ── TypeScript configuration specific to Cypress test files.
-│ ├── cypress.config.js ── Main configuration file for Cypress testing framework.
+│ ├── cypress.config.js ── Main configuration file for Cypress testing framework. (Consider renaming to .ts)
+│ ├── cypress.config.ts.bak ── Backup of Cypress configuration.
 │ └── eslint.config.js ── Configuration for ESLint, code linting and style enforcement.

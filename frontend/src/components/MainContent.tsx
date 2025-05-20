@@ -3,9 +3,11 @@ import SearchResultsView from "../views/SearchResultsView";
 import DefaultSearchView from "../views/DefaultSearchView";
 import DefaultBrowseView from "../views/DefaultBrowseView";
 import BrowseResultsView from "../views/BrowseResultsView";
+import SortPillsBar from "./common/SortPillsBar";
 import { Product } from "../types/product";
 import { Retailer } from "../types/retailer";
 import { AppTab } from "../hooks/useAppTab";
+import { SortStateAndActions } from "../types/sort";
 import StoreFilterModal from "./modals/StoreFilterModal";
 import CategoryFilterModal from "./modals/CategoryFilterModal";
 import "../styles/DefaultBrowseView.css";
@@ -76,6 +78,9 @@ interface MainContentProps {
   onToggleCategorySelection: (categoryName: string) => void; // For DefaultBrowseView
   onStoreModalConfirm: (newSelectedIds: Set<number>) => void; // For StoreFilterModal
   onCategoryModalConfirm: (newSelectedNames: Set<string>) => void; // For CategoryFilterModal
+
+  // Sort Props
+  sortProps: SortStateAndActions;
 }
 
 const MainContent: React.FC<MainContentProps> = ({
@@ -104,6 +109,7 @@ const MainContent: React.FC<MainContentProps> = ({
   onToggleCategorySelection,
   onStoreModalConfirm,
   onCategoryModalConfirm,
+  sortProps,
 }) => {
   const [isStoreModalOpen, setIsStoreModalOpen] = useState(false);
   const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
@@ -140,8 +146,8 @@ const MainContent: React.FC<MainContentProps> = ({
     selectedStoreIds.size > 0 ? `Stores (${selectedStoreIds.size})` : "+ Store";
   const categoryButtonText =
     selectedCategories.size > 0
-      ? `Categories (${selectedCategories.size})`
-      : "+ Category";
+      ? `Categ. (${selectedCategories.size})`
+      : "+ Categ.";
 
   const showHeaderBackArrow = isBrowseResultsActive;
   const showHeaderForwardArrow = !isBrowseResultsActive && canShowItems;
@@ -164,7 +170,7 @@ const MainContent: React.FC<MainContentProps> = ({
             onClick={onToggleBrowseView}
             className="browse-nav-arrow back-arrow"
           >
-            {"<"}
+            {"<<"}
           </button>
         )}
         <span className={isBrowseResultsActive ? "filters-title-indented" : ""}>
@@ -191,7 +197,7 @@ const MainContent: React.FC<MainContentProps> = ({
             onClick={handleShowItemsClick}
             className="browse-nav-arrow forward-arrow"
           >
-            {">"}
+            {">>"}
           </button>
         )}
       </div>
@@ -204,6 +210,7 @@ const MainContent: React.FC<MainContentProps> = ({
         return (
           <>
             {renderBrowseFilterHeader()}
+            {isBrowseResultsActive && <SortPillsBar {...sortProps} />}
             <div style={browseContentContainerStyle}>
               {isBrowseResultsActive ? (
                 <BrowseResultsView
@@ -245,17 +252,23 @@ const MainContent: React.FC<MainContentProps> = ({
           </>
         );
       case "search":
+        const showSortPillsForSearch =
+          activeTab === "search" && searchResults.length > 0;
+
         if (searchQuery || searchResults.length > 0 || isLoadingSearch) {
           return (
-            <SearchResultsView
-              searchQuery={searchQuery}
-              items={searchResults}
-              totalResults={totalResults}
-              isLoading={isLoadingSearch}
-              error={searchError}
-              hasMore={hasMoreResults}
-              loadMore={loadMoreResults}
-            />
+            <>
+              {showSortPillsForSearch && <SortPillsBar {...sortProps} />}
+              <SearchResultsView
+                searchQuery={searchQuery}
+                items={searchResults}
+                totalResults={totalResults}
+                isLoading={isLoadingSearch}
+                error={searchError}
+                hasMore={hasMoreResults}
+                loadMore={loadMoreResults}
+              />
+            </>
           );
         } else {
           return <DefaultSearchView />;
