@@ -99,6 +99,7 @@ interface MainContentProps {
   // New props
   searchHistory: string[];
   performSearch: (query: string) => void;
+  removeFromSearchHistory?: (query: string) => void;
 }
 
 const MainContent: React.FC<MainContentProps> = ({
@@ -139,6 +140,7 @@ const MainContent: React.FC<MainContentProps> = ({
   onFavoriteListUpdate,
   searchHistory,
   performSearch,
+  removeFromSearchHistory,
 }) => {
   const handleResultsViewScroll = useCallback(
     (scrollY: number) => {
@@ -340,6 +342,7 @@ const MainContent: React.FC<MainContentProps> = ({
             <DefaultSearchView
               searchHistory={searchHistory}
               onSearch={performSearch}
+              onRemoveSearchItem={removeFromSearchHistory}
             />
           );
         }

@@ -4,11 +4,13 @@ import "../styles/DefaultSearchView.css";
 interface DefaultSearchViewProps {
   searchHistory?: string[];
   onSearch: (query: string) => void;
+  onRemoveSearchItem?: (query: string) => void;
 }
 
 const DefaultSearchView: React.FC<DefaultSearchViewProps> = ({
   searchHistory = [],
   onSearch,
+  onRemoveSearchItem,
 }) => {
   const viewStyle: React.CSSProperties = {
     display: "flex",
@@ -41,6 +43,13 @@ const DefaultSearchView: React.FC<DefaultSearchViewProps> = ({
     onSearch(term);
   };
 
+  const handleRemoveClick = (e: React.MouseEvent, term: string) => {
+    e.stopPropagation(); // Prevent triggering the search when clicking the X
+    if (onRemoveSearchItem && !defaultSuggestions.includes(term)) {
+      onRemoveSearchItem(term);
+    }
+  };
+
   return (
     <div style={viewStyle}>
       {/* <h2>Search</h2> */}
@@ -56,6 +65,14 @@ const DefaultSearchView: React.FC<DefaultSearchViewProps> = ({
               onClick={() => handleSearchClick(term)}
             >
               {term}
+              {!defaultSuggestions.includes(term) && onRemoveSearchItem && (
+                <span
+                  className="search-history-remove"
+                  onClick={(e) => handleRemoveClick(e, term)}
+                >
+                  ×
+                </span>
+              )}
             </button>
           ))}
         </div>

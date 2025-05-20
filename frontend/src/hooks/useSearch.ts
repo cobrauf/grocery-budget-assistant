@@ -74,6 +74,19 @@ export const useSearch = () => {
     });
   }, []);
 
+  // Function to remove a search item from history
+  const removeFromSearchHistory = useCallback((query: string) => {
+    setSearchHistory((prevHistory) => {
+      // Filter out the query to remove
+      const updatedHistory = prevHistory.filter((item) => item !== query);
+
+      // Save to local storage
+      saveToLocalStorage(LS_SEARCH_HISTORY, updatedHistory);
+
+      return updatedHistory;
+    });
+  }, []);
+
   const performSearch = async (query: string, page: number = 1) => {
     if (!query.trim()) return;
 
@@ -155,5 +168,6 @@ export const useSearch = () => {
     loadMoreResults,
     currentPage, // Expose current page if needed
     resetSearch, // Expose the reset function
+    removeFromSearchHistory, // Expose the remove function
   };
 };
