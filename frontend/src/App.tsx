@@ -1,4 +1,11 @@
-import { useState, useEffect, createContext, useContext, useMemo } from "react";
+import {
+  useState,
+  useEffect,
+  createContext,
+  useContext,
+  useMemo,
+  useCallback,
+} from "react";
 import "./styles/app.css";
 // import { api } from "./services/api";
 import Header from "./components/header/Header";
@@ -41,6 +48,10 @@ export const useThemeContext = () => {
 };
 
 function App() {
+  // Scroll-based navigation state
+  const [areNavBarsVisible, setAreNavBarsVisible] = useState(true);
+  const [lastScrollY, setLastScrollY] = useState(0);
+
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const { currentThemeName, setCurrentThemeName, currentFont, setCurrentFont } =
@@ -346,8 +357,35 @@ function App() {
           initialSearchQuery={searchQuery}
           isInBrowseResultsView={isBrowseResultsActive}
           onGoHome={goHome}
+          areNavBarsVisible={areNavBarsVisible}
         />
         <MainContent
+          onResultsViewScroll={useCallback(
+            (currentScrollY: number) => {
+              const scrollingDown = currentScrollY > lastScrollY;
+              const scrollThreshold = window.innerHeight / 3;
+              const delta = Math.abs(currentScrollY - lastScrollY);
+
+              // Ignore tiny scroll amounts
+              if (delta < 10) return;
+
+              // Show navbars if near top
+              if (currentScrollY <= 50) {
+                setAreNavBarsVisible(true);
+              }
+              // Hide when scrolling down past threshold
+              else if (scrollingDown && currentScrollY > scrollThreshold) {
+                setAreNavBarsVisible(false);
+              }
+              // Show when scrolling up
+              else if (!scrollingDown) {
+                setAreNavBarsVisible(true);
+              }
+
+              setLastScrollY(currentScrollY);
+            },
+            [lastScrollY]
+          )}
           activeTab={activeTab}
           searchQuery={searchQuery}
           searchResults={displayedSearchResults}
@@ -375,7 +413,11 @@ function App() {
           onCategoryModalConfirm={handleCategoryModalConfirm}
           sortProps={sortProps}
         />
-        <BottomNav activeTab={activeTab} setActiveTab={setActiveTab} />
+        <BottomNav
+          activeTab={activeTab}
+          setActiveTab={setActiveTab}
+          areNavBarsVisible={areNavBarsVisible}
+        />
         <SideBar
           isOpen={isSidebarOpen}
           onClose={toggleSidebar}

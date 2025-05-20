@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import SearchResultsView from "../views/SearchResultsView";
 import DefaultSearchView from "../views/DefaultSearchView";
 import DefaultBrowseView from "../views/DefaultBrowseView";
@@ -45,6 +45,7 @@ const PRODUCT_CATEGORIES_WITH_ICONS: { name: string; icon: string }[] = [
 ];
 
 interface MainContentProps {
+  onResultsViewScroll?: (scrollY: number) => void;
   children?: React.ReactNode;
   activeTab: AppTab;
 
@@ -110,7 +111,14 @@ const MainContent: React.FC<MainContentProps> = ({
   onStoreModalConfirm,
   onCategoryModalConfirm,
   sortProps,
+  onResultsViewScroll,
 }) => {
+  const handleResultsViewScroll = useCallback(
+    (scrollY: number) => {
+      onResultsViewScroll?.(scrollY);
+    },
+    [onResultsViewScroll]
+  );
   const [isStoreModalOpen, setIsStoreModalOpen] = useState(false);
   const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
 
@@ -217,6 +225,7 @@ const MainContent: React.FC<MainContentProps> = ({
                   items={filteredBrowseProducts}
                   isLoading={isLoadingFilteredBrowseProducts}
                   error={null}
+                  onScrollUpdate={handleResultsViewScroll}
                 />
               ) : (
                 <DefaultBrowseView
@@ -267,6 +276,7 @@ const MainContent: React.FC<MainContentProps> = ({
                 error={searchError}
                 hasMore={hasMoreResults}
                 loadMore={loadMoreResults}
+                onScrollUpdate={handleResultsViewScroll}
               />
             </>
           );

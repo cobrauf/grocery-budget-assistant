@@ -9,6 +9,7 @@ interface BrowseResultsViewProps {
   error: string | null;
   hasMore?: boolean;
   loadMore?: () => void;
+  onScrollUpdate?: (scrollY: number) => void;
 }
 
 const BrowseResultsView: React.FC<BrowseResultsViewProps> = ({
@@ -18,6 +19,7 @@ const BrowseResultsView: React.FC<BrowseResultsViewProps> = ({
   error,
   hasMore = false,
   loadMore = () => {},
+  onScrollUpdate,
 }) => {
   return (
     <ResultsView
@@ -30,6 +32,7 @@ const BrowseResultsView: React.FC<BrowseResultsViewProps> = ({
       totalResults={totalResults}
       renderInitialLoaderFullPage={true} // Browse view has specific full page initial loader
       viewType="browse"
+      onScrollUpdate={onScrollUpdate}
     />
   );
 };

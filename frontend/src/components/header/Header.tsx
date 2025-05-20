@@ -13,6 +13,7 @@ interface HeaderProps {
   activeTab: AppTab;
   isInBrowseResultsView?: boolean;
   onGoHome?: () => void;
+  areNavBarsVisible: boolean;
 }
 
 const Header: React.FC<HeaderProps> = ({
@@ -24,6 +25,7 @@ const Header: React.FC<HeaderProps> = ({
   activeTab,
   isInBrowseResultsView,
   onGoHome,
+  areNavBarsVisible,
 }) => {
   const [isSearchFocused, setIsSearchFocused] = useState(false);
   const prevIsLoadingSearchRef = useRef<boolean>(isLoadingSearch);
@@ -38,13 +40,6 @@ const Header: React.FC<HeaderProps> = ({
   }, [isLoadingSearch, isSearchFocused, setIsSearchFocused]);
 
   const headerStyle: React.CSSProperties = {
-    display: "flex",
-    flexDirection: "column",
-    width: "100%",
-    boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
-    position: "sticky", // Make header sticky
-    top: 0,
-    zIndex: 1001, // Above search history dropdown but below modals if any
     backgroundColor: "var(--theme-header-background, #0071dc)", // To avoid content showing through during blur
   };
 
@@ -64,7 +59,12 @@ const Header: React.FC<HeaderProps> = ({
 
   return (
     <>
-      <header style={headerStyle}>
+      <header
+        className={`app-header ${
+          !areNavBarsVisible ? "app-header-hidden" : ""
+        }`.trim()}
+        style={headerStyle}
+      >
         <TopBar
           onMenuClick={onMenuClick}
           isShrunk={isTopBarShrunk}

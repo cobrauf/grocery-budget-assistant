@@ -8,4 +8,8 @@ These are general rules that you should adhere to on every request:
 - As you read thru files, try to spot areas where a refactor would help make the project cleaner, then suggest them in your end of task summary.
     Note the suggestion with "=== REFACTOR SUGGESTION === : ". This way I can see & decide if I should take your suggestion to refactor.
 
+- Always refer to @ProjectFiles.md to get a view of the project structure.
+
+- Do not make any changes until you have 95% confidence that you know what to build, ask me follow up questions until you have that confidence.
+
 

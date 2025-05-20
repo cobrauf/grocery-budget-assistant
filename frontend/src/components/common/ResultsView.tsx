@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useRef, useEffect } from "react";
 import { Product } from "../../types/product";
 import ProductCard from "./ProductCard";
 import LoadingSpinner from "./LoadingSpinner";
@@ -17,6 +17,7 @@ interface ResultsViewProps {
   renderInitialLoaderFullPage?: boolean;
   searchQuery?: string; // For "no results" message in search context
   viewType: "browse" | "search"; // To differentiate messages and behavior
+  onScrollUpdate?: (scrollY: number) => void; // New prop for scroll handling
 }
 
 const infoTextStyle: React.CSSProperties = {
@@ -37,8 +38,22 @@ const ResultsView: React.FC<ResultsViewProps> = ({
   renderInitialLoaderFullPage = false,
   searchQuery,
   viewType,
+  onScrollUpdate,
 }) => {
   const scrollableDivRef = useRef<HTMLDivElement>(null);
+
+  // Add scroll event handling
+  useEffect(() => {
+    const scrollableElement = scrollableDivRef.current;
+    if (!scrollableElement || !onScrollUpdate) return;
+
+    const handleScroll = () => {
+      onScrollUpdate(scrollableElement.scrollTop);
+    };
+
+    scrollableElement.addEventListener("scroll", handleScroll);
+    return () => scrollableElement.removeEventListener("scroll", handleScroll);
+  }, [onScrollUpdate]);
 
   const resultsContainerStyle: React.CSSProperties = {
     height: "calc(100vh - 120px)", // Adjust based on header/footer height

@@ -10,6 +10,7 @@ interface SearchResultsViewProps {
   error: string | null;
   hasMore: boolean;
   loadMore: () => void;
+  onScrollUpdate?: (scrollY: number) => void;
 }
 
 const SearchResultsView: React.FC<SearchResultsViewProps> = ({
@@ -20,6 +21,7 @@ const SearchResultsView: React.FC<SearchResultsViewProps> = ({
   error,
   hasMore,
   loadMore,
+  onScrollUpdate,
 }) => {
   return (
     <ResultsView
@@ -33,6 +35,7 @@ const SearchResultsView: React.FC<SearchResultsViewProps> = ({
       renderInitialLoaderFullPage={false}
       viewType="search"
       searchQuery={searchQuery}
+      onScrollUpdate={onScrollUpdate}
     />
   );
 };

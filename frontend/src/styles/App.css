@@ -33,6 +33,25 @@
   ); /* Added default font family */
 }
 
+/* Base styles for header transitions */
+.app-header {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  position: sticky;
+  top: 0;
+  z-index: 1001;
+  background-color: var(--theme-header-background);
+  transform: translateY(0);
+  transition: transform 0.3s ease-in-out;
+  will-change: transform;
+}
+
+.app-header-hidden {
+  transform: translateY(-100%);
+}
+
 .counter-card {
   background-color: rgba(255, 255, 255, 0.9);
   border-radius: 12px;

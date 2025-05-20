@@ -11,9 +11,15 @@
     --theme-bottom-nav-background,
     #5a2a82
   ); /* Purple background from mockup */
-  /* border-top: 1px solid #cccccc; */ /* Removed default border, mockup doesn't show it */
   z-index: 1000; /* Ensure it's above other content */
   padding: 0 5px; /* Add some padding for the items */
+  transform: translateY(0);
+  transition: transform 0.3s ease-in-out, color 0.3s ease;
+  will-change: transform;
+}
+
+.bottom-nav-hidden {
+  transform: translateY(100%);
 }
 
 .bottom-nav-item {
