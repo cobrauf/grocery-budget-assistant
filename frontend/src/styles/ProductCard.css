@@ -4,7 +4,9 @@
   display: flex;
   align-items: flex-start;
   padding: 0rem 0.5rem;
-  margin-top: -0.5rem;
+  /* padding-top: 2rem; */
+  margin-top: -0.25rem;
+  margin-bottom: -0.5rem;
   border-bottom: 1px solid var(--theme-sidebar-divider, #eee);
   background-color: var(--theme-background, white);
   color: var(--theme-text, #212529);
@@ -61,7 +63,7 @@
 }
 
 .product-card-promo-details-row {
-  margin-top: 0.25rem;
+  margin-top: 0.1rem;
 }
 
 .product-card-description {
@@ -78,7 +80,7 @@
 }
 
 .product-card-heart-icon {
-  font-size: 1.5rem;
+  font-size: 1.25rem;
   cursor: pointer;
   margin-left: 0rem;
   margin-right: 0.5rem;
@@ -118,10 +120,10 @@
 
 .product-card-retailer-logo {
   position: absolute;
-  bottom: 0rem;
-  right: 0.2rem;
-  width: 40px;
-  height: 35px;
+  bottom: 0.1rem;
+  right: 0.3rem;
+  width: 30px;
+  height: 30px;
   object-fit: contain;
   background-color: transparent;
 }
