@@ -20,7 +20,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
   // Local state to track visual liked status (especially for favorites view)
   const [visuallyLiked, setVisuallyLiked] = useState(isFavorite);
   const [showAnimation, setShowAnimation] = useState(false);
-  const [animationType, setAnimationType] = useState<"+" | "-">("+");
+  const [animationType, setAnimationType] = useState<"+" | "_">("+");
 
   // Use this ref to track if the card has been unfavorited while in favorites view
   const hasBeenUnfavorited = useRef(false);
@@ -48,7 +48,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
 
   const handleFavoriteClick = () => {
     // Trigger animation
-    setAnimationType(visuallyLiked ? "-" : "+");
+    setAnimationType(visuallyLiked ? "_" : "+");
     setShowAnimation(true);
 
     // Reset animation after it completes

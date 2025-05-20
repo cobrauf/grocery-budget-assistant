@@ -17,17 +17,17 @@ const BottomNav: React.FC<BottomNavProps> = ({
   favoriteItems,
 }) => {
   // Create dynamic label for favorites that includes the count
-  const favoritesLabel = `❤️ Favs${
+  const favoritesLabel = `${
     favoriteItems.length > 0
-      ? ` (${favoriteItems.length > 99 ? "99+" : favoriteItems.length})`
-      : ""
+      ? `❤️ Fav (${favoriteItems.length > 99 ? "99+" : favoriteItems.length})`
+      : "🤍 Fav"
   }`;
 
   const navItems: { label: string; tab: AppTab; icon?: string }[] = [
-    { label: "🛒 Browse", tab: "browse", icon: "" },
-    { label: "🔍 Search", tab: "search", icon: "" },
+    { label: "Browse", tab: "browse", icon: "" },
+    { label: "Search", tab: "search", icon: "" },
     { label: favoritesLabel, tab: "favorites", icon: "" },
-    { label: "✨ AI (WIP)", tab: "ai", icon: "" },
+    { label: "✨ AI", tab: "ai", icon: "" },
   ];
 
   return (
