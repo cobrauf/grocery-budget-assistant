@@ -90,10 +90,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
             {/* Using actual heart emojis for simplicity */}
           </span>
         </div>
-        <div className="product-card-meta-row">
-          <span className="product-card-retailer">
-            {product.retailer_name || product.retailer || "Unknown store"}
-          </span>
+        {product.retailer_name && (
           <img
             src={getRetailerLogoPath(product.retailer_name)}
             alt={`${product.retailer_name} logo`}
@@ -102,7 +99,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
               (e.target as HTMLImageElement).style.display = "none";
             }}
           />
-        </div>
+        )}
       </div>
     </div>
   );

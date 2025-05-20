@@ -339,11 +339,11 @@ const MainContent: React.FC<MainContentProps> = ({
 
         return (
           <>
-            <FavItemBar
+            {/* <FavItemBar
               onUpdate={onFavoriteListUpdate}
               onEmail={handleEmailFavorites}
               isUpdateEnabled={needsFavoriteListUpdate}
-            />
+            /> */}
             <div className="sort-pills-bar-container">
               <SortPillsBar {...sortProps} />
             </div>

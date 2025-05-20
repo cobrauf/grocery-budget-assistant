@@ -35,11 +35,13 @@
   ); /* Dimmed white for inactive tabs */
   font-size: 10px; /* Adjust font size as needed */
   cursor: pointer;
-  flex-grow: 1; /* Distribute space evenly */
+  flex: 1 1 0; /* Equal width distribution: flex-grow, flex-shrink, flex-basis */
+  max-width: 25%; /* With 4 items, each takes 25% */
   height: 100%;
   position: relative; /* For the underline */
   transition: color 0.3s ease;
   border-radius: 0px;
+  padding: 0 2px; /* Add minimal horizontal padding */
 }
 
 .bottom-nav-item.active {
@@ -71,5 +73,10 @@
 }
 
 .bottom-nav-label {
-  font-size: 14px; /* Adjust label font size */
+  font-size: 14px; /* Slightly reduced font size */
+  white-space: nowrap; /* Prevent text wrapping */
+  overflow: hidden; /* Hide overflow */
+  text-overflow: ellipsis; /* Add ellipsis for overflow */
+  width: 100%; /* Take full width of parent */
+  text-align: center; /* Center the text */
 }
