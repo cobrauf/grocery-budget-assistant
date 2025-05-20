@@ -45,12 +45,15 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
                   <span className="product-card-unit">/{product.unit}</span>
                 )}
               </div>
-              {product.is_frontpage && (
+              {product.is_frontpage ? (
                 <span className="product-card-frontpage-indicator">
-                  {" "}
                   Front Page
                 </span>
-              )}
+              ) : product.category ? (
+                <span className="product-card-category-label">
+                  {truncateText(product.category, 15)}
+                </span>
+              ) : null}
             </div>
 
             <div className="product-card-promo-details-row">
