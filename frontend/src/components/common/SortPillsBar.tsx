@@ -1,6 +1,6 @@
 import React from "react";
 import { SortStateAndActions, SortField } from "../../types/sort"; // Adjusted path
-import "./SortPillsBar.css";
+import "../../styles/SortPillsBar.css";
 
 // Define an array for pill configuration to avoid repetition
 const PILL_CONFIG: { label: string; field: SortField }[] = [

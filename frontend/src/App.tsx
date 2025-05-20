@@ -1,7 +1,7 @@
 import { useState, useEffect, createContext, useContext, useMemo } from "react";
 import "./styles/app.css";
 // import { api } from "./services/api";
-import Header from "./components/Header";
+import Header from "./components/header/Header";
 import MainContent from "./components/MainContent";
 import BottomNav from "./components/common/BottomNav";
 import SideBar from "./components/sidebar/SideBar";

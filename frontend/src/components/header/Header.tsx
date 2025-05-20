@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useRef } from "react";
-import TopBar from "./header/TopBar";
-import SearchBar from "./header/SearchBar";
-import SearchOverlay from "./common/SearchOverlay";
-import { AppTab } from "../hooks/useAppTab";
+import TopBar from "./TopBar";
+import SearchBar from "./SearchBar";
+import SearchOverlay from "../common/SearchOverlay"; // Adjusted from ../common to a more specific path if SearchOverlay moves too, or remains if it doesn't
+import { AppTab } from "../../hooks/useAppTab";
 
 interface HeaderProps {
   onMenuClick: () => void;

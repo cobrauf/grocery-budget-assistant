@@ -1,5 +1,5 @@
-import React from "react";
-import "./ModalBase.css";
+import React, { useEffect } from "react";
+import "../../styles/ModalBase.css";
 
 interface ModalBaseProps {
   isOpen: boolean;
