@@ -170,7 +170,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
   const searchBarStyle: React.CSSProperties = {
     display: "flex",
     flexDirection: "column", // To stack input and history
-    padding: "0.5rem 2rem",
+    padding: "0rem 2rem .5rem 2rem",
     position: "relative", // For potential history dropdown later
   };
 
@@ -187,7 +187,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
     backgroundColor: "var(--theme-search-input-background, white)",
     borderRadius: "20px",
     padding: "0 0.5rem",
-    height: "40px", // Fixed height for the input area
+    height: "35px", // Fixed height for the input area
     transition: "background-color 0.3s ease",
   };
 
