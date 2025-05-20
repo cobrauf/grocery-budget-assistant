@@ -13,6 +13,9 @@ interface BrowseResultsViewProps {
   addFavorite?: (product: Product) => void;
   removeFavorite?: (productId: string, retailerId: number) => void;
   isFavorite?: (productId: string, retailerId: number) => boolean;
+  // Sort props to trigger animations
+  sortField: string;
+  sortDirection: string;
 }
 
 const BrowseResultsView: React.FC<BrowseResultsViewProps> = ({
@@ -26,6 +29,8 @@ const BrowseResultsView: React.FC<BrowseResultsViewProps> = ({
   addFavorite,
   removeFavorite,
   isFavorite,
+  sortField,
+  sortDirection,
 }) => {
   return (
     <ResultsView
@@ -42,6 +47,8 @@ const BrowseResultsView: React.FC<BrowseResultsViewProps> = ({
       addFavorite={addFavorite}
       removeFavorite={removeFavorite}
       isFavorite={isFavorite}
+      sortField={sortField}
+      sortDirection={sortDirection}
     />
   );
 };

@@ -1,5 +1,16 @@
 /* Styles for ProductCard.tsx */
 
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 .product-card {
   display: flex;
   align-items: flex-start;
@@ -11,6 +22,7 @@
   background-color: var(--theme-background, white);
   color: var(--theme-text, #212529);
   width: 100%;
+  animation: slideUp 0.3s ease-out both;
 }
 
 .product-card-image {

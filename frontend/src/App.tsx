@@ -71,6 +71,7 @@ function App() {
     performSearch,
     loadMoreResults,
     resetSearch,
+    removeFromSearchHistory,
   } = useSearch();
 
   // Initialize sort state and actions
@@ -477,6 +478,7 @@ function App() {
           searchError={searchError}
           hasMoreResults={hasMoreResults}
           loadMoreResults={loadMoreResults}
+          removeFromSearchHistory={removeFromSearchHistory}
           // Browse Tab Props
           rawRetailers={rawRetailers}
           verifiedRetailers={verifiedRetailers}

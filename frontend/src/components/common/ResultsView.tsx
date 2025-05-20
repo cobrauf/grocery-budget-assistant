@@ -23,6 +23,9 @@ interface ResultsViewProps {
   removeFavorite?: (productId: string, retailerId: number) => void;
   isFavorite?: (productId: string, retailerId: number) => boolean;
   inFavoritesView?: boolean; // Added to track if this is the favorites view
+  // Sort info for animation triggers
+  sortField?: string;
+  sortDirection?: string;
 }
 
 const infoTextStyle: React.CSSProperties = {
@@ -33,6 +36,8 @@ const infoTextStyle: React.CSSProperties = {
 };
 
 const ResultsView: React.FC<ResultsViewProps> = ({
+  sortField = "price",
+  sortDirection = "asc",
   items,
   isLoading,
   error,
@@ -162,9 +167,9 @@ const ResultsView: React.FC<ResultsViewProps> = ({
           overflow: "visible", // Handled by parent scrollable div
         }}
       >
-        {items.map((item) => (
+        {items.map((item, index) => (
           <ProductCard
-            key={`${item.id}-${item.retailer_id}`}
+            key={`${item.id}-${item.retailer_id}-${sortField}-${sortDirection}`}
             product={item}
             addFavorite={addFavorite}
             removeFavorite={removeFavorite}
@@ -172,6 +177,7 @@ const ResultsView: React.FC<ResultsViewProps> = ({
               isFavorite ? isFavorite(item.id, item.retailer_id) : false
             }
             inFavoritesView={inFavoritesView}
+            animationDelay={index * 0.05}
           />
         ))}
       </InfiniteScroll>

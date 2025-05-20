@@ -8,6 +8,7 @@ interface ProductCardProps {
   removeFavorite?: (productId: string, retailerId: number) => void;
   isFavorite: boolean;
   inFavoritesView?: boolean; // Added to track if we're in favorites view
+  animationDelay?: number; // Delay in seconds for cascade animation
 }
 
 const ProductCard: React.FC<ProductCardProps> = ({
@@ -16,6 +17,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
   removeFavorite,
   isFavorite,
   inFavoritesView = false,
+  animationDelay = 0,
 }) => {
   // Local state to track visual liked status (especially for favorites view)
   const [visuallyLiked, setVisuallyLiked] = useState(isFavorite);
@@ -79,7 +81,10 @@ const ProductCard: React.FC<ProductCardProps> = ({
   }
 
   return (
-    <div className="product-card">
+    <div
+      className="product-card"
+      style={{ animationDelay: `${animationDelay}s` }}
+    >
       <div className="product-card-image">
         {product.emoji ? Array.from(product.emoji)[0] : "🛒"}
       </div>
