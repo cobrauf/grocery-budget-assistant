@@ -33,6 +33,7 @@ const FavItemsResultsView: React.FC<FavItemsResultsViewProps> = ({
       addFavorite={addFavorite}
       removeFavorite={removeFavorite}
       isFavorite={isFavorite}
+      inFavoritesView={true} // Indicate this is the favorites view
     />
   );
 };

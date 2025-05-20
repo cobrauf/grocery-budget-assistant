@@ -22,6 +22,7 @@ interface ResultsViewProps {
   addFavorite?: (product: Product) => void;
   removeFavorite?: (productId: string, retailerId: number) => void;
   isFavorite?: (productId: string, retailerId: number) => boolean;
+  inFavoritesView?: boolean; // Added to track if this is the favorites view
 }
 
 const infoTextStyle: React.CSSProperties = {
@@ -46,6 +47,7 @@ const ResultsView: React.FC<ResultsViewProps> = ({
   addFavorite,
   removeFavorite,
   isFavorite,
+  inFavoritesView,
 }) => {
   const scrollableDivRef = useRef<HTMLDivElement>(null);
 
@@ -169,6 +171,7 @@ const ResultsView: React.FC<ResultsViewProps> = ({
             isFavorite={
               isFavorite ? isFavorite(item.id, item.retailer_id) : false
             }
+            inFavoritesView={inFavoritesView}
           />
         ))}
       </InfiniteScroll>

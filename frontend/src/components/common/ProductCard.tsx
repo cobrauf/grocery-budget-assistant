@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useRef } from "react";
 import { Product } from "../../types/product"; // Corrected path
 import "../../styles/ProductCard.css"; // Import the CSS file
 
@@ -7,6 +7,7 @@ interface ProductCardProps {
   addFavorite?: (product: Product) => void;
   removeFavorite?: (productId: string, retailerId: number) => void;
   isFavorite: boolean;
+  inFavoritesView?: boolean; // Added to track if we're in favorites view
 }
 
 const ProductCard: React.FC<ProductCardProps> = ({
@@ -14,8 +15,22 @@ const ProductCard: React.FC<ProductCardProps> = ({
   addFavorite,
   removeFavorite,
   isFavorite,
+  inFavoritesView = false,
 }) => {
-  // console.log("Product data:", product);
+  // Local state to track visual liked status (especially for favorites view)
+  const [visuallyLiked, setVisuallyLiked] = useState(isFavorite);
+  const [showAnimation, setShowAnimation] = useState(false);
+  const [animationType, setAnimationType] = useState<"+" | "-">("+");
+
+  // Use this ref to track if the card has been unfavorited while in favorites view
+  const hasBeenUnfavorited = useRef(false);
+
+  // Update visual state when props change
+  React.useEffect(() => {
+    if (!inFavoritesView || !hasBeenUnfavorited.current) {
+      setVisuallyLiked(isFavorite);
+    }
+  }, [isFavorite, inFavoritesView]);
 
   const truncateText = (text: string, maxLength: number): string => {
     if (text.length <= maxLength) return text;
@@ -28,17 +43,40 @@ const ProductCard: React.FC<ProductCardProps> = ({
       .toLowerCase()
       .replace(/\s+/g, "")
       .replace(/&/g, "and");
-    console.log(`+++public/assets/logos/${imageName}.png`);
     return `public/assets/logos/${imageName}.png`; // Adjusted path assuming assets are served from public root
   };
 
   const handleFavoriteClick = () => {
-    if (isFavorite) {
+    // Trigger animation
+    setAnimationType(visuallyLiked ? "-" : "+");
+    setShowAnimation(true);
+
+    // Reset animation after it completes
+    setTimeout(() => {
+      setShowAnimation(false);
+    }, 800);
+
+    if (visuallyLiked) {
+      if (inFavoritesView) {
+        // In favorites view, just update visual state but keep card visible
+        setVisuallyLiked(false);
+        hasBeenUnfavorited.current = true;
+      }
+      // Still call removeFavorite to update global state
       removeFavorite && removeFavorite(product.id, product.retailer_id);
     } else {
+      setVisuallyLiked(true);
+      hasBeenUnfavorited.current = false;
       addFavorite && addFavorite(product);
     }
   };
+
+  // Don't show if it has been unfavorited in the favorites view and should be hidden
+  const shouldShowInFavoritesView = !inFavoritesView || visuallyLiked;
+
+  if (inFavoritesView && !shouldShowInFavoritesView) {
+    return null;
+  }
 
   return (
     <div className="product-card">
@@ -77,18 +115,25 @@ const ProductCard: React.FC<ProductCardProps> = ({
               </span>
             </div>
           </div>
-          <span
-            className={`product-card-heart-icon ${
-              isFavorite
-                ? "product-card-heart-icon-liked"
-                : "product-card-heart-icon-unliked"
-            }`}
-            onClick={handleFavoriteClick}
-            title={isFavorite ? "Remove from favorites" : "Add to favorites"}
-          >
-            {isFavorite ? "❤️" : "🤍"}{" "}
-            {/* Using actual heart emojis for simplicity */}
-          </span>
+          <div className="heart-animation-container">
+            {showAnimation && (
+              <span className="heart-animation">{animationType}</span>
+            )}
+            <span
+              className={`product-card-heart-icon ${
+                visuallyLiked
+                  ? "product-card-heart-icon-liked"
+                  : "product-card-heart-icon-unliked"
+              }`}
+              onClick={handleFavoriteClick}
+              title={
+                visuallyLiked ? "Remove from favorites" : "Add to favorites"
+              }
+            >
+              {visuallyLiked ? "❤️" : "🤍"}{" "}
+              {/* Using actual heart emojis for simplicity */}
+            </span>
+          </div>
         </div>
         {product.retailer_name && (
           <img

@@ -507,6 +507,7 @@ function App() {
           activeTab={activeTab}
           setActiveTab={setActiveTab}
           areNavBarsVisible={areNavBarsVisible}
+          favoriteItems={favoriteItems}
         />
         <SideBar
           isOpen={isSidebarOpen}
