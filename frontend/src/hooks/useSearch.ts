@@ -7,6 +7,7 @@ import {
   removeFromLocalStorage,
   LS_LAST_SEARCH_QUERY,
   LS_LAST_SEARCH_RESULTS,
+  LS_SEARCH_HISTORY,
 } from "../utils/localStorageUtils";
 
 export const useSearch = () => {
@@ -15,6 +16,9 @@ export const useSearch = () => {
   });
   const [searchResults, setSearchResults] = useState<Product[]>(() => {
     return loadFromLocalStorage<Product[]>(LS_LAST_SEARCH_RESULTS, []);
+  });
+  const [searchHistory, setSearchHistory] = useState<string[]>(() => {
+    return loadFromLocalStorage<string[]>(LS_SEARCH_HISTORY, []);
   });
   const [totalResults, setTotalResults] = useState<number>(() => {
     // Initialize based on cached results if they exist
@@ -48,6 +52,28 @@ export const useSearch = () => {
     removeFromLocalStorage(LS_LAST_SEARCH_RESULTS);
   }, []); // Empty dependency array as setters are stable
 
+  // Function to add search query to history
+  const addToSearchHistory = useCallback((query: string) => {
+    // Only add non-empty queries
+    if (!query.trim()) return;
+
+    setSearchHistory((prevHistory) => {
+      // Create new history with the current query at the front
+      // and remove any previous instances of the same query
+      const updatedHistory = [
+        query,
+        ...prevHistory.filter(
+          (item) => item.toLowerCase() !== query.toLowerCase()
+        ),
+      ].slice(0, 30); // Keep only the 10 most recent searches
+
+      // Save to local storage
+      saveToLocalStorage(LS_SEARCH_HISTORY, updatedHistory);
+
+      return updatedHistory;
+    });
+  }, []);
+
   const performSearch = async (query: string, page: number = 1) => {
     if (!query.trim()) return;
 
@@ -59,6 +85,9 @@ export const useSearch = () => {
       setSearchResults([]);
       setTotalResults(0);
       setSearchQuery(query); // Update query state only on new search
+
+      // Add to search history only for new searches
+      addToSearchHistory(query);
     }
     setCurrentPage(page);
 
@@ -117,6 +146,7 @@ export const useSearch = () => {
   return {
     searchQuery,
     searchResults,
+    searchHistory,
     totalResults,
     isLoadingSearch,
     searchError,

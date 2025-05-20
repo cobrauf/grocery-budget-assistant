@@ -63,6 +63,7 @@ function App() {
   const {
     searchQuery,
     searchResults,
+    searchHistory,
     totalResults,
     isLoadingSearch,
     searchError,
@@ -469,6 +470,8 @@ function App() {
           // Search Tab Props
           searchQuery={searchQuery}
           searchResults={displayedSearchResults}
+          searchHistory={searchHistory}
+          performSearch={performSearch}
           totalResults={totalResults}
           isLoadingSearch={isLoadingSearch}
           searchError={searchError}

@@ -95,6 +95,10 @@ interface MainContentProps {
   isFavorite: (productId: string, retailerId: number) => boolean;
   needsFavoriteListUpdate: boolean;
   onFavoriteListUpdate: () => void;
+
+  // New props
+  searchHistory: string[];
+  performSearch: (query: string) => void;
 }
 
 const MainContent: React.FC<MainContentProps> = ({
@@ -133,6 +137,8 @@ const MainContent: React.FC<MainContentProps> = ({
   isFavorite,
   needsFavoriteListUpdate,
   onFavoriteListUpdate,
+  searchHistory,
+  performSearch,
 }) => {
   const handleResultsViewScroll = useCallback(
     (scrollY: number) => {
@@ -330,7 +336,12 @@ const MainContent: React.FC<MainContentProps> = ({
             </>
           );
         } else {
-          return <DefaultSearchView />;
+          return (
+            <DefaultSearchView
+              searchHistory={searchHistory}
+              onSearch={performSearch}
+            />
+          );
         }
       case "favorites":
         if (favoriteItems.length === 0) {
