@@ -269,6 +269,9 @@ const MainContent: React.FC<MainContentProps> = ({
                   isLoading={isLoadingFilteredBrowseProducts}
                   error={null}
                   onScrollUpdate={handleResultsViewScroll}
+                  addFavorite={addFavorite}
+                  removeFavorite={removeFavorite}
+                  isFavorite={isFavorite}
                 />
               ) : (
                 <DefaultBrowseView
@@ -320,6 +323,9 @@ const MainContent: React.FC<MainContentProps> = ({
                 hasMore={hasMoreResults}
                 loadMore={loadMoreResults}
                 onScrollUpdate={handleResultsViewScroll}
+                addFavorite={addFavorite}
+                removeFavorite={removeFavorite}
+                isFavorite={isFavorite}
               />
             </>
           );

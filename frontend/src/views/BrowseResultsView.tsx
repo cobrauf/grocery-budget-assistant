@@ -10,6 +10,9 @@ interface BrowseResultsViewProps {
   hasMore?: boolean;
   loadMore?: () => void;
   onScrollUpdate?: (scrollY: number) => void;
+  addFavorite?: (product: Product) => void;
+  removeFavorite?: (productId: string, retailerId: number) => void;
+  isFavorite?: (productId: string, retailerId: number) => boolean;
 }
 
 const BrowseResultsView: React.FC<BrowseResultsViewProps> = ({
@@ -20,6 +23,9 @@ const BrowseResultsView: React.FC<BrowseResultsViewProps> = ({
   hasMore = false,
   loadMore = () => {},
   onScrollUpdate,
+  addFavorite,
+  removeFavorite,
+  isFavorite,
 }) => {
   return (
     <ResultsView
@@ -33,6 +39,9 @@ const BrowseResultsView: React.FC<BrowseResultsViewProps> = ({
       renderInitialLoaderFullPage={true} // Browse view has specific full page initial loader
       viewType="browse"
       onScrollUpdate={onScrollUpdate}
+      addFavorite={addFavorite}
+      removeFavorite={removeFavorite}
+      isFavorite={isFavorite}
     />
   );
 };

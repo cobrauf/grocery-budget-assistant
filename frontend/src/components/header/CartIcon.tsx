@@ -32,7 +32,7 @@ const CartIcon = () => {
 
   return (
     <div style={cartStyle}>
-      <span style={iconStyle}>❤️</span>
+      <span style={iconStyle}>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
     </div>
   );
 };

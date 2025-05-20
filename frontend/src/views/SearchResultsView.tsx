@@ -11,6 +11,9 @@ interface SearchResultsViewProps {
   hasMore: boolean;
   loadMore: () => void;
   onScrollUpdate?: (scrollY: number) => void;
+  addFavorite?: (product: Product) => void;
+  removeFavorite?: (productId: string, retailerId: number) => void;
+  isFavorite?: (productId: string, retailerId: number) => boolean;
 }
 
 const SearchResultsView: React.FC<SearchResultsViewProps> = ({
@@ -22,6 +25,9 @@ const SearchResultsView: React.FC<SearchResultsViewProps> = ({
   hasMore,
   loadMore,
   onScrollUpdate,
+  addFavorite,
+  removeFavorite,
+  isFavorite,
 }) => {
   return (
     <ResultsView
@@ -36,6 +42,9 @@ const SearchResultsView: React.FC<SearchResultsViewProps> = ({
       viewType="search"
       searchQuery={searchQuery}
       onScrollUpdate={onScrollUpdate}
+      addFavorite={addFavorite}
+      removeFavorite={removeFavorite}
+      isFavorite={isFavorite}
     />
   );
 };

@@ -446,28 +446,29 @@ function App() {
     <ThemeContext.Provider
       value={{ themeName: currentThemeName, setThemeName: setCurrentThemeName }}
     >
-      <div className={`app ${currentThemeName} ${currentFont}`}>
+      <div
+        className="app-container"
+        data-theme={currentThemeName}
+        style={{ fontFamily: currentFont.family }}
+      >
         <Header
-          onFocus={() => setAreNavBarsVisible(true)}
-          goHome={goHome}
+          onMenuClick={toggleSidebar}
           activeTab={activeTab}
-          resetSearch={resetSearch}
-          performSearch={handleNewSearch}
+          onSearch={handleNewSearch}
+          isLoadingSearch={isLoadingSearch}
+          onClearSearch={resetSearch}
+          initialSearchQuery={searchQuery}
+          isInBrowseResultsView={isBrowseResultsActive}
+          onGoHome={goHome}
+          areNavBarsVisible={areNavBarsVisible}
         />
         <MainContent
+          onResultsViewScroll={handleMainContentScroll}
           activeTab={activeTab}
           areNavBarsVisible={areNavBarsVisible}
           // Search Tab Props
           searchQuery={searchQuery}
-          searchResults={sortProducts(
-            searchResults,
-            activeSortField,
-            activeSortField === "price"
-              ? priceSortDirection
-              : activeSortField === "store"
-              ? storeSortDirection
-              : categorySortDirection
-          )}
+          searchResults={displayedSearchResults}
           totalResults={totalResults}
           isLoadingSearch={isLoadingSearch}
           searchError={searchError}
@@ -481,15 +482,7 @@ function App() {
           retailerApiError={retailerApiError}
           getLogoPath={getLogoPath}
           onFetchProductsByFilter={handleFetchProductsByFilter}
-          filteredBrowseProducts={sortProducts(
-            filteredBrowseProducts,
-            activeSortField,
-            activeSortField === "price"
-              ? priceSortDirection
-              : activeSortField === "store"
-              ? storeSortDirection
-              : categorySortDirection
-          )}
+          filteredBrowseProducts={displayedBrowseProducts}
           isLoadingFilteredBrowseProducts={isLoadingFilteredBrowseProducts}
           isBrowseResultsActive={isBrowseResultsActive}
           onToggleBrowseView={toggleBrowseView}
@@ -501,8 +494,6 @@ function App() {
           onCategoryModalConfirm={handleCategoryModalConfirm}
           // Sort Props
           sortProps={sortProps}
-          // Scroll Props
-          onResultsViewScroll={handleMainContentScroll}
           // Favorites Props
           favoriteItems={favoriteItems}
           displayedFavoriteProducts={displayedFavoriteProducts}
@@ -517,12 +508,16 @@ function App() {
           setActiveTab={setActiveTab}
           areNavBarsVisible={areNavBarsVisible}
         />
-        {isSidebarOpen && (
-          <>
-            <SideBar onClose={toggleSidebar} />
-            <FullOverlay onDismiss={toggleSidebar} />
-          </>
-        )}
+        <SideBar
+          isOpen={isSidebarOpen}
+          onClose={toggleSidebar}
+          currentThemeName={currentThemeName}
+          onSelectTheme={setCurrentThemeName}
+          currentFont={currentFont}
+          onSelectFont={setCurrentFont}
+          onGoHome={goHome}
+        />
+        <FullOverlay isOpen={isSidebarOpen} onClick={toggleSidebar} />
       </div>
     </ThemeContext.Provider>
   );
