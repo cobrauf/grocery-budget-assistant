@@ -342,6 +342,14 @@ const MainContent: React.FC<MainContentProps> = ({
                 addFavorite={addFavorite}
                 removeFavorite={removeFavorite}
                 isFavorite={isFavorite}
+                sortField={sortProps.activeSortField}
+                sortDirection={
+                  sortProps.activeSortField === "price"
+                    ? sortProps.priceSortDirection
+                    : sortProps.activeSortField === "store"
+                    ? sortProps.storeSortDirection
+                    : sortProps.categorySortDirection
+                }
               />
             </>
           );
@@ -376,6 +384,14 @@ const MainContent: React.FC<MainContentProps> = ({
               addFavorite={addFavorite}
               removeFavorite={removeFavorite}
               isFavorite={isFavorite}
+              sortField={sortProps.activeSortField}
+              sortDirection={
+                sortProps.activeSortField === "price"
+                  ? sortProps.priceSortDirection
+                  : sortProps.activeSortField === "store"
+                  ? sortProps.storeSortDirection
+                  : sortProps.categorySortDirection
+              }
             />
           </>
         );

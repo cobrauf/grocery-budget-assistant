@@ -9,6 +9,9 @@ interface FavItemsResultsViewProps {
   addFavorite: (product: Product) => void;
   removeFavorite: (productId: string, retailerId: number) => void;
   isFavorite: (productId: string, retailerId: number) => boolean;
+  // Sort props for animation triggers
+  sortField: string;
+  sortDirection: string;
 }
 
 const FavItemsResultsView: React.FC<FavItemsResultsViewProps> = ({
@@ -18,6 +21,8 @@ const FavItemsResultsView: React.FC<FavItemsResultsViewProps> = ({
   addFavorite,
   removeFavorite,
   isFavorite,
+  sortField,
+  sortDirection,
 }) => {
   return (
     <ResultsView
@@ -34,6 +39,8 @@ const FavItemsResultsView: React.FC<FavItemsResultsViewProps> = ({
       removeFavorite={removeFavorite}
       isFavorite={isFavorite}
       inFavoritesView={true} // Indicate this is the favorites view
+      sortField={sortField}
+      sortDirection={sortDirection}
     />
   );
 };

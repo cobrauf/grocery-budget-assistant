@@ -14,6 +14,9 @@ interface SearchResultsViewProps {
   addFavorite?: (product: Product) => void;
   removeFavorite?: (productId: string, retailerId: number) => void;
   isFavorite?: (productId: string, retailerId: number) => boolean;
+  // Sort props for animation triggers
+  sortField: string;
+  sortDirection: string;
 }
 
 const SearchResultsView: React.FC<SearchResultsViewProps> = ({
@@ -28,6 +31,8 @@ const SearchResultsView: React.FC<SearchResultsViewProps> = ({
   addFavorite,
   removeFavorite,
   isFavorite,
+  sortField,
+  sortDirection,
 }) => {
   return (
     <ResultsView
@@ -45,6 +50,8 @@ const SearchResultsView: React.FC<SearchResultsViewProps> = ({
       addFavorite={addFavorite}
       removeFavorite={removeFavorite}
       isFavorite={isFavorite}
+      sortField={sortField}
+      sortDirection={sortDirection}
     />
   );
 };
