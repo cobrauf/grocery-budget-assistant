@@ -26,9 +26,9 @@ interface ResultsViewProps {
 }
 
 const infoTextStyle: React.CSSProperties = {
-  width: "100%",
   textAlign: "center",
-  padding: "0rem 0", // Reduced padding for end message to look less spaced
+  justifyContent: "center",
+  padding: "0rem 2rem", // Reduced padding for end message to look less spaced
   color: "#555",
 };
 

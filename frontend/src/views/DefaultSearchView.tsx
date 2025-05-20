@@ -23,10 +23,15 @@ const DefaultSearchView: React.FC<DefaultSearchViewProps> = ({
 
   // Combine search history with default suggestions
   // Add default suggestions at the beginning, filter out duplicates
-  const defaultSuggestions = ["Avocados", "Mangos", "Chicken"];
+  const defaultSuggestions = [
+    "🥚 Eggs",
+    "🥑 Avocados",
+    "🥭 Mangos",
+    "🍗 Chicken",
+  ];
   const allSearchTerms = [
-    ...defaultSuggestions,
     ...searchHistory.filter((term) => !defaultSuggestions.includes(term)),
+    ...defaultSuggestions,
   ];
 
   // Limit to a reasonable number of buttons
