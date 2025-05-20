@@ -38,7 +38,7 @@
 }
 
 .filter-button {
-  background-color: #aeadad;
+  background-color: #7d7d7d;
   /* border: 1px solid #ccc; */
   padding: 0.4rem 1rem;
   border-radius: 50px;
@@ -176,7 +176,7 @@
 }
 
 .show-items-button:disabled {
-  background-color: #aeadad;
+  background-color: #7d7d7d;
   cursor: not-allowed;
 }
 

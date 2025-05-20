@@ -63,7 +63,7 @@ export const themes: Theme[] = [
       bottomNavTextActive: "#ffffff",
       bottomNavIndicatorActive: "#ffffff",
       // Light Theme Sort Pill Colors
-      sortPillBackground: "#aeadad", // Light grey, distinct from page bg
+      sortPillBackground: "#7d7d7d", // Light grey, distinct from page bg
       sortPillText: "#ffffff", // Darker grey text
       sortPillBackgroundActive: "#7b2cbf", // Primary color
       sortPillTextActive: "#ffffff", // White text on active
@@ -92,7 +92,7 @@ export const themes: Theme[] = [
       bottomNavTextActive: "#ffffff",
       bottomNavIndicatorActive: "#00aaff",
       // Dark Theme Sort Pill Colors
-      sortPillBackground: "#aeadad", // Dark grey
+      sortPillBackground: "#7d7d7d", // Dark grey
       sortPillText: "#ffffff", // Light text
       sortPillBackgroundActive: "#00aaff", // Primary color (blue)
       sortPillTextActive: "#ffffff", // Dark text on active
@@ -121,7 +121,7 @@ export const themes: Theme[] = [
       bottomNavTextActive: "#ffffff",
       bottomNavIndicatorActive: "#ffffff",
       // Pastel Theme Sort Pill Colors
-      sortPillBackground: "#aeadad", // Light beige, same as sidebar
+      sortPillBackground: "#7d7d7d", // Light beige, same as sidebar
       sortPillText: "#ffffff", // Dark grey text
       sortPillBackgroundActive: "#f2a2a0", // Soft pink primary
       sortPillTextActive: "#ffffff", // White text on active
@@ -153,7 +153,7 @@ export const themes: Theme[] = [
       bottomNavTextActive: "#e0e0e0",
       bottomNavIndicatorActive: "#cc0000",
       // Retro Theme Sort Pill Colors
-      sortPillBackground: "#aeadad", // Medium-light grey
+      sortPillBackground: "#7d7d7d", // Medium-light grey
       sortPillText: "#ffffff", // Dark text
       sortPillBackgroundActive: "#cc0000", // Red (primary accent)
       sortPillTextActive: "#ffffff", // White text on active
