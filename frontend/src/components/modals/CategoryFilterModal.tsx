@@ -12,6 +12,7 @@ interface CategoryFilterModalProps {
   categories: CategoryItem[];
   initialSelectedCategories: Set<string>;
   onConfirmSelections: (selectedNames: Set<string>) => void;
+  isDefaultBrowseView?: boolean; // Flag to determine button text
 }
 
 const CategoryFilterModal: React.FC<CategoryFilterModalProps> = ({
@@ -20,6 +21,7 @@ const CategoryFilterModal: React.FC<CategoryFilterModalProps> = ({
   categories,
   initialSelectedCategories,
   onConfirmSelections,
+  isDefaultBrowseView = false,
 }) => {
   const [selectedNames, setSelectedNames] = useState<Set<string>>(
     new Set(initialSelectedCategories)
@@ -74,9 +76,9 @@ const CategoryFilterModal: React.FC<CategoryFilterModalProps> = ({
       <button
         onClick={handleConfirm}
         className="modal-button-confirm"
-        disabled={selectedNames.size === 0}
+        // disabled={selectedNames.size === 0} //allowing empty selection
       >
-        View Sales
+        {isDefaultBrowseView ? "Update Filters" : "Update Items"}
       </button>
     </>
   );

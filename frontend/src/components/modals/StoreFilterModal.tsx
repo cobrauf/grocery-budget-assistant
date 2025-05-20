@@ -10,6 +10,7 @@ interface StoreFilterModalProps {
   initialSelectedStoreIds: Set<number>;
   onConfirmSelections: (selectedIds: Set<number>) => void;
   getLogoPath: (name: string) => string; // To display logos in modal
+  isDefaultBrowseView?: boolean; // Flag to determine button text
 }
 
 const StoreFilterModal: React.FC<StoreFilterModalProps> = ({
@@ -19,6 +20,7 @@ const StoreFilterModal: React.FC<StoreFilterModalProps> = ({
   initialSelectedStoreIds,
   onConfirmSelections,
   getLogoPath,
+  isDefaultBrowseView = false,
 }) => {
   const [selectedIds, setSelectedIds] = useState<Set<number>>(
     new Set(initialSelectedStoreIds)
@@ -77,9 +79,9 @@ const StoreFilterModal: React.FC<StoreFilterModalProps> = ({
       <button
         onClick={handleConfirm}
         className="modal-button-confirm"
-        disabled={selectedIds.size === 0} // Disable if no IDs are selected
+        // disabled={selectedIds.size === 0} // allowing empty selection
       >
-        View Sales
+        {isDefaultBrowseView ? "Update filters" : "View Sales"}
       </button>
     </>
   );

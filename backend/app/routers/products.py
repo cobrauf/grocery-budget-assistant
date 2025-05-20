@@ -19,7 +19,7 @@ router = APIRouter(
 async def search_products_endpoint(
     q: str = Query(..., min_length=1, description="Search term for products."),
     db: Session = Depends(get_db),
-    limit: int = Query(50, ge=1, le=200, description="Max results."),
+    limit: int = Query(200, ge=1, le=200, description="Max results."),
     offset: int = Query(0, ge=0, description="Offset for pagination.")
 ):
     """
@@ -47,7 +47,7 @@ async def get_products_by_retailer_manual_json(
     retailer_id: int,
     ad_period: str = Query("current", description="Ad period (e.g., 'current', 'upcoming')."),
     db: Session = Depends(get_db),
-    limit: int = Query(100, ge=1, le=500),
+    limit: int = Query(200, ge=1, le=500),
     offset: int = Query(0, ge=0)
 ):
     """
@@ -77,7 +77,7 @@ async def get_filtered_products_endpoint(
     store_ids: str = Query(None, description="Comma-separated list of store IDs. E.g., '1,2,3'"),
     categories: str = Query(None, description="Comma-separated list of categories. E.g., 'Dairy,Meats'"),
     db: Session = Depends(get_db),
-    limit: int = Query(100, ge=1, le=500, description="Maximum number of products to return."),
+    limit: int = Query(200, ge=1, le=500, description="Maximum number of products to return."),
     offset: int = Query(0, ge=0, description="Offset for pagination.")
 ):
     """

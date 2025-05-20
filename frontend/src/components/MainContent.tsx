@@ -312,6 +312,7 @@ const MainContent: React.FC<MainContentProps> = ({
               initialSelectedStoreIds={selectedStoreIds}
               onConfirmSelections={handleLocalStoreModalConfirm}
               getLogoPath={getLogoPath}
+              isDefaultBrowseView={!isBrowseResultsActive}
             />
             <CategoryFilterModal
               isOpen={isCategoryModalOpen}
@@ -319,6 +320,7 @@ const MainContent: React.FC<MainContentProps> = ({
               categories={PRODUCT_CATEGORIES_WITH_ICONS}
               initialSelectedCategories={selectedCategories}
               onConfirmSelections={handleLocalCategoryModalConfirm}
+              isDefaultBrowseView={!isBrowseResultsActive}
             />
           </>
         );

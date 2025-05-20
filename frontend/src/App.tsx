@@ -372,12 +372,16 @@ function App() {
 
   const handleStoreModalConfirm = (newStoreIds: Set<number>) => {
     setSelectedStoreIds(newStoreIds);
-    // executeBrowseSearch(newStoreIds, selectedCategories);
+    if (isBrowseResultsActive) {
+      executeBrowseSearch(newStoreIds, selectedCategories);
+    }
   };
 
   const handleCategoryModalConfirm = (newCategories: Set<string>) => {
     setSelectedCategories(newCategories);
-    // executeBrowseSearch(selectedStoreIds, newCategories);
+    if (isBrowseResultsActive) {
+      executeBrowseSearch(selectedStoreIds, newCategories);
+    }
   };
 
   const goHome = () => {
