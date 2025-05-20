@@ -1,14 +1,21 @@
-import React, { useState } from "react";
+import React from "react";
 import { Product } from "../../types/product"; // Corrected path
 import "../../styles/ProductCard.css"; // Import the CSS file
 
 interface ProductCardProps {
   product: Product;
+  addFavorite?: (product: Product) => void;
+  removeFavorite?: (productId: string, retailerId: number) => void;
+  isFavorite: boolean;
 }
 
-const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
+const ProductCard: React.FC<ProductCardProps> = ({
+  product,
+  addFavorite,
+  removeFavorite,
+  isFavorite,
+}) => {
   // console.log("Product data:", product);
-  const [isLiked, setIsLiked] = useState(false);
 
   const truncateText = (text: string, maxLength: number): string => {
     if (text.length <= maxLength) return text;
@@ -23,6 +30,14 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
       .replace(/&/g, "and");
     console.log(`+++public/assets/logos/${imageName}.png`);
     return `public/assets/logos/${imageName}.png`; // Adjusted path assuming assets are served from public root
+  };
+
+  const handleFavoriteClick = () => {
+    if (isFavorite) {
+      removeFavorite && removeFavorite(product.id, product.retailer_id);
+    } else {
+      addFavorite && addFavorite(product);
+    }
   };
 
   return (
@@ -64,18 +79,21 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
           </div>
           <span
             className={`product-card-heart-icon ${
-              isLiked
+              isFavorite
                 ? "product-card-heart-icon-liked"
                 : "product-card-heart-icon-unliked"
             }`}
-            onClick={() => setIsLiked(!isLiked)}
-            title={isLiked ? "Unlike" : "Like"}
+            onClick={handleFavoriteClick}
+            title={isFavorite ? "Remove from favorites" : "Add to favorites"}
           >
-            {isLiked ? "❤️" : "🤍"}{" "}
+            {isFavorite ? "❤️" : "🤍"}{" "}
             {/* Using actual heart emojis for simplicity */}
           </span>
         </div>
-        {product.retailer_name && (
+        <div className="product-card-meta-row">
+          <span className="product-card-retailer">
+            {product.retailer_name || product.retailer || "Unknown store"}
+          </span>
           <img
             src={getRetailerLogoPath(product.retailer_name)}
             alt={`${product.retailer_name} logo`}
@@ -84,7 +102,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
               (e.target as HTMLImageElement).style.display = "none";
             }}
           />
-        )}
+        </div>
       </div>
     </div>
   );

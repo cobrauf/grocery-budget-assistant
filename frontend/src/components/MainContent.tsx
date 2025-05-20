@@ -3,7 +3,10 @@ import SearchResultsView from "../views/SearchResultsView";
 import DefaultSearchView from "../views/DefaultSearchView";
 import DefaultBrowseView from "../views/DefaultBrowseView";
 import BrowseResultsView from "../views/BrowseResultsView";
+import DefaultFavItemsView from "../views/DefaultFavItemsView";
+import FavItemsResultsView from "../views/FavItemsResultsView";
 import SortPillsBar from "./common/SortPillsBar";
+import FavItemBar from "./common/FavItemBar";
 import { Product } from "../types/product";
 import { Retailer } from "../types/retailer";
 import { AppTab } from "../hooks/useAppTab";
@@ -83,6 +86,15 @@ interface MainContentProps {
 
   // Sort Props
   sortProps: SortStateAndActions;
+
+  // Favorites Props
+  favoriteItems: Product[];
+  displayedFavoriteProducts: Product[];
+  addFavorite: (product: Product) => void;
+  removeFavorite: (productId: string, retailerId: number) => void;
+  isFavorite: (productId: string, retailerId: number) => boolean;
+  needsFavoriteListUpdate: boolean;
+  onFavoriteListUpdate: () => void;
 }
 
 const MainContent: React.FC<MainContentProps> = ({
@@ -114,10 +126,19 @@ const MainContent: React.FC<MainContentProps> = ({
   onCategoryModalConfirm,
   sortProps,
   onResultsViewScroll,
+  favoriteItems,
+  displayedFavoriteProducts,
+  addFavorite,
+  removeFavorite,
+  isFavorite,
+  needsFavoriteListUpdate,
+  onFavoriteListUpdate,
 }) => {
   const handleResultsViewScroll = useCallback(
     (scrollY: number) => {
-      onResultsViewScroll?.(scrollY);
+      if (onResultsViewScroll) {
+        onResultsViewScroll(scrollY);
+      }
     },
     [onResultsViewScroll]
   );
@@ -171,6 +192,11 @@ const MainContent: React.FC<MainContentProps> = ({
   const handleLocalCategoryModalConfirm = (newSelectedNames: Set<string>) => {
     setIsCategoryModalOpen(false);
     onCategoryModalConfirm(newSelectedNames);
+  };
+
+  const handleEmailFavorites = () => {
+    // Placeholder for future email functionality
+    console.log("Email favorites button clicked");
   };
 
   const renderBrowseFilterHeader = () => {
@@ -300,6 +326,31 @@ const MainContent: React.FC<MainContentProps> = ({
         } else {
           return <DefaultSearchView />;
         }
+      case "favorites":
+        if (favoriteItems.length === 0) {
+          return <DefaultFavItemsView />;
+        }
+
+        return (
+          <>
+            <FavItemBar
+              onUpdate={onFavoriteListUpdate}
+              onEmail={handleEmailFavorites}
+              isUpdateEnabled={needsFavoriteListUpdate}
+            />
+            <div className="sort-pills-bar-container">
+              <SortPillsBar {...sortProps} />
+            </div>
+            <FavItemsResultsView
+              items={displayedFavoriteProducts}
+              isLoading={false}
+              onScrollUpdate={handleResultsViewScroll}
+              addFavorite={addFavorite}
+              removeFavorite={removeFavorite}
+              isFavorite={isFavorite}
+            />
+          </>
+        );
       case "ai":
         return (
           <div style={{ textAlign: "center", paddingTop: "20px" }}>

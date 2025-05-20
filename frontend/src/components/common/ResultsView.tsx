@@ -18,6 +18,10 @@ interface ResultsViewProps {
   searchQuery?: string; // For "no results" message in search context
   viewType: "browse" | "search"; // To differentiate messages and behavior
   onScrollUpdate?: (scrollY: number) => void; // New prop for scroll handling
+  // Props for favorites functionality
+  addFavorite?: (product: Product) => void;
+  removeFavorite?: (productId: string, retailerId: number) => void;
+  isFavorite?: (productId: string, retailerId: number) => boolean;
 }
 
 const infoTextStyle: React.CSSProperties = {
@@ -39,6 +43,9 @@ const ResultsView: React.FC<ResultsViewProps> = ({
   searchQuery,
   viewType,
   onScrollUpdate,
+  addFavorite,
+  removeFavorite,
+  isFavorite,
 }) => {
   const scrollableDivRef = useRef<HTMLDivElement>(null);
 
@@ -154,7 +161,15 @@ const ResultsView: React.FC<ResultsViewProps> = ({
         }}
       >
         {items.map((item) => (
-          <ProductCard key={`${item.id}-${item.retailer_id}`} product={item} />
+          <ProductCard
+            key={`${item.id}-${item.retailer_id}`}
+            product={item}
+            addFavorite={addFavorite}
+            removeFavorite={removeFavorite}
+            isFavorite={
+              isFavorite ? isFavorite(item.id, item.retailer_id) : false
+            }
+          />
         ))}
       </InfiniteScroll>
       {/* For cases where initial loader isn't full page, but still loading */}

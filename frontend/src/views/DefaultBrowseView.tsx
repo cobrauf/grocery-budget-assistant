@@ -129,7 +129,7 @@ const DefaultBrowseView: React.FC<DefaultBrowseViewProps> = ({
           onClick={onShowItemsRequest}
           disabled={!canShowItems}
         >
-          View Sales
+          View Sales {">>"}
         </button>
       </div>
     </div>

@@ -67,9 +67,9 @@
 
 .bottom-nav-icon {
   font-size: 22px; /* Adjust icon size */
-  margin-bottom: 2px; /* Reduced margin */
+  margin-bottom: 0px; /* Reduced margin */
 }
 
 .bottom-nav-label {
-  font-size: 15px; /* Adjust label font size */
+  font-size: 14px; /* Adjust label font size */
 }
