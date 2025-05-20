@@ -387,6 +387,7 @@ function App() {
             [lastScrollY]
           )}
           activeTab={activeTab}
+          areNavBarsVisible={areNavBarsVisible}
           searchQuery={searchQuery}
           searchResults={displayedSearchResults}
           totalResults={totalResults}

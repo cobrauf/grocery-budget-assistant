@@ -1,3 +1,17 @@
+.sort-pills-bar-container {
+  max-height: 100px;
+  opacity: 1;
+  overflow: hidden;
+  transition: max-height 0.3s ease-in-out, opacity 0.3s ease-in-out;
+  will-change: max-height, opacity;
+}
+
+.sort-pills-bar-container-hidden {
+  max-height: 0;
+  opacity: 0;
+  padding: 0;
+}
+
 .sort-pills-bar {
   display: flex;
   gap: 10px;
