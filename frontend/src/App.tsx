@@ -59,7 +59,7 @@ function App() {
   const { currentThemeName, setCurrentThemeName, currentFont, setCurrentFont } =
     useAppTheme();
 
-  const { activeTab, setActiveTab } = useAppTab();
+  const { activeTab, setActiveTab, viewMode, setViewMode } = useAppTab();
 
   const {
     searchQuery,
@@ -286,8 +286,9 @@ function App() {
   }, [isSidebarOpen]);
 
   const handleNewSearch = async (query: string) => {
-    await performSearch(query);
-    setActiveTab("search");
+    performSearch(query);
+    // Set search view mode to results when performing a search
+    setViewMode("search", "results");
   };
 
   const handleFetchProductsByFilter = async (
@@ -328,7 +329,9 @@ function App() {
   };
 
   const toggleBrowseView = () => {
-    setIsBrowseResultsActive((prev) => !prev);
+    setIsBrowseResultsActive(!isBrowseResultsActive);
+    // Update viewMode when toggling browse view
+    setViewMode("browse", isBrowseResultsActive ? "default" : "results");
   };
 
   // Handlers for Browse Tab filter selections
@@ -475,7 +478,11 @@ function App() {
           activeTab={activeTab}
           onSearch={handleNewSearch}
           isLoadingSearch={isLoadingSearch}
-          onClearSearch={resetSearch}
+          onClearSearch={() => {
+            resetSearch();
+            // Set search view mode to default when clearing search
+            setViewMode("search", "default");
+          }}
           initialSearchQuery={searchQuery}
           isInBrowseResultsView={isBrowseResultsActive}
           onGoHome={goHome}
@@ -484,6 +491,8 @@ function App() {
         <MainContent
           onResultsViewScroll={handleMainContentScroll}
           activeTab={activeTab}
+          viewMode={viewMode}
+          setViewMode={setViewMode}
           areNavBarsVisible={areNavBarsVisible}
           // Search Tab Props
           searchQuery={searchQuery}

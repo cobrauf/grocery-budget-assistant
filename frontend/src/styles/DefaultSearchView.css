@@ -18,7 +18,7 @@
   max-height: 100px;
   padding: 0.5rem;
   background-color: var(--theme-primary-light, #e6f4ff);
-  color: var(--theme-text, #333);
+  color: #333;
   border: 1px solid var(--theme-primary, #0071dc);
   border-radius: 8px;
   font-size: 1.25rem;

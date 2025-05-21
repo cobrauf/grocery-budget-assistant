@@ -78,7 +78,7 @@ const CategoryFilterModal: React.FC<CategoryFilterModalProps> = ({
         className="modal-button-confirm"
         // disabled={selectedNames.size === 0} //allowing empty selection
       >
-        {isDefaultBrowseView ? "Update Filters" : "Update Items"}
+        {isDefaultBrowseView ? "Update Filters" : "Update Results"}
       </button>
     </>
   );
