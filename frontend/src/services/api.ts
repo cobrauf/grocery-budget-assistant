@@ -27,26 +27,17 @@ export const fetchRetailers = async (): Promise<Retailer[]> => {
   return response.data;
 };
 
-export const fetchProductsByRetailer = async (
-  retailerId: number,
-  adPeriod: string = "current"
-): Promise<Product[]> => {
+export const searchProducts = async (query: string): Promise<Product[]> => {
   const response = await api.get<Product[]>(
-    `/products/retailer/${retailerId}?ad_period=${adPeriod}`
+    `/products/search?q=${encodeURIComponent(query)}`
   );
   return response.data;
 };
 
-// export const searchProducts = async (query: string): Promise<Product[]> => {
-//   const response = await api.get<Product[]>(
-//     `/products/search?q=${encodeURIComponent(query)}`
-//   );
-//   return response.data;
-// };
-
 export const fetchProductsByFilter = async (
   storeIds: string[],
-  categories: string[]
+  categories: string[],
+  adPeriod: string = "current"
 ): Promise<Product[]> => {
   const params = new URLSearchParams();
   if (storeIds.length > 0) {
@@ -57,7 +48,7 @@ export const fetchProductsByFilter = async (
   }
 
   const response = await api.get<Product[]>(
-    `/products/filter?${params.toString()}`
+    `/products/filter?${params.toString()}&ad_period=${adPeriod}`
   );
   return response.data;
 };

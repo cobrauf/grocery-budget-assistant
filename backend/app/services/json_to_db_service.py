@@ -28,6 +28,16 @@ def update_ad_periods(db: Session, retailer_id: int):
     db.commit()
     logger.info("Ad periods updated.")
 
+def validate_emoji(emoji: str) -> str:
+    """
+    Validates that the emoji is exactly 1 character.
+    If not, returns the default '❔' emoji.
+    """
+    if emoji and len(emoji) == 1:
+        return emoji
+    logger.warning(f"Invalid emoji: '{emoji}'. Using default emoji '❔' instead.")
+    return '❔'
+
 def process_single_json_file(db: Session, file_path: Path):
     logger.info(f"Processing file: {file_path.name}")
     try:
@@ -75,6 +85,9 @@ def process_single_json_file(db: Session, file_path: Path):
     # 5. Create new Products
     products_to_add = []
     for pdf_product in parsed_data.products:
+        # Validate emoji before adding to database
+        validated_emoji = validate_emoji(pdf_product.emoji)
+        
         new_product = models.Product(
             weekly_ad=new_weekly_ad,
             retailer_id=db_retailer.id,
@@ -88,7 +101,7 @@ def process_single_json_file(db: Session, file_path: Path):
             promotion_from=pdf_product.promotion_from,
             promotion_to=pdf_product.promotion_to,
             is_frontpage=pdf_product.is_frontpage,
-            emoji=pdf_product.emoji
+            emoji=validated_emoji
         )
         products_to_add.append(new_product)
     
