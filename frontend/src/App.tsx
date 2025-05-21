@@ -5,7 +5,6 @@ import {
   useContext,
   useMemo,
   useCallback,
-  useRef,
 } from "react";
 import "./styles/app.css";
 // import { api } from "./services/api";
@@ -19,11 +18,11 @@ import { useSearch } from "./hooks/useSearch"; // Import search hook
 import { useRetailers } from "./hooks/useRetailers"; // Import retailers hook
 import { useAppTab } from "./hooks/useAppTab"; // Import useAppTab
 import { useSort } from "./hooks/useSort"; // Import useSort hook
+import { useViewHistory } from "./hooks/useViewHistory"; // Import view history hook
 import { fetchProductsByFilter as apiFetchProductsByFilter } from "./services/api"; // Import the new API function
 import { Product } from "./types/product"; // Ensure Product type is imported
 import { SortField, SortDirection } from "./types/sort"; // Import sort types
 import { sortProducts } from "./utils/sortingUtils"; // Import sortProducts utility
-import { BrowserHistoryState } from "./types/viewHistory"; // Import the BrowserHistoryState type
 import {
   saveToLocalStorage,
   loadFromLocalStorage,
@@ -450,129 +449,17 @@ function App() {
     [lastScrollY]
   );
 
-  // Add initialLoadRef to track if this is the first load
-  const initialLoadRef = useRef(true);
-
-  // Function to determine the current browser history state
-  const determineCurrentBrowserState = (): BrowserHistoryState => {
-    // For search tab, check if we're in results or default view
-    const searchHasContext =
-      searchQuery.trim() !== "" || searchResults.length > 0;
-
-    // For favorites tab, check if we have any favorite items
-    const favoritesHaveItems = favoriteItems.length > 0;
-
-    // Generate a unique key for this view state
-    let appViewKey = activeTab;
-    if (activeTab === "browse") {
-      appViewKey += isBrowseResultsActive ? "_results" : "_default";
-    } else if (activeTab === "search") {
-      appViewKey += searchHasContext ? "_results" : "_default";
-    } else if (activeTab === "favorites") {
-      appViewKey += favoritesHaveItems ? "_results" : "_default";
-    }
-
-    return {
-      appViewKey,
-      activeTab,
-      isBrowseResultsActive:
-        activeTab === "browse" ? isBrowseResultsActive : undefined,
-      searchHasContext: activeTab === "search" ? searchHasContext : undefined,
-      favoritesHaveItems:
-        activeTab === "favorites" ? favoritesHaveItems : undefined,
-    };
-  };
-
-  // Function to push state to browser history
-  const pushToBrowserHistory = (newState: BrowserHistoryState) => {
-    // Get the current state from history
-    const currentState = window.history.state?.appState;
-
-    // Only push if the new state is different from the current state
-    if (!currentState || currentState.appViewKey !== newState.appViewKey) {
-      // Generate URL hash based on the view state
-      const urlHash = `#/${newState.activeTab}${
-        newState.activeTab === "browse" && newState.isBrowseResultsActive
-          ? "/results"
-          : newState.activeTab === "search" && newState.searchHasContext
-          ? "/results"
-          : newState.activeTab === "favorites" && newState.favoritesHaveItems
-          ? "/results"
-          : ""
-      }`;
-
-      window.history.pushState({ appState: newState }, "", urlHash);
-      console.log("Pushed to browser history:", newState);
-    }
-  };
-
-  // Handle popstate event (browser back/forward button)
-  const handlePopState = useCallback(
-    (event: PopStateEvent) => {
-      console.log("Popstate event:", event.state);
-
-      if (event.state && event.state.appState) {
-        const poppedState = event.state.appState as BrowserHistoryState;
-
-        // Restore the active tab
-        setActiveTab(poppedState.activeTab);
-
-        // Restore browse view state if this is a browse tab
-        if (poppedState.activeTab === "browse") {
-          setIsBrowseResultsActive(poppedState.isBrowseResultsActive ?? false);
-        }
-
-        // Handle search state restoration
-        if (
-          poppedState.activeTab === "search" &&
-          !poppedState.searchHasContext
-        ) {
-          resetSearch();
-        }
-
-        // Note: For favorites tab, MainContent already renders based on favoriteItems.length,
-        // so we don't need special handling here
-      } else {
-        // If we don't have a valid state, go to the home view
-        setActiveTab("browse");
-        setIsBrowseResultsActive(false);
-      }
-    },
-    [resetSearch, setActiveTab, setIsBrowseResultsActive]
-  );
-
-  // Effect to add popstate event listener
-  useEffect(() => {
-    window.addEventListener("popstate", handlePopState);
-
-    return () => {
-      window.removeEventListener("popstate", handlePopState);
-    };
-  }, [handlePopState]);
-
-  // Effect to update browser history when view state changes
-  useEffect(() => {
-    const currentBrowserState = determineCurrentBrowserState();
-
-    if (initialLoadRef.current) {
-      // For the initial load, replace state instead of pushing
-      window.history.replaceState(
-        { appState: currentBrowserState },
-        "",
-        `#/${activeTab}`
-      );
-      initialLoadRef.current = false;
-    } else {
-      // For subsequent state changes, push new state
-      pushToBrowserHistory(currentBrowserState);
-    }
-  }, [
+  // Initialize browser history management
+  useViewHistory({
     activeTab,
     isBrowseResultsActive,
     searchQuery,
-    searchResults.length,
-    favoriteItems.length,
-  ]);
+    searchResults,
+    favoriteItems,
+    setActiveTab,
+    setIsBrowseResultsActive,
+    resetSearch,
+  });
 
   return (
     <ThemeContext.Provider
