@@ -48,12 +48,41 @@ const ProductCard: React.FC<ProductCardProps> = ({
     return `public/assets/logos/${imageName}.png`; // Adjusted path assuming assets are served from public root
   };
 
+  const getExpirationDate = (): string | null => {
+    // First try to get product's  promotion end date if exits, if not use weekly ad's end date
+    if (product.promotion_to) {
+      try {
+        const date = new Date(product.promotion_to);
+        if (!isNaN(date.getTime())) {
+          return formatDate(date);
+        }
+      } catch (e) {
+        // Invalid date format, continue to try weekly_ad_valid_to
+      }
+    }
+
+    if (product.weekly_ad_valid_to) {
+      try {
+        const date = new Date(product.weekly_ad_valid_to);
+        if (!isNaN(date.getTime())) {
+          return formatDate(date);
+        }
+      } catch (e) {
+        // Invalid date format
+      }
+    }
+    return null;
+  };
+
+  const formatDate = (date: Date): string => {
+    const month = date.getMonth() + 1; // getMonth() is zero-based
+    const day = date.getDate();
+    return `${month}/${day}`;
+  };
+
   const handleFavoriteClick = () => {
-    // Trigger animation
     setAnimationType(visuallyLiked ? "_" : "+");
     setShowAnimation(true);
-
-    // Reset animation after it completes
     setTimeout(() => {
       setShowAnimation(false);
     }, 800);
@@ -80,6 +109,8 @@ const ProductCard: React.FC<ProductCardProps> = ({
     return null;
   }
 
+  const expirationDate = getExpirationDate();
+
   return (
     <div
       className="product-card"
@@ -103,21 +134,28 @@ const ProductCard: React.FC<ProductCardProps> = ({
                   <span className="product-card-unit">/{product.unit}</span>
                 )}
               </div>
-              {product.is_frontpage ? (
-                <span className="product-card-frontpage-indicator">
-                  Front Page
-                </span>
-              ) : product.category ? (
-                <span className="product-card-category-label">
-                  {truncateText(product.category, 15)}
-                </span>
-              ) : null}
+              <div className="product-card-meta-info">
+                {product.is_frontpage ? (
+                  <span className="product-card-frontpage-indicator">
+                    Front Page
+                  </span>
+                ) : product.category ? (
+                  <span className="product-card-category-label">
+                    {truncateText(product.category, 15)}
+                  </span>
+                ) : null}
+              </div>
             </div>
 
             <div className="product-card-promo-details-row">
               <span className="product-card-promo">
-                {truncateText(product.promotion_details || "---", 30)}
+                {truncateText(product.promotion_details || "---", 25)}
               </span>
+              {expirationDate && (
+                <span className="product-card-expiration-date">
+                  Ends: {expirationDate}
+                </span>
+              )}
             </div>
           </div>
           <div className="heart-animation-container">
@@ -136,7 +174,6 @@ const ProductCard: React.FC<ProductCardProps> = ({
               }
             >
               {visuallyLiked ? "❤️" : "🤍"}{" "}
-              {/* Using actual heart emojis for simplicity */}
             </span>
           </div>
         </div>
