@@ -288,6 +288,7 @@ const MainContent: React.FC<MainContentProps> = ({
                       ? sortProps.storeSortDirection
                       : sortProps.categorySortDirection
                   }
+                  displayLimit={200}
                 />
               ) : (
                 <DefaultBrowseView
@@ -352,6 +353,7 @@ const MainContent: React.FC<MainContentProps> = ({
                     ? sortProps.storeSortDirection
                     : sortProps.categorySortDirection
                 }
+                displayLimit={200}
               />
             </>
           );

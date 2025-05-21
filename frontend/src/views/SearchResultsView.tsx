@@ -17,6 +17,8 @@ interface SearchResultsViewProps {
   // Sort props for animation triggers
   sortField: string;
   sortDirection: string;
+  // Display limit for limit exceeded notification
+  displayLimit?: number;
 }
 
 const SearchResultsView: React.FC<SearchResultsViewProps> = ({
@@ -33,6 +35,7 @@ const SearchResultsView: React.FC<SearchResultsViewProps> = ({
   isFavorite,
   sortField,
   sortDirection,
+  displayLimit,
 }) => {
   return (
     <ResultsView
@@ -52,6 +55,7 @@ const SearchResultsView: React.FC<SearchResultsViewProps> = ({
       isFavorite={isFavorite}
       sortField={sortField}
       sortDirection={sortDirection}
+      displayLimit={displayLimit}
     />
   );
 };
