@@ -49,11 +49,19 @@ const ProductCard: React.FC<ProductCardProps> = ({
   };
 
   const getExpirationDate = (): string | null => {
-    // First try to get product's  promotion end date if exits, if not use weekly ad's end date
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // Reset time to start of today
+
+    // First try to get product's promotion end date if exists, if not use weekly ad's end date
     if (product.promotion_to) {
       try {
         const date = new Date(product.promotion_to);
         if (!isNaN(date.getTime())) {
+          // Check if date is in the past
+          date.setHours(0, 0, 0, 0); // Reset time for fair comparison
+          if (date < today) {
+            return "Expired";
+          }
           return formatDate(date);
         }
       } catch (e) {
@@ -65,6 +73,11 @@ const ProductCard: React.FC<ProductCardProps> = ({
       try {
         const date = new Date(product.weekly_ad_valid_to);
         if (!isNaN(date.getTime())) {
+          // Check if date is in the past
+          date.setHours(0, 0, 0, 0); // Reset time for fair comparison
+          if (date < today) {
+            return "Expired";
+          }
           return formatDate(date);
         }
       } catch (e) {
@@ -153,7 +166,9 @@ const ProductCard: React.FC<ProductCardProps> = ({
               </span>
               {expirationDate && (
                 <span className="product-card-expiration-date">
-                  Ends: {expirationDate}
+                  {expirationDate === "Expired"
+                    ? "Expired"
+                    : "Ends: " + expirationDate}
                 </span>
               )}
             </div>
