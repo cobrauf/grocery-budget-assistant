@@ -46,9 +46,10 @@ export const fetchProductsByFilter = async (
   if (categories.length > 0) {
     params.append("categories", categories.join(","));
   }
+  params.append("ad_period", adPeriod);
 
   const response = await api.get<Product[]>(
-    `/products/filter?${params.toString()}&ad_period=${adPeriod}`
+    `/products/filter?${params.toString()}`
   );
   return response.data;
 };

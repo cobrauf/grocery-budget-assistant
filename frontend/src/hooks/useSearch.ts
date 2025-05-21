@@ -106,12 +106,6 @@ export const useSearch = () => {
 
     try {
       const products = await searchProducts(query);
-
-      // TODO: When backend supports pagination, update logic:
-      // const total = response.headers['x-total-count']; // Example header
-      // setTotalResults(Number(total));
-      // setHasMoreResults(page * 20 < Number(total)); // Example check
-
       // Save last search query and results to local storage
       if (page === 1) {
         // Only save if it's a new search initiating query

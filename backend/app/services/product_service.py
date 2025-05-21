@@ -2,14 +2,15 @@ from sqlalchemy.orm import Session, joinedload
 from typing import List
 from fastapi import HTTPException
 
-from ..models import Product as ProductModel, WeeklyAd as WeeklyAdModel, Retailer as RetailerModel 
-from ..schemas.data_schemas import ProductWithDetails 
+from ..models import Product as ProductModel, WeeklyAd as WeeklyAdModel, Retailer as RetailerModel
+from ..schemas.data_schemas import ProductWithDetails
+
 
 async def get_products_by_retailer_and_ad_period(
-    db: Session, 
-    retailer_id: int, 
+    db: Session,
+    retailer_id: int,
     ad_period: str,
-    limit: int = 100, 
+    limit: int = 100,
     offset: int = 0
 ) -> List[ProductWithDetails]:
     query = (
@@ -18,14 +19,16 @@ async def get_products_by_retailer_and_ad_period(
         .filter(ProductModel.retailer_id == retailer_id)
         .filter(WeeklyAdModel.ad_period == ad_period)
         .options(
-            joinedload(ProductModel.retailer), # Ensure retailer data is loaded
-            joinedload(ProductModel.weekly_ad) # Ensure weekly_ad data is loaded
+            # Ensure retailer data is loaded
+            joinedload(ProductModel.retailer),
+            # Ensure weekly_ad data is loaded
+            joinedload(ProductModel.weekly_ad)
         )
         .offset(offset)
         .limit(limit)
     )
     products_orm = query.all()
-    
+
     products_with_details: List[ProductWithDetails] = []
     for p_orm in products_orm:
         details = ProductWithDetails(
@@ -42,7 +45,7 @@ async def get_products_by_retailer_and_ad_period(
             is_frontpage=p_orm.is_frontpage,
             emoji=p_orm.emoji,
             # retailer: str field from ProductBaseSchema, inherited.
-            retailer=p_orm.retailer.name if p_orm.retailer else "N/A", 
+            retailer=p_orm.retailer.name if p_orm.retailer else "N/A",
             retailer_id=p_orm.retailer_id,
             weekly_ad_id=p_orm.weekly_ad_id,
             # Fields specific to ProductWithDetails
@@ -54,10 +57,11 @@ async def get_products_by_retailer_and_ad_period(
         products_with_details.append(details)
     return products_with_details
 
+
 async def search_products(
-    db: Session, 
-    q: str, 
-    limit: int, 
+    db: Session,
+    q: str,
+    limit: int,
     offset: int
 ) -> List[ProductWithDetails]:
     '''
@@ -66,14 +70,15 @@ async def search_products(
     Returns a list of Pydantic ProductWithDetails models.
     '''
     if not q or not q.strip():
-        raise HTTPException(status_code=400, detail="Search query 'q' cannot be empty.")
+        raise HTTPException(
+            status_code=400, detail="Search query 'q' cannot be empty.")
 
     try:
         query_results_orm = (
             db.query(ProductModel)
             .join(WeeklyAdModel, ProductModel.weekly_ad_id == WeeklyAdModel.id)
             .join(RetailerModel, ProductModel.retailer_id == RetailerModel.id)
-            .filter(ProductModel.fts_vector.match(q, postgresql_regconfig='english')) 
+            .filter(ProductModel.fts_vector.match(q, postgresql_regconfig='english'))
             .options(
                 joinedload(ProductModel.retailer),
                 joinedload(ProductModel.weekly_ad)
@@ -82,7 +87,7 @@ async def search_products(
             .limit(limit)
             .all()
         )
-        
+
         products_with_details: List[ProductWithDetails] = []
         for p_orm in query_results_orm:
             details = ProductWithDetails(
@@ -109,16 +114,19 @@ async def search_products(
                 weekly_ad_ad_period=p_orm.weekly_ad.ad_period if p_orm.weekly_ad else None,
             )
             products_with_details.append(details)
-        
+
         return products_with_details
     except Exception as e:
         print(f"Error during product search service: {e}")
-        raise HTTPException(status_code=500, detail=f"Internal server error during product search: {str(e)}")
+        raise HTTPException(
+            status_code=500, detail=f"Internal server error during product search: {str(e)}")
+
 
 async def get_products_by_filter(
     db: Session,
-    store_ids: List[str] = None, # Made optional, default to None
-    categories: List[str] = None, # Made optional, default to None
+    store_ids: List[str] = None,  # Made optional, default to None
+    categories: List[str] = None,  # Made optional, default to None
+    ad_period: str = "current",  # Default to current, but can be overridden
     limit: int = 100,
     offset: int = 0
 ) -> List[ProductWithDetails]:
@@ -130,7 +138,8 @@ async def get_products_by_filter(
     query = (
         db.query(ProductModel)
         .join(WeeklyAdModel, ProductModel.weekly_ad_id == WeeklyAdModel.id)
-        .join(RetailerModel, ProductModel.retailer_id == RetailerModel.id) # Ensure Retailer is joined for retailer_name
+        # Ensure Retailer is joined for retailer_name
+        .join(RetailerModel, ProductModel.retailer_id == RetailerModel.id)
     )
 
     if store_ids:
@@ -140,15 +149,14 @@ async def get_products_by_filter(
             int_store_ids = [int(id_str) for id_str in store_ids]
             query = query.filter(ProductModel.retailer_id.in_(int_store_ids))
         except ValueError:
-            raise HTTPException(status_code=400, detail="Invalid store ID format. Store IDs must be integers.")
+            raise HTTPException(
+                status_code=400, detail="Invalid store ID format. Store IDs must be integers.")
 
     if categories:
         query = query.filter(ProductModel.category.in_(categories))
-    
-    # Always apply ad_period = 'current' for browse/filter functionality
-    # This aligns with how single retailer products are fetched. 
-    # If this needs to be dynamic, it should be passed as a parameter.
-    query = query.filter(WeeklyAdModel.ad_period == "current")
+
+    # Apply the ad_period filter
+    query = query.filter(WeeklyAdModel.ad_period == ad_period)
 
     products_orm = (
         query.options(
@@ -184,5 +192,5 @@ async def get_products_by_filter(
             weekly_ad_ad_period=p_orm.weekly_ad.ad_period if p_orm.weekly_ad else None,
         )
         products_with_details.append(details)
-    
+
     return products_with_details
