@@ -13,39 +13,8 @@ import { AppTab, ViewMode } from "../hooks/useAppTab";
 import { SortStateAndActions } from "../types/sort";
 import StoreFilterModal from "./modals/StoreFilterModal";
 import CategoryFilterModal from "./modals/CategoryFilterModal";
+import { PRODUCT_CATEGORIES_WITH_ICONS } from "../views/DefaultBrowseView";
 import "../styles/DefaultBrowseView.css";
-
-// This should ideally be in a shared constants file
-const PRODUCT_CATEGORIES_WITH_ICONS: { name: string; icon: string }[] = [
-  { name: "Fresh Produce", icon: "🥦" },
-  { name: "Fruits", icon: "🍓" },
-  { name: "Dairy", icon: "🥛" },
-  { name: "Meats", icon: "🥩" },
-  { name: "Seafood", icon: "🐟" },
-  { name: "Baked Goods", icon: "🍞" },
-  { name: "Snacks", icon: "🥨" },
-  { name: "Beverages", icon: "🥤" },
-  { name: "Frozen Foods", icon: "🧊" },
-  { name: "Dry Goods", icon: "🥫" },
-  { name: "Deli", icon: "🥪" },
-  { name: "Alcoholic Bev", icon: "🍹" },
-  { name: "Breakfast", icon: "🥞" },
-  { name: "Canned Goods", icon: "🥫" },
-  { name: "Condiments", icon: "🧂" },
-  { name: "Baking", icon: "🍰" },
-  { name: "Household Prod", icon: "🧼" },
-  { name: "Personal Care", icon: "🧴" },
-  { name: "Pet Products", icon: "🐾" },
-  { name: "Candy", icon: "🍬" },
-  { name: "Gifts", icon: "🎁" },
-  { name: "Flowers-Plants", icon: "💐" },
-  { name: "Garden", icon: "🪴" },
-  { name: "Outdoors", icon: "🏕️" },
-  { name: "Kitchen", icon: "🍳" },
-  { name: "Kids", icon: "🧸" },
-  { name: "Furniture", icon: "🛋️" },
-  { name: "Other", icon: "❓" },
-];
 
 interface MainContentProps {
   onResultsViewScroll?: (scrollY: number) => void;
@@ -337,7 +306,6 @@ const MainContent: React.FC<MainContentProps> = ({
             <CategoryFilterModal
               isOpen={isCategoryModalOpen}
               onClose={() => setIsCategoryModalOpen(false)}
-              categories={PRODUCT_CATEGORIES_WITH_ICONS}
               initialSelectedCategories={selectedCategories}
               onConfirmSelections={handleLocalCategoryModalConfirm}
               isDefaultBrowseView={viewMode.browse === "default"}

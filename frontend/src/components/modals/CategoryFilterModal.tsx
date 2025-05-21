@@ -1,24 +1,18 @@
 import React, { useState, useEffect, useRef } from "react";
 import ModalBase from "../common/ModalBase";
-
-interface CategoryItem {
-  name: string;
-  icon: string;
-}
+import { PRODUCT_CATEGORIES_WITH_ICONS } from "../../views/DefaultBrowseView";
 
 interface CategoryFilterModalProps {
   isOpen: boolean;
   onClose: () => void;
-  categories: CategoryItem[];
   initialSelectedCategories: Set<string>;
   onConfirmSelections: (selectedNames: Set<string>) => void;
-  isDefaultBrowseView?: boolean; // Flag to determine button text
+  isDefaultBrowseView?: boolean;
 }
 
 const CategoryFilterModal: React.FC<CategoryFilterModalProps> = ({
   isOpen,
   onClose,
-  categories,
   initialSelectedCategories,
   onConfirmSelections,
   isDefaultBrowseView = false,
@@ -45,17 +39,21 @@ const CategoryFilterModal: React.FC<CategoryFilterModalProps> = ({
   };
 
   const handleSelectAllToggle = () => {
-    if (selectedNames.size === categories.length) {
+    if (selectedNames.size === PRODUCT_CATEGORIES_WITH_ICONS.length) {
       setSelectedNames(new Set());
     } else {
-      setSelectedNames(new Set(categories.map((c) => c.name)));
+      setSelectedNames(
+        new Set(PRODUCT_CATEGORIES_WITH_ICONS.map((c) => c.name))
+      );
     }
   };
 
   const isAllSelected =
-    categories.length > 0 && selectedNames.size === categories.length;
+    PRODUCT_CATEGORIES_WITH_ICONS.length > 0 &&
+    selectedNames.size === PRODUCT_CATEGORIES_WITH_ICONS.length;
   const isIndeterminate =
-    selectedNames.size > 0 && selectedNames.size < categories.length;
+    selectedNames.size > 0 &&
+    selectedNames.size < PRODUCT_CATEGORIES_WITH_ICONS.length;
 
   useEffect(() => {
     if (selectAllCheckboxRef.current) {
@@ -78,7 +76,7 @@ const CategoryFilterModal: React.FC<CategoryFilterModalProps> = ({
         className="modal-button-confirm"
         // disabled={selectedNames.size === 0} //allowing empty selection
       >
-        {isDefaultBrowseView ? "Update Filters" : "Update Results"}
+        {isDefaultBrowseView ? "Update filters" : "View Sales"}
       </button>
     </>
   );
@@ -90,7 +88,7 @@ const CategoryFilterModal: React.FC<CategoryFilterModalProps> = ({
       title="Filter by Categories"
       footer={footer}
     >
-      {categories.length > 0 && (
+      {PRODUCT_CATEGORIES_WITH_ICONS.length > 0 && (
         <div className="modal-select-all-item">
           <input
             type="checkbox"
@@ -102,7 +100,7 @@ const CategoryFilterModal: React.FC<CategoryFilterModalProps> = ({
           <label htmlFor="select-all-categories">Select All</label>
         </div>
       )}
-      {categories.map((category) => (
+      {PRODUCT_CATEGORIES_WITH_ICONS.map((category) => (
         <div key={category.name} className="modal-filter-item">
           <input
             type="checkbox"
@@ -114,7 +112,9 @@ const CategoryFilterModal: React.FC<CategoryFilterModalProps> = ({
           <label htmlFor={`category-${category.name}`}>{category.name}</label>
         </div>
       ))}
-      {categories.length === 0 && <p>No categories available to filter.</p>}
+      {PRODUCT_CATEGORIES_WITH_ICONS.length === 0 && (
+        <p>No categories available to filter.</p>
+      )}
     </ModalBase>
   );
 };

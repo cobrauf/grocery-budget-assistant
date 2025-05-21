@@ -2,21 +2,8 @@ import React from "react";
 import { Retailer } from "../types/retailer";
 import "../styles/DefaultBrowseView.css";
 
-interface DefaultBrowseViewProps {
-  rawRetailers: Retailer[];
-  verifiedRetailers: Retailer[];
-  isLoadingApiRetailers: boolean;
-  isLoadingLogoVerification: boolean;
-  retailerApiError: string | null;
-  getLogoPath: (name: string) => string;
-  onShowItemsRequest: () => void;
-  selectedStoreIds: Set<number>;
-  selectedCategories: Set<string>;
-  onToggleStoreSelection: (id: number) => void;
-  onToggleCategorySelection: (categoryName: string) => void;
-}
-
-const PRODUCT_CATEGORIES_WITH_ICONS: { name: string; icon: string }[] = [
+// Export categories for use in other components
+export const PRODUCT_CATEGORIES_WITH_ICONS: { name: string; icon: string }[] = [
   { name: "Fresh Produce", icon: "🥦" },
   { name: "Fruits", icon: "🍓" },
   { name: "Dairy", icon: "🥛" },
@@ -46,6 +33,20 @@ const PRODUCT_CATEGORIES_WITH_ICONS: { name: string; icon: string }[] = [
   { name: "Furniture", icon: "🛋️" },
   { name: "Other", icon: "❓" },
 ];
+
+interface DefaultBrowseViewProps {
+  rawRetailers: Retailer[];
+  verifiedRetailers: Retailer[];
+  isLoadingApiRetailers: boolean;
+  isLoadingLogoVerification: boolean;
+  retailerApiError: string | null;
+  getLogoPath: (name: string) => string;
+  onShowItemsRequest: () => void;
+  selectedStoreIds: Set<number>;
+  selectedCategories: Set<string>;
+  onToggleStoreSelection: (id: number) => void;
+  onToggleCategorySelection: (categoryName: string) => void;
+}
 
 const DefaultBrowseView: React.FC<DefaultBrowseViewProps> = ({
   verifiedRetailers,
