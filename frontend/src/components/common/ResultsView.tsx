@@ -18,16 +18,26 @@ interface ResultsViewProps {
   searchQuery?: string; // For "no results" message in search context
   viewType: "browse" | "search"; // To differentiate messages and behavior
   onScrollUpdate?: (scrollY: number) => void; // New prop for scroll handling
+  // Props for favorites functionality
+  addFavorite?: (product: Product) => void;
+  removeFavorite?: (productId: string, retailerId: number) => void;
+  isFavorite?: (productId: string, retailerId: number) => boolean;
+  inFavoritesView?: boolean; // Added to track if this is the favorites view
+  // Sort info for animation triggers
+  sortField?: string;
+  sortDirection?: string;
 }
 
 const infoTextStyle: React.CSSProperties = {
-  width: "100%",
   textAlign: "center",
-  padding: "0rem 0", // Reduced padding for end message to look less spaced
+  justifyContent: "center",
+  padding: "0rem 2rem", // Reduced padding for end message to look less spaced
   color: "#555",
 };
 
 const ResultsView: React.FC<ResultsViewProps> = ({
+  sortField = "price",
+  sortDirection = "asc",
   items,
   isLoading,
   error,
@@ -39,6 +49,10 @@ const ResultsView: React.FC<ResultsViewProps> = ({
   searchQuery,
   viewType,
   onScrollUpdate,
+  addFavorite,
+  removeFavorite,
+  isFavorite,
+  inFavoritesView,
 }) => {
   const scrollableDivRef = useRef<HTMLDivElement>(null);
 
@@ -153,8 +167,18 @@ const ResultsView: React.FC<ResultsViewProps> = ({
           overflow: "visible", // Handled by parent scrollable div
         }}
       >
-        {items.map((item) => (
-          <ProductCard key={`${item.id}-${item.retailer_id}`} product={item} />
+        {items.map((item, index) => (
+          <ProductCard
+            key={`${item.id}-${item.retailer_id}-${sortField}-${sortDirection}`}
+            product={item}
+            addFavorite={addFavorite}
+            removeFavorite={removeFavorite}
+            isFavorite={
+              isFavorite ? isFavorite(item.id, item.retailer_id) : false
+            }
+            inFavoritesView={inFavoritesView}
+            animationDelay={index * 0.05}
+          />
         ))}
       </InfiniteScroll>
       {/* For cases where initial loader isn't full page, but still loading */}

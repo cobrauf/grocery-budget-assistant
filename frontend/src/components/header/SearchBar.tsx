@@ -105,7 +105,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
     const newHistory = [
       trimmedTerm,
       ...searchHistory.filter((t) => t !== trimmedTerm),
-    ].slice(0, 20); // Keep latest 20, unique (changed from 10 to 20)
+    ].slice(0, 30); // Keep latest 20, unique (changed from 10 to 20)
     updateHistory(newHistory);
   };
 

@@ -29,6 +29,7 @@ import {
   LS_SELECTED_CATEGORIES,
   LS_LAST_BROWSE_FILTER_KEY,
   LS_LAST_BROWSE_PRODUCTS,
+  LS_FAVORITE_ITEMS,
 } from "./utils/localStorageUtils"; // Import localStorage utilities
 
 // --- Theme Context ---
@@ -62,6 +63,7 @@ function App() {
   const {
     searchQuery,
     searchResults,
+    searchHistory,
     totalResults,
     isLoadingSearch,
     searchError,
@@ -69,6 +71,7 @@ function App() {
     performSearch,
     loadMoreResults,
     resetSearch,
+    removeFromSearchHistory,
   } = useSearch();
 
   // Initialize sort state and actions
@@ -79,6 +82,81 @@ function App() {
     storeSortDirection,
     categorySortDirection,
   } = sortProps;
+
+  // Favorites state
+  const [favoriteItems, setFavoriteItems] = useState<Product[]>(() => {
+    return loadFromLocalStorage<Product[]>(LS_FAVORITE_ITEMS, []);
+  });
+
+  // State to track if favorites list needs an update
+  const [needsFavoriteListUpdate, setNeedsFavoriteListUpdate] = useState(false);
+
+  // Save favorites to local storage whenever they change
+  useEffect(() => {
+    saveToLocalStorage(LS_FAVORITE_ITEMS, favoriteItems);
+  }, [favoriteItems]);
+
+  // Favorites functions
+  const addFavorite = useCallback((product: Product) => {
+    setFavoriteItems((prevFavorites) => {
+      // Check if product is already in favorites using a composite key
+      const isAlreadyFavorite = prevFavorites.some(
+        (p) => p.id === product.id && p.retailer_id === product.retailer_id
+      );
+
+      if (isAlreadyFavorite) {
+        return prevFavorites;
+      }
+
+      return [...prevFavorites, product];
+    });
+  }, []);
+
+  const removeFavorite = useCallback(
+    (productId: string, retailerId: number) => {
+      setFavoriteItems((prevFavorites) => {
+        const updatedFavorites = prevFavorites.filter(
+          (p) => !(p.id === productId && p.retailer_id === retailerId)
+        );
+
+        // If we're removing a favorite while on the favorites tab, set needsFavoriteListUpdate to true
+        if (activeTab === "favorites") {
+          setNeedsFavoriteListUpdate(true);
+        }
+
+        return updatedFavorites;
+      });
+    },
+    [activeTab]
+  );
+
+  const isFavorite = useCallback(
+    (productId: string, retailerId: number) => {
+      return favoriteItems.some(
+        (p) => p.id === productId && p.retailer_id === retailerId
+      );
+    },
+    [favoriteItems]
+  );
+
+  // Apply the current sort to favorites
+  const displayedFavoriteProducts = useMemo(() => {
+    return sortProducts(
+      favoriteItems,
+      activeSortField,
+      activeSortField === "price"
+        ? priceSortDirection
+        : activeSortField === "store"
+        ? storeSortDirection
+        : categorySortDirection
+    );
+  }, [
+    favoriteItems,
+    activeSortField,
+    priceSortDirection,
+    storeSortDirection,
+    categorySortDirection,
+  ]);
 
   const isSearchActive = activeTab === "search";
 
@@ -294,12 +372,16 @@ function App() {
 
   const handleStoreModalConfirm = (newStoreIds: Set<number>) => {
     setSelectedStoreIds(newStoreIds);
-    // executeBrowseSearch(newStoreIds, selectedCategories);
+    if (isBrowseResultsActive) {
+      executeBrowseSearch(newStoreIds, selectedCategories);
+    }
   };
 
   const handleCategoryModalConfirm = (newCategories: Set<string>) => {
     setSelectedCategories(newCategories);
-    // executeBrowseSearch(selectedStoreIds, newCategories);
+    if (isBrowseResultsActive) {
+      executeBrowseSearch(selectedStoreIds, newCategories);
+    }
   };
 
   const goHome = () => {
@@ -339,6 +421,33 @@ function App() {
   ]);
   // --- End derived sorted product lists ---
 
+  const handleMainContentScroll = useCallback(
+    (currentScrollY: number) => {
+      const scrollingDown = currentScrollY > lastScrollY;
+      const scrollThreshold = window.innerHeight / 3;
+      const delta = Math.abs(currentScrollY - lastScrollY);
+
+      // Ignore tiny scroll amounts
+      if (delta < 10) return;
+
+      // Show navbars if near top
+      if (currentScrollY <= 50) {
+        setAreNavBarsVisible(true);
+      }
+      // Hide when scrolling down past threshold
+      else if (scrollingDown && currentScrollY > scrollThreshold) {
+        setAreNavBarsVisible(false);
+      }
+      // Show when scrolling up
+      else if (!scrollingDown) {
+        setAreNavBarsVisible(true);
+      }
+
+      setLastScrollY(currentScrollY);
+    },
+    [lastScrollY]
+  );
+
   return (
     <ThemeContext.Provider
       value={{ themeName: currentThemeName, setThemeName: setCurrentThemeName }}
@@ -360,41 +469,21 @@ function App() {
           areNavBarsVisible={areNavBarsVisible}
         />
         <MainContent
-          onResultsViewScroll={useCallback(
-            (currentScrollY: number) => {
-              const scrollingDown = currentScrollY > lastScrollY;
-              const scrollThreshold = window.innerHeight / 3;
-              const delta = Math.abs(currentScrollY - lastScrollY);
-
-              // Ignore tiny scroll amounts
-              if (delta < 10) return;
-
-              // Show navbars if near top
-              if (currentScrollY <= 50) {
-                setAreNavBarsVisible(true);
-              }
-              // Hide when scrolling down past threshold
-              else if (scrollingDown && currentScrollY > scrollThreshold) {
-                setAreNavBarsVisible(false);
-              }
-              // Show when scrolling up
-              else if (!scrollingDown) {
-                setAreNavBarsVisible(true);
-              }
-
-              setLastScrollY(currentScrollY);
-            },
-            [lastScrollY]
-          )}
+          onResultsViewScroll={handleMainContentScroll}
           activeTab={activeTab}
           areNavBarsVisible={areNavBarsVisible}
+          // Search Tab Props
           searchQuery={searchQuery}
           searchResults={displayedSearchResults}
+          searchHistory={searchHistory}
+          performSearch={performSearch}
           totalResults={totalResults}
           isLoadingSearch={isLoadingSearch}
           searchError={searchError}
           hasMoreResults={hasMoreResults}
           loadMoreResults={loadMoreResults}
+          removeFromSearchHistory={removeFromSearchHistory}
+          // Browse Tab Props
           rawRetailers={rawRetailers}
           verifiedRetailers={verifiedRetailers}
           isLoadingApiRetailers={isLoadingApiRetailers}
@@ -412,12 +501,22 @@ function App() {
           onToggleCategorySelection={toggleCategorySelection}
           onStoreModalConfirm={handleStoreModalConfirm}
           onCategoryModalConfirm={handleCategoryModalConfirm}
+          // Sort Props
           sortProps={sortProps}
+          // Favorites Props
+          favoriteItems={favoriteItems}
+          displayedFavoriteProducts={displayedFavoriteProducts}
+          addFavorite={addFavorite}
+          removeFavorite={removeFavorite}
+          isFavorite={isFavorite}
+          needsFavoriteListUpdate={needsFavoriteListUpdate}
+          onFavoriteListUpdate={() => setNeedsFavoriteListUpdate(false)}
         />
         <BottomNav
           activeTab={activeTab}
           setActiveTab={setActiveTab}
           areNavBarsVisible={areNavBarsVisible}
+          favoriteItems={favoriteItems}
         />
         <SideBar
           isOpen={isSidebarOpen}

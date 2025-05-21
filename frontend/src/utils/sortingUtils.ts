@@ -32,6 +32,8 @@ export const sortProducts = (
     const bRetailerName = b.retailer_name?.toLowerCase() || "";
     const aCategory = a.category?.toLowerCase() || "";
     const bCategory = b.category?.toLowerCase() || "";
+    const aIsfrontpage = a.is_frontpage ? 1 : 0;
+    const bIsfrontpage = b.is_frontpage ? 1 : 0;
 
     switch (field) {
       case "price":
@@ -42,8 +44,14 @@ export const sortProducts = (
         if (aRetailerName > bRetailerName) comparison = 1;
         break;
       case "category":
-        if (aCategory < bCategory) comparison = -1;
-        if (aCategory > bCategory) comparison = 1;
+        // First compare frontpage status
+        if (aIsfrontpage !== bIsfrontpage) {
+          comparison = bIsfrontpage - aIsfrontpage; // Higher value (1) comes first
+        } else {
+          // If both have same frontpage status, compare categories
+          if (aCategory < bCategory) comparison = -1;
+          if (aCategory > bCategory) comparison = 1;
+        }
         break;
       default:
         return 0;

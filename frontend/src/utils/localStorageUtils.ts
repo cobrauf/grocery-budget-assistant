@@ -40,6 +40,7 @@ export const LS_SEARCH_HISTORY = "appState.search.history";
 export const LS_LAST_SEARCH_QUERY = "appState.search.lastQuery";
 export const LS_LAST_SEARCH_RESULTS = "appState.search.lastResults";
 export const LS_RETAILERS_CACHE = "appState.retailers.cache";
+export const LS_FAVORITE_ITEMS = "appState.favorites.items";
 
 // Constants for Sort State
 export const LS_ACTIVE_SORT_FIELD = "appState.sort.activeSortField";

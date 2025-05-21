@@ -2,31 +2,21 @@ import React from "react";
 import { Product } from "../types/product";
 import ResultsView from "../components/common/ResultsView";
 
-interface SearchResultsViewProps {
-  searchQuery: string;
+interface FavItemsResultsViewProps {
   items: Product[];
-  totalResults: number;
   isLoading: boolean;
-  error: string | null;
-  hasMore: boolean;
-  loadMore: () => void;
   onScrollUpdate?: (scrollY: number) => void;
-  addFavorite?: (product: Product) => void;
-  removeFavorite?: (productId: string, retailerId: number) => void;
-  isFavorite?: (productId: string, retailerId: number) => boolean;
+  addFavorite: (product: Product) => void;
+  removeFavorite: (productId: string, retailerId: number) => void;
+  isFavorite: (productId: string, retailerId: number) => boolean;
   // Sort props for animation triggers
   sortField: string;
   sortDirection: string;
 }
 
-const SearchResultsView: React.FC<SearchResultsViewProps> = ({
-  searchQuery,
+const FavItemsResultsView: React.FC<FavItemsResultsViewProps> = ({
   items,
-  totalResults,
   isLoading,
-  error,
-  hasMore,
-  loadMore,
   onScrollUpdate,
   addFavorite,
   removeFavorite,
@@ -38,22 +28,21 @@ const SearchResultsView: React.FC<SearchResultsViewProps> = ({
     <ResultsView
       items={items}
       isLoading={isLoading}
-      error={error}
-      hasMore={hasMore}
-      loadMore={loadMore}
-      scrollableId="searchScrollableDiv"
-      totalResults={totalResults}
+      error={null}
+      hasMore={false}
+      loadMore={() => {}}
+      scrollableId="favoritesScrollableDiv"
       renderInitialLoaderFullPage={false}
-      viewType="search"
-      searchQuery={searchQuery}
+      viewType="browse" // Reuse browse view styling
       onScrollUpdate={onScrollUpdate}
       addFavorite={addFavorite}
       removeFavorite={removeFavorite}
       isFavorite={isFavorite}
+      inFavoritesView={true} // Indicate this is the favorites view
       sortField={sortField}
       sortDirection={sortDirection}
     />
   );
 };
 
-export default SearchResultsView;
+export default FavItemsResultsView;

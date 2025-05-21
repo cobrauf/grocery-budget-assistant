@@ -4,7 +4,7 @@ import { useState, useCallback, useEffect } from "react";
 //   LS_LAST_SEARCH_QUERY,
 // } from "../utils/localStorageUtils";
 
-export type AppTab = "browse" | "search" | "ai";
+export type AppTab = "browse" | "search" | "ai" | "favorites";
 
 export interface TabState {
   activeTab: AppTab;

@@ -3,7 +3,10 @@ import SearchResultsView from "../views/SearchResultsView";
 import DefaultSearchView from "../views/DefaultSearchView";
 import DefaultBrowseView from "../views/DefaultBrowseView";
 import BrowseResultsView from "../views/BrowseResultsView";
+import DefaultFavItemsView from "../views/DefaultFavItemsView";
+import FavItemsResultsView from "../views/FavItemsResultsView";
 import SortPillsBar from "./common/SortPillsBar";
+import FavItemBar from "./common/FavItemBar";
 import { Product } from "../types/product";
 import { Retailer } from "../types/retailer";
 import { AppTab } from "../hooks/useAppTab";
@@ -83,6 +86,20 @@ interface MainContentProps {
 
   // Sort Props
   sortProps: SortStateAndActions;
+
+  // Favorites Props
+  favoriteItems: Product[];
+  displayedFavoriteProducts: Product[];
+  addFavorite: (product: Product) => void;
+  removeFavorite: (productId: string, retailerId: number) => void;
+  isFavorite: (productId: string, retailerId: number) => boolean;
+  needsFavoriteListUpdate: boolean;
+  onFavoriteListUpdate: () => void;
+
+  // New props
+  searchHistory: string[];
+  performSearch: (query: string) => void;
+  removeFromSearchHistory?: (query: string) => void;
 }
 
 const MainContent: React.FC<MainContentProps> = ({
@@ -114,10 +131,22 @@ const MainContent: React.FC<MainContentProps> = ({
   onCategoryModalConfirm,
   sortProps,
   onResultsViewScroll,
+  favoriteItems,
+  displayedFavoriteProducts,
+  addFavorite,
+  removeFavorite,
+  isFavorite,
+  needsFavoriteListUpdate,
+  onFavoriteListUpdate,
+  searchHistory,
+  performSearch,
+  removeFromSearchHistory,
 }) => {
   const handleResultsViewScroll = useCallback(
     (scrollY: number) => {
-      onResultsViewScroll?.(scrollY);
+      if (onResultsViewScroll) {
+        onResultsViewScroll(scrollY);
+      }
     },
     [onResultsViewScroll]
   );
@@ -171,6 +200,11 @@ const MainContent: React.FC<MainContentProps> = ({
   const handleLocalCategoryModalConfirm = (newSelectedNames: Set<string>) => {
     setIsCategoryModalOpen(false);
     onCategoryModalConfirm(newSelectedNames);
+  };
+
+  const handleEmailFavorites = () => {
+    // Placeholder for future email functionality
+    console.log("Email favorites button clicked");
   };
 
   const renderBrowseFilterHeader = () => {
@@ -243,6 +277,17 @@ const MainContent: React.FC<MainContentProps> = ({
                   isLoading={isLoadingFilteredBrowseProducts}
                   error={null}
                   onScrollUpdate={handleResultsViewScroll}
+                  addFavorite={addFavorite}
+                  removeFavorite={removeFavorite}
+                  isFavorite={isFavorite}
+                  sortField={sortProps.activeSortField}
+                  sortDirection={
+                    sortProps.activeSortField === "price"
+                      ? sortProps.priceSortDirection
+                      : sortProps.activeSortField === "store"
+                      ? sortProps.storeSortDirection
+                      : sortProps.categorySortDirection
+                  }
                 />
               ) : (
                 <DefaultBrowseView
@@ -267,6 +312,7 @@ const MainContent: React.FC<MainContentProps> = ({
               initialSelectedStoreIds={selectedStoreIds}
               onConfirmSelections={handleLocalStoreModalConfirm}
               getLogoPath={getLogoPath}
+              isDefaultBrowseView={!isBrowseResultsActive}
             />
             <CategoryFilterModal
               isOpen={isCategoryModalOpen}
@@ -274,6 +320,7 @@ const MainContent: React.FC<MainContentProps> = ({
               categories={PRODUCT_CATEGORIES_WITH_ICONS}
               initialSelectedCategories={selectedCategories}
               onConfirmSelections={handleLocalCategoryModalConfirm}
+              isDefaultBrowseView={!isBrowseResultsActive}
             />
           </>
         );
@@ -294,16 +341,67 @@ const MainContent: React.FC<MainContentProps> = ({
                 hasMore={hasMoreResults}
                 loadMore={loadMoreResults}
                 onScrollUpdate={handleResultsViewScroll}
+                addFavorite={addFavorite}
+                removeFavorite={removeFavorite}
+                isFavorite={isFavorite}
+                sortField={sortProps.activeSortField}
+                sortDirection={
+                  sortProps.activeSortField === "price"
+                    ? sortProps.priceSortDirection
+                    : sortProps.activeSortField === "store"
+                    ? sortProps.storeSortDirection
+                    : sortProps.categorySortDirection
+                }
               />
             </>
           );
         } else {
-          return <DefaultSearchView />;
+          return (
+            <DefaultSearchView
+              searchHistory={searchHistory}
+              onSearch={performSearch}
+              onRemoveSearchItem={removeFromSearchHistory}
+            />
+          );
         }
+      case "favorites":
+        if (favoriteItems.length === 0) {
+          return <DefaultFavItemsView />;
+        }
+
+        return (
+          <>
+            {/* <FavItemBar
+              onUpdate={onFavoriteListUpdate}
+              onEmail={handleEmailFavorites}
+              isUpdateEnabled={needsFavoriteListUpdate}
+            /> */}
+            <div className="sort-pills-bar-container">
+              <SortPillsBar {...sortProps} />
+            </div>
+            <FavItemsResultsView
+              items={displayedFavoriteProducts}
+              isLoading={false}
+              onScrollUpdate={handleResultsViewScroll}
+              addFavorite={addFavorite}
+              removeFavorite={removeFavorite}
+              isFavorite={isFavorite}
+              sortField={sortProps.activeSortField}
+              sortDirection={
+                sortProps.activeSortField === "price"
+                  ? sortProps.priceSortDirection
+                  : sortProps.activeSortField === "store"
+                  ? sortProps.storeSortDirection
+                  : sortProps.categorySortDirection
+              }
+            />
+          </>
+        );
       case "ai":
         return (
           <div style={{ textAlign: "center", paddingTop: "20px" }}>
-            <h2>AI Tab</h2>
+            <div className="default-fav-items-icon">✨</div>
+            <h2>AI</h2>
             <p>(Coming soon)</p>
           </div>
         );
