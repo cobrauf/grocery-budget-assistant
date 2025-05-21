@@ -180,6 +180,11 @@ function App() {
   // State to manage if the detailed browse results view is active vs. filter selection view
   const [isBrowseResultsActive, setIsBrowseResultsActive] = useState(false);
 
+  // Keep isBrowseResultsActive in sync with viewMode.browse
+  useEffect(() => {
+    setIsBrowseResultsActive(viewMode.browse === "results");
+  }, [viewMode.browse]);
+
   // Cache for browse results
   const [browseResultsCache, setBrowseResultsCache] = useState<
     Map<string, Product[]>
@@ -301,14 +306,16 @@ function App() {
       const cachedProducts = browseResultsCache.get(cacheKey)!;
       setFilteredBrowseProducts(cachedProducts);
       setIsLoadingFilteredBrowseProducts(false);
-      setIsBrowseResultsActive(true);
+      // Set view mode instead of directly setting isBrowseResultsActive
+      setViewMode("browse", "results");
       // Save to local storage as well, as this might be a cache hit from memory cache
       saveToLocalStorage(LS_LAST_BROWSE_FILTER_KEY, cacheKey);
       saveToLocalStorage(LS_LAST_BROWSE_PRODUCTS, cachedProducts);
       return;
     }
 
-    setIsBrowseResultsActive(true);
+    // Set view mode to results
+    setViewMode("browse", "results");
     setIsLoadingFilteredBrowseProducts(true);
     setFilteredBrowseProducts([]);
     try {
@@ -324,14 +331,17 @@ function App() {
       console.error("Error fetching filtered products:", error);
     } finally {
       setIsLoadingFilteredBrowseProducts(false);
-      setIsBrowseResultsActive(true); // Show results view regardless of fetch outcome (empty/error handled by view)
+      // Always ensure we stay in results view after fetch completes
+      setViewMode("browse", "results");
     }
   };
 
   const toggleBrowseView = () => {
-    setIsBrowseResultsActive(!isBrowseResultsActive);
-    // Update viewMode when toggling browse view
-    setViewMode("browse", isBrowseResultsActive ? "default" : "results");
+    // Just toggle the viewMode, and let the useEffect update isBrowseResultsActive
+    setViewMode(
+      "browse",
+      viewMode.browse === "default" ? "results" : "default"
+    );
   };
 
   // Handlers for Browse Tab filter selections
@@ -370,7 +380,7 @@ function App() {
       handleFetchProductsByFilter(storeIdsAsString, categoryNames);
     } else {
       setFilteredBrowseProducts([]);
-      setIsBrowseResultsActive(false);
+      setViewMode("browse", "default");
     }
   };
 
@@ -390,7 +400,7 @@ function App() {
 
   const goHome = () => {
     setActiveTab("browse");
-    setIsBrowseResultsActive(false);
+    setViewMode("browse", "default");
   };
 
   // --- Derived sorted product lists ---
