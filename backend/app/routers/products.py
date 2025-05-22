@@ -4,20 +4,24 @@ from typing import List
 
 # Import necessary components
 from ..database import get_db
-from ..services import product_service 
-from fastapi.responses import JSONResponse  
-from fastapi.encoders import jsonable_encoder   
-from ..schemas.data_schemas import ProductWithDetails # Ensure ProductWithDetails is available
+from ..services import product_service
+from fastapi.responses import JSONResponse
+from fastapi.encoders import jsonable_encoder
+# Ensure ProductWithDetails is available
+from ..schemas.data_schemas import ProductWithDetails
 
 
 router = APIRouter(
-    prefix="/products", # Prefix for all product routes
+    prefix="/products",  # Prefix for all product routes
     tags=["Products"]  # Tag for Swagger UI
 )
+
 
 @router.get("/search/")
 async def search_products_endpoint(
     q: str = Query(..., min_length=1, description="Search term for products."),
+    ad_period: str = Query(
+        "current", description="Ad period (e.g., 'current', 'previous')."),
     db: Session = Depends(get_db),
     limit: int = Query(200, ge=1, le=200, description="Max results."),
     offset: int = Query(0, ge=0, description="Offset for pagination.")
@@ -26,11 +30,12 @@ async def search_products_endpoint(
     Endpoint to search for products using Full-Text Search.
     Delegates the search logic to product_service.search_products.
     """
-    print(f"Searching products with query: '{q}', limit: {limit}, offset: {offset}")
+    print(
+        f"Searching products with query: '{q}', ad_period: '{ad_period}', limit: {limit}, offset: {offset}")
     try:
         # Call the service function to perform the search
         search_results = await product_service.search_products(
-            db=db, q=q, limit=limit, offset=offset
+            db=db, q=q, ad_period=ad_period, limit=limit, offset=offset
         )
         return search_results
     except HTTPException as http_exc:
@@ -39,13 +44,15 @@ async def search_products_endpoint(
     except Exception as e:
         # Catch any other unexpected errors
         print(f"Unexpected error in search_products_endpoint: {e}")
-        raise HTTPException(status_code=500, detail="Internal server error during product search.")
+        raise HTTPException(
+            status_code=500, detail="Internal server error during product search.")
 
 
-@router.get("/retailer/{retailer_id}") 
+@router.get("/retailer/{retailer_id}")
 async def get_products_by_retailer_manual_json(
     retailer_id: int,
-    ad_period: str = Query("current", description="Ad period (e.g., 'current', 'upcoming')."),
+    ad_period: str = Query(
+        "current", description="Ad period (e.g., 'current', 'upcoming')."),
     db: Session = Depends(get_db),
     limit: int = Query(200, ge=1, le=500),
     offset: int = Query(0, ge=0)
@@ -57,8 +64,8 @@ async def get_products_by_retailer_manual_json(
     try:
         # Call the service function
         products_db = await product_service.get_products_by_retailer_and_ad_period(
-            db=db, 
-            retailer_id=retailer_id, 
+            db=db,
+            retailer_id=retailer_id,
             ad_period=ad_period,
             limit=limit,
             offset=offset
@@ -69,15 +76,24 @@ async def get_products_by_retailer_manual_json(
         # Re-raise known HTTP exceptions
         raise http_exc
     except Exception as e:
-        print(f"Error fetching products for retailer {retailer_id}, ad period '{ad_period}': {e}")
-        raise HTTPException(status_code=500, detail="Error fetching products for specified retailer and ad period.") 
+        print(
+            f"Error fetching products for retailer {retailer_id}, ad period '{ad_period}': {e}")
+        raise HTTPException(
+            status_code=500, detail="Error fetching products for specified retailer and ad period.")
 
-@router.get("/filter/", response_model=List[ProductWithDetails]) # Added response_model
+
+# Added response_model
+@router.get("/filter/", response_model=List[ProductWithDetails])
 async def get_filtered_products_endpoint(
-    store_ids: str = Query(None, description="Comma-separated list of store IDs. E.g., '1,2,3'"),
-    categories: str = Query(None, description="Comma-separated list of categories. E.g., 'Dairy,Meats'"),
+    store_ids: str = Query(
+        None, description="Comma-separated list of store IDs. E.g., '1,2,3'"),
+    categories: str = Query(
+        None, description="Comma-separated list of categories. E.g., 'Dairy,Meats'"),
+    ad_period: str = Query(
+        "current", description="Ad period (e.g., 'current', 'upcoming')."),
     db: Session = Depends(get_db),
-    limit: int = Query(200, ge=1, le=500, description="Maximum number of products to return."),
+    limit: int = Query(200, ge=1, le=500,
+                       description="Maximum number of products to return."),
     offset: int = Query(0, ge=0, description="Offset for pagination.")
 ):
     """
@@ -92,6 +108,7 @@ async def get_filtered_products_endpoint(
             db=db,
             store_ids=parsed_store_ids,
             categories=parsed_categories,
+            ad_period=ad_period,
             limit=limit,
             offset=offset
         )
@@ -104,4 +121,5 @@ async def get_filtered_products_endpoint(
         raise HTTPException(status_code=400, detail=str(ve))
     except Exception as e:
         print(f"Unexpected error in get_filtered_products_endpoint: {e}")
-        raise HTTPException(status_code=500, detail="Internal server error while filtering products.") 
+        raise HTTPException(
+            status_code=500, detail="Internal server error while filtering products.")

@@ -81,7 +81,7 @@ const StoreFilterModal: React.FC<StoreFilterModalProps> = ({
         className="modal-button-confirm"
         // disabled={selectedIds.size === 0} // allowing empty selection
       >
-        {isDefaultBrowseView ? "Update filters" : "View Sales"}
+        {isDefaultBrowseView ? "Update filters" : "Update results"}
       </button>
     </>
   );

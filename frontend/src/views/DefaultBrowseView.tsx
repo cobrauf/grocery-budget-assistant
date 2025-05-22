@@ -2,6 +2,29 @@ import React from "react";
 import { Retailer } from "../types/retailer";
 import "../styles/DefaultBrowseView.css";
 
+// Export categories for use in other components
+export const PRODUCT_CATEGORIES_WITH_ICONS: { name: string; icon: string }[] = [
+  { name: "Produce", icon: "🥦" },
+  { name: "Fruits", icon: "🍓" },
+  { name: "Dairy", icon: "🥛" },
+  { name: "Meats", icon: "🥩" },
+  { name: "Seafood", icon: "🐟" },
+  { name: "Bakery", icon: "🍞" },
+  { name: "Beverages", icon: "🥤" },
+  { name: "Alcohol", icon: "🍹" },
+  { name: "Frozen", icon: "🧊" },
+  { name: "Deli", icon: "🥪" },
+  { name: "Breakfast", icon: "🥞" },
+  { name: "Snacks", icon: "🥨" },
+  { name: "Dry Goods", icon: "🏜️" },
+  { name: "Canned", icon: "🥫" },
+  { name: "Condiments", icon: "🧂" },
+  { name: "Personal Care", icon: "🧴" },
+  { name: "Kitchen", icon: "🍲" },
+  { name: "Outdoors", icon: "🏕️" },
+  { name: "Other", icon: "❓" },
+];
+
 interface DefaultBrowseViewProps {
   rawRetailers: Retailer[];
   verifiedRetailers: Retailer[];
@@ -15,37 +38,6 @@ interface DefaultBrowseViewProps {
   onToggleStoreSelection: (id: number) => void;
   onToggleCategorySelection: (categoryName: string) => void;
 }
-
-const PRODUCT_CATEGORIES_WITH_ICONS: { name: string; icon: string }[] = [
-  { name: "Fresh Produce", icon: "🥦" },
-  { name: "Fruits", icon: "🍓" },
-  { name: "Dairy", icon: "🥛" },
-  { name: "Meats", icon: "🥩" },
-  { name: "Seafood", icon: "🐟" },
-  { name: "Baked Goods", icon: "🍞" },
-  { name: "Snacks", icon: "🥨" },
-  { name: "Beverages", icon: "🥤" },
-  { name: "Frozen Foods", icon: "🧊" },
-  { name: "Dry Goods", icon: "🥫" },
-  { name: "Deli", icon: "🥪" },
-  { name: "Alcoholic Bev", icon: "🍹" },
-  { name: "Breakfast", icon: "🥞" },
-  { name: "Canned Goods", icon: "🥫" },
-  { name: "Condiments", icon: "🧂" },
-  { name: "Baking", icon: "🍰" },
-  { name: "Household Prod", icon: "🧼" },
-  { name: "Personal Care", icon: "🧴" },
-  { name: "Pet Products", icon: "🐾" },
-  { name: "Candy", icon: "🍬" },
-  { name: "Gifts", icon: "🎁" },
-  { name: "Flowers-Plants", icon: "💐" },
-  { name: "Garden", icon: "🪴" },
-  { name: "Outdoors", icon: "🏕️" },
-  { name: "Kitchen", icon: "🍳" },
-  { name: "Kids", icon: "🧸" },
-  { name: "Furniture", icon: "🛋️" },
-  { name: "Other", icon: "❓" },
-];
 
 const DefaultBrowseView: React.FC<DefaultBrowseViewProps> = ({
   verifiedRetailers,

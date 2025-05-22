@@ -9,48 +9,19 @@ import SortPillsBar from "./common/SortPillsBar";
 import FavItemBar from "./common/FavItemBar";
 import { Product } from "../types/product";
 import { Retailer } from "../types/retailer";
-import { AppTab } from "../hooks/useAppTab";
+import { AppTab, ViewMode } from "../hooks/useAppTab";
 import { SortStateAndActions } from "../types/sort";
 import StoreFilterModal from "./modals/StoreFilterModal";
 import CategoryFilterModal from "./modals/CategoryFilterModal";
+import { PRODUCT_CATEGORIES_WITH_ICONS } from "../views/DefaultBrowseView";
 import "../styles/DefaultBrowseView.css";
-
-// This should ideally be in a shared constants file
-const PRODUCT_CATEGORIES_WITH_ICONS: { name: string; icon: string }[] = [
-  { name: "Fresh Produce", icon: "🥦" },
-  { name: "Fruits", icon: "🍓" },
-  { name: "Dairy", icon: "🥛" },
-  { name: "Meats", icon: "🥩" },
-  { name: "Seafood", icon: "🐟" },
-  { name: "Baked Goods", icon: "🍞" },
-  { name: "Snacks", icon: "🥨" },
-  { name: "Beverages", icon: "🥤" },
-  { name: "Frozen Foods", icon: "🧊" },
-  { name: "Dry Goods", icon: "🥫" },
-  { name: "Deli", icon: "🥪" },
-  { name: "Alcoholic Bev", icon: "🍹" },
-  { name: "Breakfast", icon: "🥞" },
-  { name: "Canned Goods", icon: "🥫" },
-  { name: "Condiments", icon: "🧂" },
-  { name: "Baking", icon: "🍰" },
-  { name: "Household Prod", icon: "🧼" },
-  { name: "Personal Care", icon: "🧴" },
-  { name: "Pet Products", icon: "🐾" },
-  { name: "Candy", icon: "🍬" },
-  { name: "Gifts", icon: "🎁" },
-  { name: "Flowers-Plants", icon: "💐" },
-  { name: "Garden", icon: "🪴" },
-  { name: "Outdoors", icon: "🏕️" },
-  { name: "Kitchen", icon: "🍳" },
-  { name: "Kids", icon: "🧸" },
-  { name: "Furniture", icon: "🛋️" },
-  { name: "Other", icon: "❓" },
-];
 
 interface MainContentProps {
   onResultsViewScroll?: (scrollY: number) => void;
   children?: React.ReactNode;
   activeTab: AppTab;
+  viewMode: Record<"browse" | "search", ViewMode>;
+  setViewMode: (tab: "browse" | "search", mode: ViewMode) => void;
   areNavBarsVisible: boolean;
 
   // Search Tab Props
@@ -104,6 +75,8 @@ interface MainContentProps {
 
 const MainContent: React.FC<MainContentProps> = ({
   activeTab,
+  viewMode,
+  setViewMode,
   areNavBarsVisible,
   searchQuery,
   searchResults,
@@ -177,6 +150,8 @@ const MainContent: React.FC<MainContentProps> = ({
       const storeIdsAsString = Array.from(selectedStoreIds).map(String);
       const categoryNames = Array.from(selectedCategories);
       onFetchProductsByFilter(storeIdsAsString, categoryNames);
+
+      setViewMode("browse", "results");
     } else {
       console.log("Show Items clicked with no selection.");
     }
@@ -189,8 +164,8 @@ const MainContent: React.FC<MainContentProps> = ({
       ? `Categ. (${selectedCategories.size})`
       : "+ Categ.";
 
-  const showHeaderBackArrow = isBrowseResultsActive;
-  const showHeaderForwardArrow = !isBrowseResultsActive && canShowItems;
+  const showHeaderBackArrow = viewMode.browse === "results";
+  const showHeaderForwardArrow = viewMode.browse === "default" && canShowItems;
 
   const handleLocalStoreModalConfirm = (newSelectedIds: Set<number>) => {
     setIsStoreModalOpen(false);
@@ -207,18 +182,31 @@ const MainContent: React.FC<MainContentProps> = ({
     console.log("Email favorites button clicked");
   };
 
+  const handleToggleBrowseView = () => {
+    setViewMode(
+      "browse",
+      viewMode.browse === "default" ? "results" : "default"
+    );
+
+    onToggleBrowseView();
+  };
+
   const renderBrowseFilterHeader = () => {
     return (
       <div className="filters-header">
         {showHeaderBackArrow && (
           <button
-            onClick={onToggleBrowseView}
+            onClick={handleToggleBrowseView}
             className="browse-nav-arrow back-arrow"
           >
             {"<<"}
           </button>
         )}
-        <span className={isBrowseResultsActive ? "filters-title-indented" : ""}>
+        <span
+          className={
+            viewMode.browse === "results" ? "filters-title-indented" : ""
+          }
+        >
           Filters:
         </span>
         <button
@@ -261,7 +249,7 @@ const MainContent: React.FC<MainContentProps> = ({
             >
               {renderBrowseFilterHeader()}
             </div>
-            {isBrowseResultsActive && (
+            {viewMode.browse === "results" && (
               <div
                 className={`sort-pills-bar-container ${
                   !areNavBarsVisible ? "sort-pills-bar-container-hidden" : ""
@@ -271,7 +259,7 @@ const MainContent: React.FC<MainContentProps> = ({
               </div>
             )}
             <div style={browseContentContainerStyle}>
-              {isBrowseResultsActive ? (
+              {viewMode.browse === "results" ? (
                 <BrowseResultsView
                   items={filteredBrowseProducts}
                   isLoading={isLoadingFilteredBrowseProducts}
@@ -288,6 +276,7 @@ const MainContent: React.FC<MainContentProps> = ({
                       ? sortProps.storeSortDirection
                       : sortProps.categorySortDirection
                   }
+                  displayLimit={200}
                 />
               ) : (
                 <DefaultBrowseView
@@ -312,23 +301,24 @@ const MainContent: React.FC<MainContentProps> = ({
               initialSelectedStoreIds={selectedStoreIds}
               onConfirmSelections={handleLocalStoreModalConfirm}
               getLogoPath={getLogoPath}
-              isDefaultBrowseView={!isBrowseResultsActive}
+              isDefaultBrowseView={viewMode.browse === "default"}
             />
             <CategoryFilterModal
               isOpen={isCategoryModalOpen}
               onClose={() => setIsCategoryModalOpen(false)}
-              categories={PRODUCT_CATEGORIES_WITH_ICONS}
               initialSelectedCategories={selectedCategories}
               onConfirmSelections={handleLocalCategoryModalConfirm}
-              isDefaultBrowseView={!isBrowseResultsActive}
+              isDefaultBrowseView={viewMode.browse === "default"}
             />
           </>
         );
       case "search":
         const showSortPillsForSearch =
-          activeTab === "search" && searchResults.length > 0;
+          activeTab === "search" &&
+          viewMode.search === "results" &&
+          searchResults.length > 0;
 
-        if (searchQuery || searchResults.length > 0 || isLoadingSearch) {
+        if (viewMode.search === "results") {
           return (
             <>
               {showSortPillsForSearch && <SortPillsBar {...sortProps} />}
@@ -352,6 +342,7 @@ const MainContent: React.FC<MainContentProps> = ({
                     ? sortProps.storeSortDirection
                     : sortProps.categorySortDirection
                 }
+                displayLimit={200}
               />
             </>
           );
@@ -359,7 +350,10 @@ const MainContent: React.FC<MainContentProps> = ({
           return (
             <DefaultSearchView
               searchHistory={searchHistory}
-              onSearch={performSearch}
+              onSearch={(query) => {
+                performSearch(query);
+                setViewMode("search", "results");
+              }}
               onRemoveSearchItem={removeFromSearchHistory}
             />
           );

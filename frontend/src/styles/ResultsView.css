@@ -6,10 +6,9 @@
   gap: 1rem; /* Spacing between cards */
   padding: 1rem; /* Padding around the grid */
   justify-content: center; /* Center items horizontally */
-  height: calc(
-    100vh - 120px
-  ); /* Example: Adjust based on header/footer height */
-  overflow-y: auto; /* Make the container scrollable */
+  height: 100%;
+  overflow-y: auto;
+  flex-grow: 1;
 }
 
 .info-text {
@@ -43,4 +42,27 @@
 
 .loading-spinner-container-initial {
   width: 100%;
+}
+
+.limit-exceeded-notification {
+  text-align: center;
+  padding: 0.75rem 1rem;
+  margin-bottom: 1rem;
+  background-color: var(--theme-warning-bg, #fff3cd);
+  color: var(--theme-warning-text, #856404);
+  border-radius: 4px;
+  font-size: 0.8rem;
+  width: 100%;
+  animation: fade-in 0.3s ease-in-out;
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }

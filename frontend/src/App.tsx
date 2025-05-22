@@ -18,6 +18,7 @@ import { useSearch } from "./hooks/useSearch"; // Import search hook
 import { useRetailers } from "./hooks/useRetailers"; // Import retailers hook
 import { useAppTab } from "./hooks/useAppTab"; // Import useAppTab
 import { useSort } from "./hooks/useSort"; // Import useSort hook
+import { useViewHistory } from "./hooks/useViewHistory"; // Import view history hook
 import { fetchProductsByFilter as apiFetchProductsByFilter } from "./services/api"; // Import the new API function
 import { Product } from "./types/product"; // Ensure Product type is imported
 import { SortField, SortDirection } from "./types/sort"; // Import sort types
@@ -58,7 +59,7 @@ function App() {
   const { currentThemeName, setCurrentThemeName, currentFont, setCurrentFont } =
     useAppTheme();
 
-  const { activeTab, setActiveTab } = useAppTab();
+  const { activeTab, setActiveTab, viewMode, setViewMode } = useAppTab();
 
   const {
     searchQuery,
@@ -179,6 +180,11 @@ function App() {
   // State to manage if the detailed browse results view is active vs. filter selection view
   const [isBrowseResultsActive, setIsBrowseResultsActive] = useState(false);
 
+  // Keep isBrowseResultsActive in sync with viewMode.browse
+  useEffect(() => {
+    setIsBrowseResultsActive(viewMode.browse === "results");
+  }, [viewMode.browse]);
+
   // Cache for browse results
   const [browseResultsCache, setBrowseResultsCache] = useState<
     Map<string, Product[]>
@@ -285,8 +291,9 @@ function App() {
   }, [isSidebarOpen]);
 
   const handleNewSearch = async (query: string) => {
-    await performSearch(query);
-    setActiveTab("search");
+    performSearch(query);
+    // Set search view mode to results when performing a search
+    setViewMode("search", "results");
   };
 
   const handleFetchProductsByFilter = async (
@@ -299,14 +306,16 @@ function App() {
       const cachedProducts = browseResultsCache.get(cacheKey)!;
       setFilteredBrowseProducts(cachedProducts);
       setIsLoadingFilteredBrowseProducts(false);
-      setIsBrowseResultsActive(true);
+      // Set view mode instead of directly setting isBrowseResultsActive
+      setViewMode("browse", "results");
       // Save to local storage as well, as this might be a cache hit from memory cache
       saveToLocalStorage(LS_LAST_BROWSE_FILTER_KEY, cacheKey);
       saveToLocalStorage(LS_LAST_BROWSE_PRODUCTS, cachedProducts);
       return;
     }
 
-    setIsBrowseResultsActive(true);
+    // Set view mode to results
+    setViewMode("browse", "results");
     setIsLoadingFilteredBrowseProducts(true);
     setFilteredBrowseProducts([]);
     try {
@@ -322,12 +331,17 @@ function App() {
       console.error("Error fetching filtered products:", error);
     } finally {
       setIsLoadingFilteredBrowseProducts(false);
-      setIsBrowseResultsActive(true); // Show results view regardless of fetch outcome (empty/error handled by view)
+      // Always ensure we stay in results view after fetch completes
+      setViewMode("browse", "results");
     }
   };
 
   const toggleBrowseView = () => {
-    setIsBrowseResultsActive((prev) => !prev);
+    // Just toggle the viewMode, and let the useEffect update isBrowseResultsActive
+    setViewMode(
+      "browse",
+      viewMode.browse === "default" ? "results" : "default"
+    );
   };
 
   // Handlers for Browse Tab filter selections
@@ -366,7 +380,7 @@ function App() {
       handleFetchProductsByFilter(storeIdsAsString, categoryNames);
     } else {
       setFilteredBrowseProducts([]);
-      setIsBrowseResultsActive(false);
+      setViewMode("browse", "default");
     }
   };
 
@@ -386,7 +400,7 @@ function App() {
 
   const goHome = () => {
     setActiveTab("browse");
-    setIsBrowseResultsActive(false);
+    setViewMode("browse", "default");
   };
 
   // --- Derived sorted product lists ---
@@ -448,6 +462,18 @@ function App() {
     [lastScrollY]
   );
 
+  // Initialize browser history management
+  useViewHistory({
+    activeTab,
+    isBrowseResultsActive,
+    searchQuery,
+    searchResults,
+    favoriteItems,
+    setActiveTab,
+    setIsBrowseResultsActive,
+    resetSearch,
+  });
+
   return (
     <ThemeContext.Provider
       value={{ themeName: currentThemeName, setThemeName: setCurrentThemeName }}
@@ -462,7 +488,11 @@ function App() {
           activeTab={activeTab}
           onSearch={handleNewSearch}
           isLoadingSearch={isLoadingSearch}
-          onClearSearch={resetSearch}
+          onClearSearch={() => {
+            resetSearch();
+            // Set search view mode to default when clearing search
+            setViewMode("search", "default");
+          }}
           initialSearchQuery={searchQuery}
           isInBrowseResultsView={isBrowseResultsActive}
           onGoHome={goHome}
@@ -471,6 +501,8 @@ function App() {
         <MainContent
           onResultsViewScroll={handleMainContentScroll}
           activeTab={activeTab}
+          viewMode={viewMode}
+          setViewMode={setViewMode}
           areNavBarsVisible={areNavBarsVisible}
           // Search Tab Props
           searchQuery={searchQuery}

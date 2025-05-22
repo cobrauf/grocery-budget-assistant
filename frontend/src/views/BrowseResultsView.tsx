@@ -16,6 +16,8 @@ interface BrowseResultsViewProps {
   // Sort props to trigger animations
   sortField: string;
   sortDirection: string;
+  // Display limit for limit exceeded notification
+  displayLimit?: number;
 }
 
 const BrowseResultsView: React.FC<BrowseResultsViewProps> = ({
@@ -31,6 +33,7 @@ const BrowseResultsView: React.FC<BrowseResultsViewProps> = ({
   isFavorite,
   sortField,
   sortDirection,
+  displayLimit,
 }) => {
   return (
     <ResultsView
@@ -49,6 +52,7 @@ const BrowseResultsView: React.FC<BrowseResultsViewProps> = ({
       isFavorite={isFavorite}
       sortField={sortField}
       sortDirection={sortDirection}
+      displayLimit={displayLimit}
     />
   );
 };

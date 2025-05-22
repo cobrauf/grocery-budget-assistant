@@ -16,10 +16,11 @@ Extract grocery ad data from the provided PDF file ({file_display_name}).
 "category": Extract its category (choose from the provided list: {categories_list_str}).
 
 "promotion_details": Extract relevant SALES/PACKAGING info into "promotion_details" field (e.g., "8-oz. Pkg.", "Must Buy 4", "Limit 2", "Requires Coupon", etc).
-(But don't repeat the unit info in the promotion_details field, otherwise it will be redundant to the "unit" field.)
+Also Extract relevant PRODUCT info  (eg, Oats & Honey or Cinnamon Raisin, or brand names).
+But don't repeat the unit info in the promotion_details field, otherwise it will be redundant to the "unit" field.
+IMPORTANT: Have the sales/packaging info in front of the product info, since sales/packaging info is more important.
 
-"description": Extract relevant PRODUCT info into the "description" field, return null for this field if there is no relevant info. (eg, Oats & Honey or Cinnamon Raisin, or brand names)
-(But don't repeat the unit info in the description field, otherwise it will be redundant to the "unit" field.)
+"description": Leave this field empty.
 
 "is_frontpage": Identify if a product appears on the front page of the ad and set is_frontpage to true or false.
 
@@ -49,10 +50,10 @@ Respond ONLY with a valid JSON object matching the following structure:
       "name": "string", (keep it <= 20 characters)
       "price": float,
       "retailer": "string",
-      "description": "string | null", (keep to <= 40 characters)
+      "description": "string | null", (not using, keep empty/null)
       "unit": "string | null",
       "category": "string | null",
-      "promotion_details": "string | null", (keep to <= 40 characters)
+      "promotion_details": "string | null", (keep to <= 50 characters)
       "original_price": "float | null",
       "promotion_from": "YYYY-MM-DD | null",
       "promotion_to": "YYYY-MM-DD | null",
@@ -67,10 +68,10 @@ Here's an example of a product output:
   "name": "Organic Apple",
   "price": 3.99,
   "retailer": "Aldi",
-  "description": "Gala Variety",
+  "description": null,
   "unit": "Pound",
   "category": "Fruits", 
-  "promotion_details": "3-LB. Pkg., 2/$4, Limit 2",
+  "promotion_details": "3-LB. Pkg., 2/$4, Limit 2, Gala Variety",
   "original_price": 4.99,
   "promotion_from": null,
   "promotion_to": null,
@@ -94,37 +95,44 @@ Here's another example of a product output:
       "emoji": "🥤"
 }}
 
+One more example:
+  {{
+      "name": "White Corn",
+        "price": 0.25,
+        "retailer": "Jons",
+        "description": null,
+        "unit": "Each",
+        "category": "Produce",
+        "promotion_details": "4/$0.99",
+        "original_price": null,
+        "promotion_from": null,
+        "promotion_to": null,
+        "is_frontpage": true,
+        "emoji": "🌽"
+  }},
+
 Ensure the response contains only the JSON object, with no surrounding text, explanations, or markdown formatting like ```json.
 """
 
 PRODUCT_CATEGORIES = [
-    "Fresh Produce",
+    "Produce",
     "Fruits",
     "Dairy",
     "Meats",
     "Seafood",
-    "Baked Goods",
-    "Snacks",
+    "Bakery",
     "Beverages",
-    "Frozen Foods",
-    "Dry Goods",
+    "Alcohol",
+    "Frozen",
     "Deli",
-    "Alcoholic Bev",
     "Breakfast",
-    "Canned Goods",
+    "Snacks",
+    "Dry Goods",
+    "Canned",
     "Condiments",
-    "Baking",
-    "Household Prod",
     "Personal Care",
-    "Pet Products",
-    "Candy",
-    "Gifts",
-    "Flowers-Plants",
-    "Garden",
-    "Outdoors",
     "Kitchen",
-    "Kids",
-    "Furniture",
+    "Outdoors",
     "Other"
 ]
 

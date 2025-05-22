@@ -1,5 +1,5 @@
 import { useState, useCallback } from "react";
-import { api } from "../services/api";
+import { searchProducts } from "../services/api";
 import { Product } from "../types/product";
 import {
   saveToLocalStorage,
@@ -87,7 +87,11 @@ export const useSearch = () => {
     });
   }, []);
 
-  const performSearch = async (query: string, page: number = 1) => {
+  const performSearch = async (
+    query: string,
+    page: number = 1,
+    adPeriod: string = "current"
+  ) => {
     if (!query.trim()) return;
 
     setIsLoadingSearch(true);
@@ -105,19 +109,7 @@ export const useSearch = () => {
     setCurrentPage(page);
 
     try {
-      // TODO: Update backend API call to support pagination (page, limit)
-      // For now, it fetches all results matching the query
-      const response = await api.get<Product[]>(
-        `/products/search?q=${encodeURIComponent(query)}`
-        // Potential future pagination: `&page=${page}&limit=20`
-      );
-      const products = response.data;
-
-      // TODO: When backend supports pagination, update logic:
-      // const total = response.headers['x-total-count']; // Example header
-      // setTotalResults(Number(total));
-      // setHasMoreResults(page * 20 < Number(total)); // Example check
-
+      const products = await searchProducts(query, adPeriod);
       // Save last search query and results to local storage
       if (page === 1) {
         // Only save if it's a new search initiating query
@@ -150,9 +142,9 @@ export const useSearch = () => {
   };
 
   // Function to load more results (for infinite scroll or button)
-  const loadMoreResults = () => {
+  const loadMoreResults = (adPeriod: string = "current") => {
     if (!isLoadingSearch && hasMoreResults) {
-      performSearch(searchQuery, currentPage + 1);
+      performSearch(searchQuery, currentPage + 1, adPeriod);
     }
   };
 

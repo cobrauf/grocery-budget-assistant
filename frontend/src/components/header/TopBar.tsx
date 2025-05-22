@@ -88,7 +88,7 @@ const TopBar: React.FC<TopBarProps> = ({
         ☰
       </span>
       <span style={{ fontWeight: "bold", fontSize: "1.2rem" }}>
-        Grocery-Assistant
+        Weekly-Buddy
       </span>
       <CartIcon />
     </div>

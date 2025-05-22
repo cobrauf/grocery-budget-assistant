@@ -26,12 +26,14 @@ interface ResultsViewProps {
   // Sort info for animation triggers
   sortField?: string;
   sortDirection?: string;
+  // New prop for display limit notification
+  displayLimit?: number;
 }
 
 const infoTextStyle: React.CSSProperties = {
   textAlign: "center",
   justifyContent: "center",
-  padding: "0rem 2rem", // Reduced padding for end message to look less spaced
+  padding: "1rem 2rem", // Reduced padding for end message to look less spaced
   color: "#555",
 };
 
@@ -53,6 +55,7 @@ const ResultsView: React.FC<ResultsViewProps> = ({
   removeFavorite,
   isFavorite,
   inFavoritesView,
+  displayLimit,
 }) => {
   const scrollableDivRef = useRef<HTMLDivElement>(null);
 
@@ -82,6 +85,21 @@ const ResultsView: React.FC<ResultsViewProps> = ({
     padding: "2rem 0",
     color: "red",
   };
+
+  // Determine if we should show the limit exceeded notification
+  const shouldShowLimitExceededNotification =
+    !isLoading &&
+    items.length > 0 &&
+    displayLimit &&
+    items.length === displayLimit;
+
+  // Limit exceeded notification element
+  const limitExceededElement = shouldShowLimitExceededNotification ? (
+    <div className="limit-exceeded-notification">
+      Showing first {displayLimit} results only. Try narrowing your
+      filters/search.
+    </div>
+  ) : null;
 
   let noResultsElement: React.ReactNode;
   if (viewType === "browse") {
@@ -146,6 +164,7 @@ const ResultsView: React.FC<ResultsViewProps> = ({
 
   return (
     <div id={scrollableId} ref={scrollableDivRef} style={resultsContainerStyle}>
+      {limitExceededElement}
       <InfiniteScroll
         dataLength={items.length}
         next={loadMore}
