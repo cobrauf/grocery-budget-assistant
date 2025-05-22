@@ -87,7 +87,11 @@ export const useSearch = () => {
     });
   }, []);
 
-  const performSearch = async (query: string, page: number = 1) => {
+  const performSearch = async (
+    query: string,
+    page: number = 1,
+    adPeriod: string = "current"
+  ) => {
     if (!query.trim()) return;
 
     setIsLoadingSearch(true);
@@ -105,7 +109,7 @@ export const useSearch = () => {
     setCurrentPage(page);
 
     try {
-      const products = await searchProducts(query);
+      const products = await searchProducts(query, adPeriod);
       // Save last search query and results to local storage
       if (page === 1) {
         // Only save if it's a new search initiating query
@@ -138,9 +142,9 @@ export const useSearch = () => {
   };
 
   // Function to load more results (for infinite scroll or button)
-  const loadMoreResults = () => {
+  const loadMoreResults = (adPeriod: string = "current") => {
     if (!isLoadingSearch && hasMoreResults) {
-      performSearch(searchQuery, currentPage + 1);
+      performSearch(searchQuery, currentPage + 1, adPeriod);
     }
   };
 

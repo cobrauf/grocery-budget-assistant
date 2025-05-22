@@ -20,6 +20,8 @@ router = APIRouter(
 @router.get("/search/")
 async def search_products_endpoint(
     q: str = Query(..., min_length=1, description="Search term for products."),
+    ad_period: str = Query(
+        "current", description="Ad period (e.g., 'current', 'previous')."),
     db: Session = Depends(get_db),
     limit: int = Query(200, ge=1, le=200, description="Max results."),
     offset: int = Query(0, ge=0, description="Offset for pagination.")
@@ -29,11 +31,11 @@ async def search_products_endpoint(
     Delegates the search logic to product_service.search_products.
     """
     print(
-        f"Searching products with query: '{q}', limit: {limit}, offset: {offset}")
+        f"Searching products with query: '{q}', ad_period: '{ad_period}', limit: {limit}, offset: {offset}")
     try:
         # Call the service function to perform the search
         search_results = await product_service.search_products(
-            db=db, q=q, limit=limit, offset=offset
+            db=db, q=q, ad_period=ad_period, limit=limit, offset=offset
         )
         return search_results
     except HTTPException as http_exc:

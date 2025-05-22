@@ -27,9 +27,16 @@ export const fetchRetailers = async (): Promise<Retailer[]> => {
   return response.data;
 };
 
-export const searchProducts = async (query: string): Promise<Product[]> => {
+export const searchProducts = async (
+  query: string,
+  adPeriod: string = "current"
+): Promise<Product[]> => {
+  const params = new URLSearchParams();
+  params.append("q", query);
+  params.append("ad_period", adPeriod);
+
   const response = await api.get<Product[]>(
-    `/products/search?q=${encodeURIComponent(query)}`
+    `/products/search?${params.toString()}`
   );
   return response.data;
 };

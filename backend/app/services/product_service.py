@@ -61,8 +61,9 @@ async def get_products_by_retailer_and_ad_period(
 async def search_products(
     db: Session,
     q: str,
-    limit: int,
-    offset: int
+    ad_period: str = "current",
+    limit: int = 100,
+    offset: int = 0
 ) -> List[ProductWithDetails]:
     '''
     Searches for products using Full-Text Search (FTS) based on the query string.
@@ -79,6 +80,7 @@ async def search_products(
             .join(WeeklyAdModel, ProductModel.weekly_ad_id == WeeklyAdModel.id)
             .join(RetailerModel, ProductModel.retailer_id == RetailerModel.id)
             .filter(ProductModel.fts_vector.match(q, postgresql_regconfig='english'))
+            .filter(WeeklyAdModel.ad_period == ad_period)
             .options(
                 joinedload(ProductModel.retailer),
                 joinedload(ProductModel.weekly_ad)
