@@ -23,7 +23,7 @@ import { Retailer } from "../types/retailer";
 
 // API functions
 export const fetchRetailers = async (): Promise<Retailer[]> => {
-  const response = await api.get<Retailer[]>("/retailers");
+  const response = await api.get<Retailer[]>("/retailers/");
   return response.data;
 };
 
