@@ -44,10 +44,10 @@ export const searchProducts = async (
 
   console.log(
     "search products url:",
-    API_URL + "/products/search?" + params.toString()
+    API_URL + "/products/search/?" + params.toString()
   );
   const response = await api.get<Product[]>(
-    `/products/search?${params.toString()}`
+    `/products/search/?${params.toString()}`
   );
   return response.data;
 };
