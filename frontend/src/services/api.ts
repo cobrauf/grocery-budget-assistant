@@ -36,16 +36,6 @@ export const searchProducts = async (
   params.append("q", query);
   params.append("ad_period", adPeriod);
 
-  // Add these debug logs:
-  console.log("Current API_URL value:", API_URL);
-  console.log("Axios instance baseURL:", api.defaults.baseURL);
-  console.log("window.location.hostname:", window.location.hostname);
-  console.log("VITE_API_URL env var:", import.meta.env.VITE_API_URL);
-
-  console.log(
-    "search products url:",
-    API_URL + "/products/search/?" + params.toString()
-  );
   const response = await api.get<Product[]>(
     `/products/search/?${params.toString()}`
   );
@@ -65,19 +55,9 @@ export const fetchProductsByFilter = async (
     params.append("categories", categories.join(","));
   }
   params.append("ad_period", adPeriod);
-  // console.log(
-  //   "fetch products by filter url: ",
-  //   API_URL + "/products/filter?" + params.toString()
-  // );
-  // const response = await api.get<Product[]>(
-  //   `/products/filter?${params.toString()}`
-  // );
-  console.log(
-    "test url: ",
-    "https://grocery-buddy-t7aeu.ondigitalocean.app/grocery-budget-assistant-backend/products/filter/?store_ids=9&ad_period=current"
-  );
+
   const response = await api.get<Product[]>(
-    "https://grocery-buddy-t7aeu.ondigitalocean.app/grocery-budget-assistant-backend/products/filter/?store_ids=9&ad_period=current"
+    `/products/filter/?${params.toString()}`
   );
   return response.data;
 };
