@@ -22,8 +22,8 @@ export const useRetailers = (isSearchActive: boolean) => {
     const imageName =
       retailerName.toLowerCase().replace(/\s+/g, "").replace(/&/g, "and") +
       ".png";
-    console.log(`---public/assets/logos/${imageName}`);
-    return `public/assets/logos/${imageName}`; // Assuming public folder is root for assets
+    console.log(`---/assets/logos/${imageName}`);
+    return `/assets/logos/${imageName}`; // Assuming public folder is root for assets
   }, []);
 
   useEffect(() => {

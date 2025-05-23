@@ -45,7 +45,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
       .toLowerCase()
       .replace(/\s+/g, "")
       .replace(/&/g, "and");
-    return `public/assets/logos/${imageName}.png`; // Adjusted path assuming assets are served from public root
+    return `/assets/logos/${imageName}.png`; // Adjusted path assuming assets are served from public root
   };
 
   const getExpirationDate = (): string | null => {
