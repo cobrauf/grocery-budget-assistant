@@ -35,6 +35,13 @@ export const searchProducts = async (
   const params = new URLSearchParams();
   params.append("q", query);
   params.append("ad_period", adPeriod);
+
+  // Add these debug logs:
+  console.log("Current API_URL value:", API_URL);
+  console.log("Axios instance baseURL:", api.defaults.baseURL);
+  console.log("window.location.hostname:", window.location.hostname);
+  console.log("VITE_API_URL env var:", import.meta.env.VITE_API_URL);
+
   console.log(
     "search products url:",
     API_URL + "/products/search?" + params.toString()
