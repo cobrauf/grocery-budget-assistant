@@ -6,7 +6,7 @@ import {
   useMemo,
   useCallback,
 } from "react";
-import "./styles/app.css";
+import "./styles/App.css";
 // import { api } from "./services/api";
 import Header from "./components/header/Header";
 import MainContent from "./components/MainContent";
