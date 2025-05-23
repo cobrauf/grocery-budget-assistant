@@ -1,8 +1,0 @@
-{
-  "devDependencies": {
-    "@types/react-infinite-scroll-component": "^4.2.5"
-  },
-  "dependencies": {
-    "react-infinite-scroll-component": "^6.1.0"
-  }
-}
