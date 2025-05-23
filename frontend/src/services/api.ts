@@ -23,6 +23,7 @@ import { Retailer } from "../types/retailer";
 
 // API functions
 export const fetchRetailers = async (): Promise<Retailer[]> => {
+  console.log("retailers url: ", API_URL + "/retailers/");
   const response = await api.get<Retailer[]>("/retailers/");
   return response.data;
 };
@@ -34,7 +35,10 @@ export const searchProducts = async (
   const params = new URLSearchParams();
   params.append("q", query);
   params.append("ad_period", adPeriod);
-
+  console.log(
+    "search products url:",
+    API_URL + "/products/search?" + params.toString()
+  );
   const response = await api.get<Product[]>(
     `/products/search?${params.toString()}`
   );
@@ -54,7 +58,10 @@ export const fetchProductsByFilter = async (
     params.append("categories", categories.join(","));
   }
   params.append("ad_period", adPeriod);
-
+  console.log(
+    "fetch products by filter url: ",
+    API_URL + "/products/filter?" + params.toString()
+  );
   const response = await api.get<Product[]>(
     `/products/filter?${params.toString()}`
   );
