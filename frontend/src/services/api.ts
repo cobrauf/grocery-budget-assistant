@@ -58,12 +58,19 @@ export const fetchProductsByFilter = async (
     params.append("categories", categories.join(","));
   }
   params.append("ad_period", adPeriod);
+  // console.log(
+  //   "fetch products by filter url: ",
+  //   API_URL + "/products/filter?" + params.toString()
+  // );
+  // const response = await api.get<Product[]>(
+  //   `/products/filter?${params.toString()}`
+  // );
   console.log(
-    "fetch products by filter url: ",
-    API_URL + "/products/filter?" + params.toString()
+    "test url: ",
+    "https://grocery-buddy-t7aeu.ondigitalocean.app/grocery-budget-assistant-backend/products/filter/?store_ids=9&ad_period=current"
   );
   const response = await api.get<Product[]>(
-    `/products/filter?${params.toString()}`
+    "https://grocery-buddy-t7aeu.ondigitalocean.app/grocery-budget-assistant-backend/products/filter/?store_ids=9&ad_period=current"
   );
   return response.data;
 };
