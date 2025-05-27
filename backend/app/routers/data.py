@@ -4,6 +4,7 @@ from sqlalchemy.orm import Session
 from .. import models
 from ..database import get_db 
 from ..services import json_to_db_service
+from ..services import json_enhancement_service
 
 '''
 Defines API endpoints for retrieving data (Retailers, Weekly Ads, Products),
@@ -32,8 +33,13 @@ async def list_weekly_ads(db: Session = Depends(get_db)):
 @router.post("/json_to_db/")
 async def upload_jsons_to_db(db: Session = Depends(get_db)):
     print("uploading JSONs to DB")
-    # Pass the db session to the service function
     return json_to_db_service.process_json_extractions(db)
+
+@router.post("/enhance_json/")
+async def enhance_json_files_endpoint():
+    print("Enhancing JSON files via API endpoint...")
+    return json_enhancement_service.enhance_all_json_files()
+   
 
 
 

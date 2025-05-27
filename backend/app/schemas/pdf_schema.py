@@ -5,6 +5,7 @@ from .base_schemas import ProductBaseSchema, WeeklyAdBaseSchema
 
 class PDFProduct(ProductBaseSchema):
     # Fields are inherited, no need to redefine unless overriding
+    gen_terms: Optional[str] = None
     pass
 
 class PDFWeeklyAd(WeeklyAdBaseSchema):
