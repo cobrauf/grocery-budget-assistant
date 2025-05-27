@@ -36,9 +36,14 @@ async def upload_jsons_to_db(db: Session = Depends(get_db)):
     return json_to_db_service.process_json_extractions(db)
 
 @router.post("/enhance_json/")
-async def enhance_json_files_endpoint():
-    print("Enhancing JSON files via API endpoint...")
-    return json_enhancement_service.enhance_all_json_files()
+async def enhance_json_files_endpoint(): # ensure this is async def
+    print("Async Enhancing JSON files via API endpoint...")
+    try:
+        await json_enhancement_service.enhance_all_json_files() # await the async function
+        return {"message": "JSON enhancement process started successfully and has completed."} # Or reflect ongoing status
+    except Exception as e:
+        print(f"Error during JSON enhancement process: {e}")
+        raise HTTPException(status_code=500, detail=f"An error occurred during JSON enhancement: {str(e)}")
    
 
 
