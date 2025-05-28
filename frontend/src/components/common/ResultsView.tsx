@@ -116,7 +116,9 @@ const ResultsView: React.FC<ResultsViewProps> = ({
   }
 
   let endMessageElement: React.ReactNode | null = null;
-  if (!isLoading && items.length > 0) {
+
+  // Only show end message if not in favorites view
+  if (!inFavoritesView && !isLoading && items.length > 0) {
     if (viewType === "browse") {
       endMessageElement = (
         <p style={infoTextStyle}>

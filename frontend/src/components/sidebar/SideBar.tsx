@@ -67,7 +67,7 @@ const SideBar: React.FC<SideBarProps> = ({
   return (
     <div className={`sidebar ${isOpen ? "sidebar-open" : "sidebar-closed"}`}>
       <div className="sidebar-header">
-        <span className="sidebar-logo"> ☰ </span> {/* Or your app logo/name */}
+        <span className="sidebar-logo"> </span> {/* Or your app logo/name */}
         <button
           onClick={onClose}
           className="sidebar-close-button"

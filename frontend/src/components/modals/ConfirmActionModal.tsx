@@ -1,16 +1,20 @@
 import React from "react";
 import ModalBase from "../common/ModalBase";
 
-interface ClearFavoritesModalProps {
+interface ConfirmActionModalProps {
   isOpen: boolean;
   onClose: () => void;
   onConfirm: () => void;
+  title: string;
+  children: React.ReactNode;
 }
 
-const ClearFavoritesModal: React.FC<ClearFavoritesModalProps> = ({
+const ConfirmActionModal: React.FC<ConfirmActionModalProps> = ({
   isOpen,
   onClose,
   onConfirm,
+  title,
+  children,
 }) => {
   const handleConfirm = () => {
     onConfirm();
@@ -29,17 +33,10 @@ const ClearFavoritesModal: React.FC<ClearFavoritesModalProps> = ({
   );
 
   return (
-    <ModalBase
-      isOpen={isOpen}
-      onClose={onClose}
-      title="Clear Favorites"
-      footer={footer}
-    >
-      <p style={{ textAlign: "center", margin: "20px 0" }}>
-        Remove all favorited items?
-      </p>
+    <ModalBase isOpen={isOpen} onClose={onClose} title={title} footer={footer}>
+      <div style={{ textAlign: "center", margin: "20px 0" }}>{children}</div>
     </ModalBase>
   );
 };
 
-export default ClearFavoritesModal;
+export default ConfirmActionModal;

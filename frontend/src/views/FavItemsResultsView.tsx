@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Product } from "../types/product";
 import ResultsView from "../components/common/ResultsView";
-import ClearFavoritesModal from "../components/modals/ClearFavoritesModal";
+import ConfirmActionModal from "../components/modals/ConfirmActionModal";
 
 interface FavItemsResultsViewProps {
   items: Product[];
@@ -26,12 +26,55 @@ const FavItemsResultsView: React.FC<FavItemsResultsViewProps> = ({
   sortDirection,
 }) => {
   const [isClearFavsModalOpen, setIsClearFavsModalOpen] = useState(false);
+  const [isClearExpiredFavsModalOpen, setIsClearExpiredFavsModalOpen] =
+    useState(false);
 
   const handleClearAllFavorites = () => {
     // Clear all favorites when confirmed
     items.forEach((item) => {
       removeFavorite(item.id, item.retailer_id);
     });
+    setIsClearFavsModalOpen(false); // Close modal after action
+  };
+
+  const isProductExpired = (product: Product): boolean => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const checkDate = (dateString: string | undefined | null): boolean => {
+      if (!dateString) return false;
+      try {
+        const date = new Date(dateString);
+        if (!isNaN(date.getTime())) {
+          date.setHours(0, 0, 0, 0);
+          return date < today;
+        }
+      } catch (e) {
+        // Invalid date format
+      }
+      return false;
+    };
+
+    if (product.promotion_to && checkDate(product.promotion_to)) {
+      return true;
+    }
+    if (
+      !product.promotion_to &&
+      product.weekly_ad_valid_to &&
+      checkDate(product.weekly_ad_valid_to)
+    ) {
+      return true;
+    }
+    return false;
+  };
+
+  const handleClearExpiredFavorites = () => {
+    items.forEach((item) => {
+      if (isProductExpired(item)) {
+        removeFavorite(item.id, item.retailer_id);
+      }
+    });
+    setIsClearExpiredFavsModalOpen(false); // Close modal after action
   };
 
   return (
@@ -66,25 +109,40 @@ const FavItemsResultsView: React.FC<FavItemsResultsViewProps> = ({
           style={{
             textAlign: "center",
             margin: "20px 0",
-            position: "absolute",
-            bottom: "20px",
-            left: "0",
-            right: "0",
           }}
         >
           <button
             onClick={() => setIsClearFavsModalOpen(true)}
             className="modal-button-confirm"
+            style={{ marginRight: "10px" }}
           >
-            Clear All Favs
+            Remove All
+          </button>
+          <button
+            onClick={() => setIsClearExpiredFavsModalOpen(true)}
+            className="modal-button-confirm"
+          >
+            Remove Expired
           </button>
         </div>
       )}
-      <ClearFavoritesModal
+      <ConfirmActionModal
         isOpen={isClearFavsModalOpen}
         onClose={() => setIsClearFavsModalOpen(false)}
         onConfirm={handleClearAllFavorites}
-      />
+        title=""
+      >
+        <p>Remove all favorites?</p>
+      </ConfirmActionModal>
+
+      <ConfirmActionModal
+        isOpen={isClearExpiredFavsModalOpen}
+        onClose={() => setIsClearExpiredFavsModalOpen(false)}
+        onConfirm={handleClearExpiredFavorites}
+        title=""
+      >
+        <p>Remove expired favorites?</p>
+      </ConfirmActionModal>
     </div>
   );
 };
