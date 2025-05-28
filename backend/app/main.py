@@ -6,7 +6,6 @@ from fastapi.middleware.cors import CORSMiddleware
 # Import routers
 from .routers import data, pdf, retailers, products
 from . import database # Keep for SessionLocal usage if get_db_session remains here (or move get_db_session too)
-from .utils.utils import find_project_root
 
 '''
 Main FastAPI application entry point.
@@ -39,10 +38,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-# Define paths relative to project root using utils.find_project_root()
-PROJECT_ROOT = find_project_root()
-UPLOAD_DIR = PROJECT_ROOT / "backend" / "pdf" / "uploads"
 
 @app.get("/")
 def read_root():

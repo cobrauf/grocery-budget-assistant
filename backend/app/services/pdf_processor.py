@@ -10,7 +10,7 @@ from datetime import date
 
 
 from ..schemas.pdf_schema import ExtractedPDFData
-from ..utils.utils import find_project_root
+# from ..utils.utils import find_project_root # No longer using find_project_root for these paths
 from .pdf_prompts import GENERAL_PROMPT_TEMPLATE, PRODUCT_CATEGORIES, KNOWN_RETAILERS, PRODUCT_UNITS # 
 
 '''
@@ -24,9 +24,10 @@ Persists the successfully validated, structured data by saving it into local JSO
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 GEMINI_MODEL = os.getenv("GEMINI_MODEL") 
 
-PROJECT_ROOT = find_project_root()
-UPLOADS_DIR = PROJECT_ROOT / "backend" / "pdf" / "uploads"
-EXTRACTIONS_DIR = PROJECT_ROOT / "backend" / "pdf" / "extractions"
+# Define paths relative to this file's location
+SERVICE_FILE_DIR = Path(__file__).resolve().parent
+UPLOADS_DIR = SERVICE_FILE_DIR.parent.parent / "pdf" / "uploads"
+EXTRACTIONS_DIR = SERVICE_FILE_DIR.parent.parent / "pdf" / "extractions"
 
 
 # --- Initialization ---

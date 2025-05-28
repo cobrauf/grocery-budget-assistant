@@ -8,7 +8,6 @@ from pathlib import Path
 
 # Import necessary components from parent directories or app modules
 from ..services.pdf_processor import GroceryAdProcessor
-from ..utils.utils import find_project_root
 
 '''
 Defines API endpoints specifically for handling PDF files.
@@ -19,9 +18,9 @@ GET /pdf/processing-status/: Provides a basic status check of PDF processing bas
 '''
 
 # Define paths relative to project root using utils.find_project_root()
-PROJECT_ROOT = find_project_root()
-UPLOADS_DIR = PROJECT_ROOT / "backend" / "pdf" / "uploads"
-EXTRACTIONS_DIR = PROJECT_ROOT / "backend" / "pdf" / "extractions"
+SERVICE_FILE_DIR = Path(__file__).resolve().parent
+UPLOADS_DIR = SERVICE_FILE_DIR.parent.parent / "pdf" / "uploads"
+EXTRACTIONS_DIR = SERVICE_FILE_DIR.parent.parent / "pdf" / "extractions"
 
 router = APIRouter(
     prefix="/pdf", # Prefix for PDF related routes
