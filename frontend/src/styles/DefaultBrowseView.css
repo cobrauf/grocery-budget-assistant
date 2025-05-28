@@ -207,3 +207,22 @@
 .forward-arrow {
   margin-left: 1rem;
 }
+
+/* Animation for store and category icons */
+@keyframes slideInFromRight {
+  from {
+    opacity: 0;
+    transform: translateX(50px); /* Start off-screen to the right */
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.icon-slide-in {
+  animation-name: slideInFromRight;
+  animation-duration: 0.3s; /* Adjust duration as needed */
+  animation-fill-mode: backwards; /* Ensures styles are applied before animation starts if needed */
+  animation-timing-function: ease-out;
+}

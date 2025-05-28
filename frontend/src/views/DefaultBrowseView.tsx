@@ -73,12 +73,13 @@ const DefaultBrowseView: React.FC<DefaultBrowseViewProps> = ({
       {retailersToDisplay.length > 0 && (
         <div className="logo-scroll-container horizontal-scroll">
           <div className="two-row-grid">
-            {retailersToDisplay.map((retailer) => (
+            {retailersToDisplay.map((retailer, index) => (
               <div
                 key={retailer.id}
-                className={`logo-item-card ${
+                className={`logo-item-card icon-slide-in ${
                   selectedStoreIds.has(retailer.id) ? "selected" : ""
                 }`}
+                style={{ animationDelay: `${index * 0.03}s` }}
                 onClick={() => onToggleStoreSelection(retailer.id)}
               >
                 <img
@@ -97,12 +98,13 @@ const DefaultBrowseView: React.FC<DefaultBrowseViewProps> = ({
       {categoriesToDisplay.length > 0 && (
         <div className="logo-scroll-container horizontal-scroll">
           <div className="two-row-grid">
-            {categoriesToDisplay.map((category) => (
+            {categoriesToDisplay.map((category, index) => (
               <div
                 key={category.name}
-                className={`logo-item-card category-item ${
+                className={`logo-item-card category-item icon-slide-in ${
                   selectedCategories.has(category.name) ? "selected" : ""
                 }`}
+                style={{ animationDelay: `${index * 0.03}s` }}
                 onClick={() => onToggleCategorySelection(category.name)}
               >
                 <span className="logo-image category-icon">
