@@ -42,6 +42,7 @@ CREATE TABLE IF NOT EXISTS products (
     promotion_details TEXT, -- e.g., "Buy One Get One Free", "2 for $5", "Save $1.00"
     promotion_from DATE,
     promotion_to DATE,
+    gen_terms TEXT DEFAULT NULL,
     created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
     is_frontpage BOOLEAN DEFAULT FALSE,
     emoji VARCHAR(10)
@@ -62,7 +63,8 @@ BEGIN
     coalesce(NEW.name, '') || ' ' ||
     coalesce(NEW.description, '') || ' ' ||
     coalesce(NEW.category, '') || ' ' ||
-    coalesce(NEW.promotion_details, '')
+    coalesce(NEW.promotion_details, '') || ' ' ||
+    coalesce(NEW.gen_terms, '')
   );
   RETURN NEW;
 END;

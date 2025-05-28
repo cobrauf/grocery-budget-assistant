@@ -60,6 +60,7 @@ class Product(Base):
     promotion_details = Column(Text)
     promotion_from = Column(Date, nullable=True)
     promotion_to = Column(Date, nullable=True)
+    gen_terms = Column(Text, nullable=True) # Added for LLM-generated keywords
     created_at = Column(TIMESTAMP(timezone=True), server_default=func.now())
     fts_vector = Column(TSVECTOR) # For full-text search
     retailer_id = Column(BigInteger, ForeignKey("retailers.id", ondelete="CASCADE"), nullable=False)

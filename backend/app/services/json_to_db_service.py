@@ -9,7 +9,7 @@ from pathlib import Path
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-EXTRACTIONS_DIR = Path(__file__).resolve().parent.parent.parent / "pdf" / "extractions"
+SOURCE_JSON_DIR = Path(__file__).resolve().parent.parent.parent / "pdf" / "enhanced_json"
 
 
 def update_ad_periods(db: Session, retailer_id: int):
@@ -35,8 +35,8 @@ def validate_emoji(emoji: str) -> str:
     """
     if emoji and len(emoji) == 1:
         return emoji
-    logger.warning(f"Invalid emoji: '{emoji}'. Using default emoji '❔' instead.")
-    return '❔'
+    logger.warning(f"emoji: {emoji}, character count: {len(emoji)}, did not change.")
+    return emoji
 
 def process_single_json_file(db: Session, file_path: Path):
     logger.info(f"Processing file: {file_path.name}")
@@ -101,7 +101,8 @@ def process_single_json_file(db: Session, file_path: Path):
             promotion_from=pdf_product.promotion_from,
             promotion_to=pdf_product.promotion_to,
             is_frontpage=pdf_product.is_frontpage,
-            emoji=validated_emoji
+            emoji=validated_emoji,
+            gen_terms=pdf_product.gen_terms
         )
         products_to_add.append(new_product)
     
@@ -119,14 +120,14 @@ def process_single_json_file(db: Session, file_path: Path):
     logger.info(f"Successfully processed {file_path.name}")
 
 def process_json_extractions(db: Session):
-    logger.info(f"Starting JSON extraction processing from directory: {EXTRACTIONS_DIR}")
+    logger.info(f"Starting JSON extraction processing from directory: {SOURCE_JSON_DIR}")
     try:
-        if not EXTRACTIONS_DIR.exists() or not EXTRACTIONS_DIR.is_dir():
-            logger.error(f"Extractions directory not found: {EXTRACTIONS_DIR}")
+        if not SOURCE_JSON_DIR.exists() or not SOURCE_JSON_DIR.is_dir():
+            logger.error(f"Source JSON directory not found: {SOURCE_JSON_DIR}")
             return
 
         processed_files = 0
-        for file_path in EXTRACTIONS_DIR.glob("*.json"):
+        for file_path in SOURCE_JSON_DIR.glob("*.json"):
             try:
                 process_single_json_file(db, file_path)
                 processed_files +=1
