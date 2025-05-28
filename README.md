@@ -11,11 +11,10 @@ Grocery-Buddy is a full-stack web application designed to help users discover th
 - **--Frontend--**
 
   - **Browse Deals:** View a comprehensive list of current grocery promotions.
-  - **Filter & Sort:** Filter by retailers/categories; sort by price, etc.
+    - Filter by retailers/categories; sort by price, etc.
   - **Favorites:** Save your favorite deals for quick access.
   - **Search:** Search for specific products across all retailers.
-  - **Dynamic UI:** Responsive and interactive user interface built with React.
-  - **Themeable:** Light/dark mode and font selection for user preference.
+  - **Dynamic/Themeable UI:** Responsive and themeable user interface built with React.
 
 - **--Backend--**
 
@@ -26,9 +25,10 @@ Grocery-Buddy is a full-stack web application designed to help users discover th
     - The enhanced deal information is uploaded to a Supabase (PostgreSQL) database as a microservice.
 
 - **--AI Features-- (Coming soon)**
-  - Ask the app to curate a shopping list, optionally with a budget.
-  - EG. "Put together a high-protein shopping list for $75."
-  - Or, "Assemble a balanced meal plan with emphasis on produce for a family of 3 for $150."
+
+  - **Chat With AI:** Ask the app to curate a shopping list, optionally with a budget.
+    - EG. "Put together a high-protein shopping list for $75."
+    - Or, "Assemble a balanced meal plan with emphasis on produce for a family of 3 for $150."
 
 ## Tech Stack 🛠️
 
@@ -51,17 +51,17 @@ This project leverages a modern tech stack:
 
 ## Screenshots 📸
 
-**Main Deal Browsing Interface:**
-![Browsing Deals](./docs/media/1.jpg)
+**Main Deal Browse Interface:**
+<img src="./docs/media/1.jpg" width="600" alt="Browse Deals Interface">
 
 **Favorites Management View:**
-![Favorites View](./docs/media/2.jpg)
+<img src="./docs/media/2.jpg" width="600" alt="Favorites Management View">
 
 **Filtering Options (Example):**
-![Filtering Example](./docs/media/3.jpg)
+<img src="./docs/media/3.jpg" width="600" alt="Filtering Options Example">
 
 **Dark Mode Theme:**
-![Dark Mode](./docs/media/4.jpg)
+<img src="./docs/media/4.jpg" width="600" alt="Dark Mode Theme">
 
 **Mobile/Responsive View (Example):**
-![Mobile View](./docs/media/5.jpg)
+<img src="./docs/media/5.jpg" width="300" alt="Mobile/Responsive View Example">
