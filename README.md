@@ -51,17 +51,17 @@ This project leverages a modern tech stack:
 
 ## Screenshots 📸
 
-**Main Deal Browse Interface:**
+<!-- **Main Deal Browse Interface:** -->
 <img src="./docs/media/1.jpg" width="400">
 
-**Favorites Management View:**
+<!-- **Favorites Management View:** -->
 <img src="./docs/media/2.jpg" width="400">
 
-**Filtering Options (Example):**
+<!-- **Filtering Options (Example):** -->
 <img src="./docs/media/3.jpg" width="400">
 
-**Dark Mode Theme:**
+<!-- **Dark Mode Theme:** -->
 <img src="./docs/media/4.jpg" width="400">
 
-**Mobile/Responsive View (Example):**
+<!-- **Mobile/Responsive View (Example):** -->
 <img src="./docs/media/5.jpg" width="400">
