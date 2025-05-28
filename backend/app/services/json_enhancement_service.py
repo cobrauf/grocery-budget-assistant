@@ -56,7 +56,7 @@ async def process_single_json_file_for_enhancement(filepath: Path) -> Optional[E
             "Don't reuse words from the existing attributes",
             "For food generally considered healthy (produce/fruits/meats/dairy), add 'healthy' to the attribute.",
             "For food generally considered high in protein (meats/fish/eggs/nuts/beans), add 'high protein' to the attribute.",
-            "If the emoji field is a ? or some other non-emoji character, replace it with a 🛒 emoji.",
+            "If the emoji field is a ? or some other non-emoji character, find a suitable emoji, if none are suitable, replace it with a 🛒 emoji.",
             
             "IMPORTANT: All other parts of the JSON structure and data MUST remain unchanged. Treat the input JSON as immutable except for the addition of the 'gen_terms' attribute to each product.",
             "Ensure the output is identical to the input JSON except for the addition of the 'gen_terms' attribute to each product.",
@@ -150,7 +150,7 @@ async def enhance_all_json_files():
     files_to_process_paths = [] # Keep track of files we actually schedule
 
     for filepath in extraction_files:
-        expected_enhanced_filename = f"{filepath.stem}_enhanced{filepath.suffix}"
+        expected_enhanced_filename = f"{filepath.stem}-enhanced{filepath.suffix}"
         expected_enhanced_filepath = ENHANCED_JSON_DIR / expected_enhanced_filename
 
         if expected_enhanced_filepath.exists():
@@ -162,14 +162,10 @@ async def enhance_all_json_files():
         tasks.append(asyncio.create_task(process_single_json_file_for_enhancement(filepath), name=f"Enhance-{filepath.name}"))
     
     if not tasks: # If all files were skipped
-        logging.info("No new files to process after checking for existing enhanced versions.")
-        # Update summary and return
-        logging.info("JSON Enhancement Process Summary:")
-        logging.info(f"Total files found in extractions: {len(extraction_files)}")
-        logging.info(f"Files already enhanced: {len(extraction_files)}") # All were skipped
-        logging.info(f"Successfully processed (new): {processed_files_count}")
-        logging.info(f"Failed to process (new): {failed_files_count}")
-        return
+        logging.info("No new files to process as all were found to be already enhanced or no files were in extractions directory.")
+        # The counts (processed_files_count, failed_files_count) will be 0 here as they are initialized before this block.
+        # The final summary outside this block will correctly reflect 0 processed/failed if this path is taken.
+        return # Early exit if no tasks were scheduled
 
     logging.info(f"Scheduled {len(tasks)} new files for enhancement.")
     results = await asyncio.gather(*tasks, return_exceptions=True)
@@ -178,7 +174,7 @@ async def enhance_all_json_files():
         # Use the files_to_process_paths list to correctly map results to filepaths
         # This is important because `results` will only contain results for tasks that were actually run
         filepath_processed = files_to_process_paths[i] 
-        output_filename = f"{filepath_processed.stem}_enhanced{filepath_processed.suffix}"
+        output_filename = f"{filepath_processed.stem}-enhanced{filepath_processed.suffix}"
         output_filepath = ENHANCED_JSON_DIR / output_filename
 
         if isinstance(result_or_exc, ExtractedPDFData):
