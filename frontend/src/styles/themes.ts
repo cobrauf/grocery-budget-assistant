@@ -73,8 +73,8 @@ export const themes: Theme[] = [
       sortPillTextActive: "#ffffff", // White text on active
       // sortPillArrowColor: "#495057", // Same as pill text
       // sortPillArrowColorActive: "#ffffff", // Same as active pill text e0e0e0
-      marginBlockBackgroundGradientStart: "#8F87F1", // Light gray for margin blocks
-      marginBlockBackgroundGradientEnd: "#7b2cbf", // Slightly darker for gradient
+      marginBlockBackgroundGradientStart: "#7b2cbf", // Light gray for margin blocks
+      marginBlockBackgroundGradientEnd: "#7A73D1", // Slightly darker for gradient 7b2cbf
     },
   },
   {
