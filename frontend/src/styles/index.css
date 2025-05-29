@@ -22,7 +22,13 @@ html {
 
 @media (min-width: 1024px) {
   body {
-    background-color: var(--theme-margin-block-background);
+    background: linear-gradient(
+        to bottom right,
+        var(--theme-margin-block-background-gradient-start) 0%,
+        var(--theme-margin-block-background-gradient-end) 50%,
+        var(--theme-margin-block-background-gradient-start) 100%
+      )
+      var(--theme-margin-block-background-gradient-start);
   }
 }
 

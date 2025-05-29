@@ -6,7 +6,8 @@ export interface Theme {
     text: string; // Default text color
     primary: string; // Primary action color (buttons, highlights)
     secondary: string; // Secondary action/info color
-    marginBlockBackground: string; // Added for desktop margin blocks
+    marginBlockBackgroundGradientStart: string; // Renamed for desktop margin blocks gradient
+    marginBlockBackgroundGradientEnd: string; // Added for desktop margin blocks gradient end color
 
     // Header
     headerBackground: string;
@@ -71,8 +72,9 @@ export const themes: Theme[] = [
       sortPillBackgroundActive: "#7b2cbf", // Primary color
       sortPillTextActive: "#ffffff", // White text on active
       // sortPillArrowColor: "#495057", // Same as pill text
-      // sortPillArrowColorActive: "#ffffff", // Same as active pill text
-      marginBlockBackground: "#e0e0e0", // Light gray for margin blocks
+      // sortPillArrowColorActive: "#ffffff", // Same as active pill text e0e0e0
+      marginBlockBackgroundGradientStart: "#8F87F1", // Light gray for margin blocks
+      marginBlockBackgroundGradientEnd: "#7b2cbf", // Slightly darker for gradient
     },
   },
   {
@@ -103,7 +105,8 @@ export const themes: Theme[] = [
       sortPillTextActive: "#ffffff", // Dark text on active
       // sortPillArrowColor: "#f8f9fa", // Same as pill text
       // sortPillArrowColorActive: "#1a1a1a", // Same as active pill text
-      marginBlockBackground: "#121212", // Very dark gray for margin blocks
+      marginBlockBackgroundGradientStart: "#333446", // Very dark gray for margin blocks
+      marginBlockBackgroundGradientEnd: "#1f1f1f", // Subtly lighter for gradient
     },
   },
   {
@@ -134,7 +137,8 @@ export const themes: Theme[] = [
       sortPillTextActive: "#ffffff", // White text on active
       // sortPillArrowColor: "#5d5d5d", // Same as pill text
       // sortPillArrowColorActive: "#ffffff", // Same as active pill text
-      marginBlockBackground: "#f5e9e0", // Light desaturated warm color for margin blocks
+      marginBlockBackgroundGradientStart: "#E6B2BA", // Light desaturated warm color for margin blocks
+      marginBlockBackgroundGradientEnd: "#FBE4D6", // Subtly darker/desaturated for gradient
     },
   },
   {
@@ -168,7 +172,8 @@ export const themes: Theme[] = [
       sortPillTextActive: "#ffffff", // White text on active
       // sortPillArrowColor: "#212121", // Dark arrow
       // sortPillArrowColorActive: "#ffffff", // White arrow on active
-      marginBlockBackground: "#a0a0a0", // Medium gray for margin blocks
+      marginBlockBackgroundGradientStart: "#D4C9BE", // Medium gray for margin blocks
+      marginBlockBackgroundGradientEnd: "#909090", // Slightly darker for gradient
     },
   },
 ];
