@@ -10,7 +10,7 @@ interface SwipeNavigationProps {
 }
 
 const TABS_ORDER: AppTab[] = ["browse", "search", "favorites", "ai"];
-const MIN_SWIPE_DISTANCE = 100;
+const MIN_SWIPE_DISTANCE = 125;
 
 export const useSwipeNavigation = ({
   targetRef,

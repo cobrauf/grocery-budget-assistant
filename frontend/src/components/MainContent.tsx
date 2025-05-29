@@ -202,6 +202,11 @@ const MainContent: React.FC<MainContentProps> = ({
     onToggleBrowseView();
   };
 
+  const handlePerformSearchFromDefaultView = (query: string) => {
+    performSearch(query);
+    setViewMode("search", "results");
+  };
+
   const renderBrowseFilterHeader = () => {
     return (
       <div className="filters-header">
@@ -360,7 +365,7 @@ const MainContent: React.FC<MainContentProps> = ({
           return (
             <DefaultSearchView
               searchHistory={searchHistory}
-              onSearch={performSearch}
+              onSearch={handlePerformSearchFromDefaultView}
               onRemoveSearchItem={removeFromSearchHistory}
             />
           );
