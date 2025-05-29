@@ -6,6 +6,7 @@ export interface Theme {
     text: string; // Default text color
     primary: string; // Primary action color (buttons, highlights)
     secondary: string; // Secondary action/info color
+    marginBlockBackground: string; // Added for desktop margin blocks
 
     // Header
     headerBackground: string;
@@ -71,6 +72,7 @@ export const themes: Theme[] = [
       sortPillTextActive: "#ffffff", // White text on active
       // sortPillArrowColor: "#495057", // Same as pill text
       // sortPillArrowColorActive: "#ffffff", // Same as active pill text
+      marginBlockBackground: "#e0e0e0", // Light gray for margin blocks
     },
   },
   {
@@ -101,6 +103,7 @@ export const themes: Theme[] = [
       sortPillTextActive: "#ffffff", // Dark text on active
       // sortPillArrowColor: "#f8f9fa", // Same as pill text
       // sortPillArrowColorActive: "#1a1a1a", // Same as active pill text
+      marginBlockBackground: "#121212", // Very dark gray for margin blocks
     },
   },
   {
@@ -131,6 +134,7 @@ export const themes: Theme[] = [
       sortPillTextActive: "#ffffff", // White text on active
       // sortPillArrowColor: "#5d5d5d", // Same as pill text
       // sortPillArrowColorActive: "#ffffff", // Same as active pill text
+      marginBlockBackground: "#f5e9e0", // Light desaturated warm color for margin blocks
     },
   },
   {
@@ -164,6 +168,7 @@ export const themes: Theme[] = [
       sortPillTextActive: "#ffffff", // White text on active
       // sortPillArrowColor: "#212121", // Dark arrow
       // sortPillArrowColorActive: "#ffffff", // White arrow on active
+      marginBlockBackground: "#a0a0a0", // Medium gray for margin blocks
     },
   },
 ];

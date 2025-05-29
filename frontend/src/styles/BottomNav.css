@@ -80,3 +80,13 @@
   width: 100%; /* Take full width of parent */
   text-align: center; /* Center the text */
 }
+
+@media (min-width: 1024px) {
+  .bottom-nav {
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+    left: 0; /* Required for fixed with margin auto */
+    right: 0; /* Required for fixed with margin auto */
+  }
+}
