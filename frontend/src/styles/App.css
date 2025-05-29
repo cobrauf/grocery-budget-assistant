@@ -60,24 +60,14 @@
   background-color: var(--theme-header-background);
   transform: translateY(0);
   transition: transform 0.3s ease-in-out;
-  will-change: transform;
+  will-change: transform; /* Optimize for transform animations */
 }
 
+/* Commenting out or removing .app-header-hidden as it's no longer used for Header visibility 
 .app-header-hidden {
-  /* transform: translateY(-100%); */
-  /* using the same as above so it's not hidden during scrolling, not sure which is better */
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  position: sticky;
-  top: 0;
-  z-index: 1001;
-  background-color: var(--theme-header-background);
-  transform: translateY(0);
-  transition: transform 0.3s ease-in-out;
-  will-change: transform;
+  transform: translateY(-100%);
 }
+*/
 
 .counter-card {
   background-color: rgba(255, 255, 255, 0.9);
@@ -320,4 +310,9 @@ textarea::-moz-placeholder {
 .sidebar-nav-item-animate {
   opacity: 0; /* Start hidden */
   animation-fill-mode: forwards;
+}
+
+/* Main content padding to prevent overlap with fixed header/footer */
+.main-content {
+  /* Add any other global styles you need */
 }

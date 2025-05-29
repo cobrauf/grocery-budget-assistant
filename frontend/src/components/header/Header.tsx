@@ -13,7 +13,7 @@ interface HeaderProps {
   activeTab: AppTab;
   isInBrowseResultsView?: boolean;
   onGoHome?: () => void;
-  areNavBarsVisible: boolean;
+  areNavBarsVisible?: boolean;
 }
 
 const Header: React.FC<HeaderProps> = ({
@@ -59,12 +59,7 @@ const Header: React.FC<HeaderProps> = ({
 
   return (
     <>
-      <header
-        className={`app-header ${
-          !areNavBarsVisible ? "app-header-hidden" : ""
-        }`.trim()}
-        style={headerStyle}
-      >
+      <header className="app-header" style={headerStyle}>
         <TopBar
           onMenuClick={onMenuClick}
           isShrunk={isTopBarShrunk}

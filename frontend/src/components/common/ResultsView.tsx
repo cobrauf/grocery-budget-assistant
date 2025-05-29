@@ -65,6 +65,14 @@ const ResultsView: React.FC<ResultsViewProps> = ({
     if (!scrollableElement || !onScrollUpdate) return;
 
     const handleScroll = () => {
+      console.log(
+        "ResultsView scroll:",
+        scrollableElement.scrollTop,
+        "offsetHeight:",
+        scrollableElement.offsetHeight,
+        "scrollHeight:",
+        scrollableElement.scrollHeight
+      );
       onScrollUpdate(scrollableElement.scrollTop);
     };
 

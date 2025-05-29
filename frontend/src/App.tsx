@@ -437,29 +437,42 @@ function App() {
 
   const handleMainContentScroll = useCallback(
     (currentScrollY: number) => {
+      const HIDE_THRESHOLD_PX = 150;
+      const SHOW_NEAR_TOP_PX = 50;
+      const MIN_DELTA_FOR_CHANGE = 10;
+
       const scrollingDown = currentScrollY > lastScrollY;
-      const scrollThreshold = window.innerHeight / 3;
-      const delta = Math.abs(currentScrollY - lastScrollY);
+      const enoughDelta =
+        Math.abs(currentScrollY - lastScrollY) > MIN_DELTA_FOR_CHANGE;
 
-      // Ignore tiny scroll amounts
-      if (delta < 10) return;
-
-      // Show navbars if near top
-      if (currentScrollY <= 50) {
-        setAreNavBarsVisible(true);
-      }
-      // Hide when scrolling down past threshold
-      else if (scrollingDown && currentScrollY > scrollThreshold) {
-        setAreNavBarsVisible(false);
-      }
-      // Show when scrolling up
-      else if (!scrollingDown) {
-        setAreNavBarsVisible(true);
+      let newAreNavBarsVisible = areNavBarsVisible; // Start with current value
+      if (currentScrollY <= SHOW_NEAR_TOP_PX) {
+        newAreNavBarsVisible = true;
+      } else if (
+        scrollingDown &&
+        currentScrollY > HIDE_THRESHOLD_PX &&
+        enoughDelta
+      ) {
+        newAreNavBarsVisible = false;
+      } else if (!scrollingDown && enoughDelta) {
+        newAreNavBarsVisible = true;
       }
 
+      console.log(
+        "App.tsx scroll event:",
+        { currentScrollY, lastScrollY, scrollingDown, enoughDelta },
+        "currentVisible:",
+        areNavBarsVisible,
+        "newVisible:",
+        newAreNavBarsVisible
+      );
+
+      if (areNavBarsVisible !== newAreNavBarsVisible) {
+        setAreNavBarsVisible(newAreNavBarsVisible);
+      }
       setLastScrollY(currentScrollY);
     },
-    [lastScrollY]
+    [lastScrollY, areNavBarsVisible] // Added areNavBarsVisible to deps
   );
 
   // Initialize browser history management
@@ -496,7 +509,6 @@ function App() {
           initialSearchQuery={searchQuery}
           isInBrowseResultsView={isBrowseResultsActive}
           onGoHome={goHome}
-          areNavBarsVisible={areNavBarsVisible}
         />
         <MainContent
           onResultsViewScroll={handleMainContentScroll}

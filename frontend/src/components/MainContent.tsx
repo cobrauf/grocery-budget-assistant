@@ -394,6 +394,7 @@ const MainContent: React.FC<MainContentProps> = ({
               removeFavorite={removeFavorite}
               isFavorite={isFavorite}
               isLoading={false}
+              onScrollUpdate={handleResultsViewScroll}
             />
           </>
         );
