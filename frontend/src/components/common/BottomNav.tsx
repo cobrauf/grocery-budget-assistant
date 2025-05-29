@@ -1,5 +1,5 @@
 import React from "react";
-import { AppTab } from "../../hooks/useAppTab"; // Ensure correct path
+import { AppTab, ViewMode } from "../../hooks/useAppTab"; // Ensure correct path
 import "../../styles/BottomNav.css"; // Updated path for CSS
 import { Product } from "../../types/product";
 
@@ -8,6 +8,7 @@ interface BottomNavProps {
   setActiveTab: (tab: AppTab) => void;
   areNavBarsVisible: boolean;
   favoriteItems: Product[]; // Add favorites count
+  viewMode: Record<"browse" | "search", ViewMode>; // Add viewMode
 }
 
 const BottomNav: React.FC<BottomNavProps> = ({
@@ -15,6 +16,7 @@ const BottomNav: React.FC<BottomNavProps> = ({
   setActiveTab,
   areNavBarsVisible,
   favoriteItems,
+  viewMode, // Destructure viewMode
 }) => {
   // Create dynamic label for favorites that includes the count
   const favoritesLabel = `${
@@ -24,8 +26,26 @@ const BottomNav: React.FC<BottomNavProps> = ({
   }`;
 
   const navItems: { label: string; tab: AppTab; icon?: string }[] = [
-    { label: "Browse", tab: "browse", icon: "" },
-    { label: "Search", tab: "search", icon: "" },
+    {
+      label:
+        viewMode.browse === "results"
+          ? "< Browse"
+          : activeTab === "browse" && viewMode.browse === "default"
+          ? "Browse >"
+          : "Browse",
+      tab: "browse",
+      icon: "",
+    },
+    {
+      label:
+        viewMode.search === "results"
+          ? "< Search"
+          : activeTab === "search" && viewMode.search === "default"
+          ? "Search >"
+          : "Search",
+      tab: "search",
+      icon: "",
+    },
     { label: favoritesLabel, tab: "favorites", icon: "" },
     { label: "✨ AI", tab: "ai", icon: "" },
   ];
