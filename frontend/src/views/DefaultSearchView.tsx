@@ -37,7 +37,7 @@ const DefaultSearchView: React.FC<DefaultSearchViewProps> = ({
   ];
 
   // Limit to a reasonable number of buttons
-  const displayedTerms = allSearchTerms.slice(0, 12);
+  const displayedTerms = allSearchTerms.slice(0, 50);
 
   const handleSearchClick = (term: string) => {
     onSearch(term);

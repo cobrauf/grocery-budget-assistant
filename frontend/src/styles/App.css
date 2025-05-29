@@ -33,6 +33,21 @@
   ); /* Added default font family */
 }
 
+@media (min-width: 1024px) {
+  .app-container {
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  .app-header {
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+    left: 0; /* Required for sticky with margin auto */
+    right: 0; /* Required for sticky with margin auto */
+  }
+}
+
 /* Base styles for header transitions */
 .app-header {
   display: flex;
