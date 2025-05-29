@@ -106,6 +106,27 @@
   scrollbar-width: none; /* Firefox */
 }
 
+/* Styles for the new vertical category scroller */
+.category-scroll-container {
+  overflow-y: auto; /* Enable vertical scrolling */
+  overflow-x: hidden; /* Disable horizontal scrolling explicitly */
+  max-height: 200px; /* Adjust as needed - e.g., enough for 2-3 rows of items before scrolling */
+  /* Retain padding and border if desired from .logo-scroll-container */
+  padding: 1rem;
+  border-bottom: 1px solid #b5b5b5;
+}
+
+.category-grid {
+  display: grid;
+  grid-template-columns: repeat(
+    auto-fit,
+    minmax(70px, 1fr)
+  ); /* Changed auto-fill to auto-fit */
+  gap: 10px; /* Spacing between grid items */
+  /* Items will flow, wrap, and scroll vertically within the max-height of .category-scroll-container */
+  width: 100%; /* Ensure the grid itself tries to take full width of its parent */
+}
+
 .logo-item-card {
   display: flex;
   flex-direction: column;

@@ -394,23 +394,10 @@ const MainContent: React.FC<MainContentProps> = ({
         );
       case "ai":
         return (
-          <div
-            style={{
-              flexGrow: 1,
-              overflowY: "auto",
-              padding: "1rem",
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              justifyContent: "center",
-              textAlign: "center",
-            }}
-          >
-            <h2>AI Assistant</h2>
-            <p>
-              Coming soon! An AI-powered assistant to help you with your grocery
-              planning.
-            </p>
+          <div style={{ textAlign: "center", paddingTop: "20px" }}>
+            <div className="default-fav-items-icon">✨</div>
+            <h2>AI</h2>
+            <p>(Coming soon)</p>
           </div>
         );
       default:

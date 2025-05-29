@@ -96,8 +96,8 @@ const DefaultBrowseView: React.FC<DefaultBrowseViewProps> = ({
 
       <div className="section-title">Categories</div>
       {categoriesToDisplay.length > 0 && (
-        <div className="logo-scroll-container horizontal-scroll">
-          <div className="two-row-grid">
+        <div className="logo-scroll-container category-scroll-container">
+          <div className="category-grid">
             {categoriesToDisplay.map((category, index) => (
               <div
                 key={category.name}
