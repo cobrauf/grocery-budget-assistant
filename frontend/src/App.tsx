@@ -501,6 +501,7 @@ function App() {
         <MainContent
           onResultsViewScroll={handleMainContentScroll}
           activeTab={activeTab}
+          setActiveTab={setActiveTab}
           viewMode={viewMode}
           setViewMode={setViewMode}
           areNavBarsVisible={areNavBarsVisible}

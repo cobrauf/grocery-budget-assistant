@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useRef, RefObject } from "react";
 import SearchResultsView from "../views/SearchResultsView";
 import DefaultSearchView from "../views/DefaultSearchView";
 import DefaultBrowseView from "../views/DefaultBrowseView";
@@ -15,11 +15,13 @@ import StoreFilterModal from "./modals/StoreFilterModal";
 import CategoryFilterModal from "./modals/CategoryFilterModal";
 import { PRODUCT_CATEGORIES_WITH_ICONS } from "../views/DefaultBrowseView";
 import "../styles/DefaultBrowseView.css";
+import { useSwipeNavigation } from "../hooks/useSwipeNavigation";
 
 interface MainContentProps {
   onResultsViewScroll?: (scrollY: number) => void;
   children?: React.ReactNode;
   activeTab: AppTab;
+  setActiveTab: (tab: AppTab) => void;
   viewMode: Record<"browse" | "search", ViewMode>;
   setViewMode: (tab: "browse" | "search", mode: ViewMode) => void;
   areNavBarsVisible: boolean;
@@ -75,6 +77,7 @@ interface MainContentProps {
 
 const MainContent: React.FC<MainContentProps> = ({
   activeTab,
+  setActiveTab,
   viewMode,
   setViewMode,
   areNavBarsVisible,
@@ -115,6 +118,14 @@ const MainContent: React.FC<MainContentProps> = ({
   performSearch,
   removeFromSearchHistory,
 }) => {
+  const mainContentRef = useRef<HTMLDivElement>(null);
+
+  useSwipeNavigation({
+    targetRef: mainContentRef as RefObject<HTMLElement>,
+    activeTab: activeTab,
+    setActiveTab: setActiveTab,
+  });
+
   const handleResultsViewScroll = useCallback(
     (scrollY: number) => {
       if (onResultsViewScroll) {
@@ -259,15 +270,25 @@ const MainContent: React.FC<MainContentProps> = ({
               </div>
             )}
             <div style={browseContentContainerStyle}>
-              {viewMode.browse === "results" ? (
+              {viewMode.browse === "default" && (
+                <DefaultBrowseView
+                  rawRetailers={rawRetailers}
+                  verifiedRetailers={verifiedRetailers}
+                  isLoadingApiRetailers={isLoadingApiRetailers}
+                  isLoadingLogoVerification={isLoadingLogoVerification}
+                  retailerApiError={retailerApiError}
+                  getLogoPath={getLogoPath}
+                  selectedStoreIds={selectedStoreIds}
+                  selectedCategories={selectedCategories}
+                  onToggleStoreSelection={onToggleStoreSelection}
+                  onToggleCategorySelection={onToggleCategorySelection}
+                  onShowItemsRequest={handleShowItemsClick}
+                />
+              )}
+              {viewMode.browse === "results" && (
                 <BrowseResultsView
                   items={filteredBrowseProducts}
                   isLoading={isLoadingFilteredBrowseProducts}
-                  error={null}
-                  onScrollUpdate={handleResultsViewScroll}
-                  addFavorite={addFavorite}
-                  removeFavorite={removeFavorite}
-                  isFavorite={isFavorite}
                   sortField={sortProps.activeSortField}
                   sortDirection={
                     sortProps.activeSortField === "price"
@@ -276,21 +297,11 @@ const MainContent: React.FC<MainContentProps> = ({
                       ? sortProps.storeSortDirection
                       : sortProps.categorySortDirection
                   }
-                  displayLimit={200}
-                />
-              ) : (
-                <DefaultBrowseView
-                  rawRetailers={rawRetailers}
-                  verifiedRetailers={verifiedRetailers}
-                  isLoadingApiRetailers={isLoadingApiRetailers}
-                  isLoadingLogoVerification={isLoadingLogoVerification}
-                  retailerApiError={retailerApiError}
-                  getLogoPath={getLogoPath}
-                  onShowItemsRequest={handleShowItemsClick}
-                  selectedStoreIds={selectedStoreIds}
-                  selectedCategories={selectedCategories}
-                  onToggleStoreSelection={onToggleStoreSelection}
-                  onToggleCategorySelection={onToggleCategorySelection}
+                  onScrollUpdate={handleResultsViewScroll}
+                  addFavorite={addFavorite}
+                  removeFavorite={removeFavorite}
+                  isFavorite={isFavorite}
+                  error={null}
                 />
               )}
             </div>
@@ -330,10 +341,6 @@ const MainContent: React.FC<MainContentProps> = ({
                 error={searchError}
                 hasMore={hasMoreResults}
                 loadMore={loadMoreResults}
-                onScrollUpdate={handleResultsViewScroll}
-                addFavorite={addFavorite}
-                removeFavorite={removeFavorite}
-                isFavorite={isFavorite}
                 sortField={sortProps.activeSortField}
                 sortDirection={
                   sortProps.activeSortField === "price"
@@ -342,7 +349,10 @@ const MainContent: React.FC<MainContentProps> = ({
                     ? sortProps.storeSortDirection
                     : sortProps.categorySortDirection
                 }
-                displayLimit={200}
+                onScrollUpdate={handleResultsViewScroll}
+                addFavorite={addFavorite}
+                removeFavorite={removeFavorite}
+                isFavorite={isFavorite}
               />
             </>
           );
@@ -350,10 +360,7 @@ const MainContent: React.FC<MainContentProps> = ({
           return (
             <DefaultSearchView
               searchHistory={searchHistory}
-              onSearch={(query) => {
-                performSearch(query);
-                setViewMode("search", "results");
-              }}
+              onSearch={performSearch}
               onRemoveSearchItem={removeFromSearchHistory}
             />
           );
@@ -365,21 +372,11 @@ const MainContent: React.FC<MainContentProps> = ({
 
         return (
           <>
-            {/* <FavItemBar
-              onUpdate={onFavoriteListUpdate}
-              onEmail={handleEmailFavorites}
-              isUpdateEnabled={needsFavoriteListUpdate}
-            /> */}
             <div className="sort-pills-bar-container">
               <SortPillsBar {...sortProps} />
             </div>
             <FavItemsResultsView
               items={displayedFavoriteProducts}
-              isLoading={false}
-              onScrollUpdate={handleResultsViewScroll}
-              addFavorite={addFavorite}
-              removeFavorite={removeFavorite}
-              isFavorite={isFavorite}
               sortField={sortProps.activeSortField}
               sortDirection={
                 sortProps.activeSortField === "price"
@@ -388,15 +385,32 @@ const MainContent: React.FC<MainContentProps> = ({
                   ? sortProps.storeSortDirection
                   : sortProps.categorySortDirection
               }
+              addFavorite={addFavorite}
+              removeFavorite={removeFavorite}
+              isFavorite={isFavorite}
+              isLoading={false}
             />
           </>
         );
       case "ai":
         return (
-          <div style={{ textAlign: "center", paddingTop: "20px" }}>
-            <div className="default-fav-items-icon">✨</div>
-            <h2>AI</h2>
-            <p>(Coming soon)</p>
+          <div
+            style={{
+              flexGrow: 1,
+              overflowY: "auto",
+              padding: "1rem",
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "center",
+              textAlign: "center",
+            }}
+          >
+            <h2>AI Assistant</h2>
+            <p>
+              Coming soon! An AI-powered assistant to help you with your grocery
+              planning.
+            </p>
           </div>
         );
       default:
@@ -408,7 +422,15 @@ const MainContent: React.FC<MainContentProps> = ({
     }
   };
 
-  return <main style={mainContentStyle}>{renderContent()}</main>;
+  return (
+    <main
+      ref={mainContentRef}
+      style={mainContentStyle}
+      className="main-content"
+    >
+      {renderContent()}
+    </main>
+  );
 };
 
 export default MainContent;

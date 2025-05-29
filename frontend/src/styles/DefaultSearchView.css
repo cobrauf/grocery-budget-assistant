@@ -34,11 +34,11 @@
   position: relative;
 }
 
-.search-history-button:hover {
+/* .search-history-button:hover {
   background-color: var(--theme-primary-lighter, #d1ebff);
   transform: translateY(-2px);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
+} */
 
 .search-history-button:active {
   transform: translateY(0);
@@ -64,6 +64,6 @@
   font-weight: bold;
 }
 
-.search-history-remove:hover {
+/* .search-history-remove:hover {
   background-color: rgba(0, 0, 0, 0.2);
-}
+} */
