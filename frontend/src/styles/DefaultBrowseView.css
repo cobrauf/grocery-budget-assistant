@@ -140,9 +140,10 @@
   cursor: not-allowed;
   /* filter: grayscale(80%); uncomment if you prefer grayscale */
 }
-.logo-item-card.category-item--disabled .logo-image,
+/* .logo-item-card.category-item--disabled .logo-image, */
 .logo-item-card.category-item--disabled .logo-label {
   /* Styles for children if needed, e.g., prevent color change on hover */
+  text-decoration: line-through;
 }
 
 .logo-image {
@@ -247,6 +248,7 @@
   cursor: not-allowed !important;
   background-color: #b0b0b0 !important;
   color: #666666 !important;
+  text-decoration: line-through !important;
 }
 .filter-button--disabled:hover {
   background-color: #b0b0b0 !important;
