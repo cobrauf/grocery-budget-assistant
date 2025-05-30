@@ -4,10 +4,11 @@
   gap: 8px; /* Space between label and switch */
   font-family: var(--current-font-family, "Arial", sans-serif);
   color: var(--theme-text, #212529);
+  margin-left: 1rem;
 }
 
 .toggle-switch-label {
-  font-size: 0.9rem; /* Adjust as needed */
+  font-size: 0.8rem; /* Adjust as needed */
   cursor: pointer;
   user-select: none; /* Prevent text selection on click */
 }

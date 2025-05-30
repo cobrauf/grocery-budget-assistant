@@ -129,7 +129,7 @@ const DefaultBrowseView: React.FC<DefaultBrowseViewProps> = ({
       <div className="actions-container">
         <ToggleSwitch
           id="front-page-toggle"
-          label="Front Page Sales Only"
+          label="Front Page Only"
           checked={isFrontPageOnly}
           onChange={setIsFrontPageOnly}
           className="front-page-toggle"

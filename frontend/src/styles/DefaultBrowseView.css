@@ -175,7 +175,7 @@
 }
 
 .show-items-button {
-  padding: 0.5rem 3rem;
+  padding: 0.5rem 1.5rem;
   font-size: 1rem;
   background-color: var(--theme-primary, #007bff);
   color: white;
@@ -183,6 +183,7 @@
   border-radius: 10px;
   cursor: pointer;
   font-family: inherit;
+  margin-right: 1rem;
 }
 
 .show-items-button:disabled {
