@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { Product } from "../../types/product"; // Corrected path
 import "../../styles/ProductCard.css"; // Import the CSS file
 
@@ -10,6 +10,27 @@ interface ProductCardProps {
   inFavoritesView?: boolean; // Added to track if we're in favorites view
   animationDelay?: number; // Delay in seconds for cascade animation
 }
+
+// Helper function to parse "YYYY-MM-DD" strings into local Date objects at midnight
+const parseDateStringAsLocal = (dateString: string): Date | null => {
+  const parts = dateString.split("-");
+  if (parts.length === 3) {
+    const year = parseInt(parts[0], 10);
+    const month = parseInt(parts[1], 10) - 1; // Month is 0-indexed in JavaScript Date
+    const day = parseInt(parts[2], 10);
+    if (!isNaN(year) && !isNaN(month) && !isNaN(day)) {
+      // This creates a date at 00:00:00 in the local timezone
+      const d = new Date(year, month, day);
+      // Ensure time components are zeroed out, though Date(Y,M,D) usually does this
+      d.setHours(0, 0, 0, 0);
+      return d;
+    }
+  }
+  console.warn(
+    `Invalid date string format for parseDateStringAsLocal: ${dateString}`
+  );
+  return null;
+};
 
 const ProductCard: React.FC<ProductCardProps> = ({
   product,
@@ -28,7 +49,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
   const hasBeenUnfavorited = useRef(false);
 
   // Update visual state when props change
-  React.useEffect(() => {
+  useEffect(() => {
     if (!inFavoritesView || !hasBeenUnfavorited.current) {
       setVisuallyLiked(isFavorite);
     }
@@ -45,49 +66,46 @@ const ProductCard: React.FC<ProductCardProps> = ({
     return `/assets/logos/${imageName}.png`; // Adjusted path assuming assets are served from public root
   };
 
-  const getExpirationDate = (): string | null => {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0); // Reset time to start of today
-
-    // First try to get product's promotion end date if exists, if not use weekly ad's end date
-    if (product.promotion_to) {
-      try {
-        const date = new Date(product.promotion_to);
-        if (!isNaN(date.getTime())) {
-          // Check if date is in the past
-          date.setHours(0, 0, 0, 0); // Reset time for fair comparison
-          if (date < today) {
-            return "Expired";
-          }
-          return formatDate(date);
-        }
-      } catch (e) {
-        // Invalid date format, continue to try weekly_ad_valid_to
-      }
-    }
-
-    if (product.weekly_ad_valid_to) {
-      try {
-        const date = new Date(product.weekly_ad_valid_to);
-        if (!isNaN(date.getTime())) {
-          // Check if date is in the past
-          date.setHours(0, 0, 0, 0); // Reset time for fair comparison
-          if (date < today) {
-            return "Expired";
-          }
-          return formatDate(date);
-        }
-      } catch (e) {
-        // Invalid date format
-      }
-    }
-    return null;
-  };
-
   const formatDate = (date: Date): string => {
     const month = date.getMonth() + 1; // getMonth() is zero-based
     const day = date.getDate();
     return `${month}/${day}`;
+  };
+
+  const getExpirationDate = (): string | null => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // Start of today in local timezone
+
+    const processDateString = (
+      dateString: string | undefined | null
+    ): string | null => {
+      if (!dateString) return null;
+
+      const dealLastValidDay = parseDateStringAsLocal(dateString);
+
+      if (dealLastValidDay && !isNaN(dealLastValidDay.getTime())) {
+        // A deal is valid *through* its dealLastValidDay.
+        if (today > dealLastValidDay) {
+          return "Expired";
+        }
+        return formatDate(dealLastValidDay); // Format the last valid day for display
+      }
+      return null; // Invalid date string or parsing failed
+    };
+
+    // Prioritize product-specific promotion date
+    let expirationDisplay = processDateString(product.promotion_to);
+    if (expirationDisplay) {
+      return expirationDisplay;
+    }
+
+    // Fallback to weekly ad's validity date
+    expirationDisplay = processDateString(product.weekly_ad_valid_to);
+    if (expirationDisplay) {
+      return expirationDisplay;
+    }
+
+    return null; // No valid date found
   };
 
   const handleFavoriteClick = () => {
