@@ -135,6 +135,16 @@
   background-color: #e6f2ff; /* Light blue to indicate selection */
 }
 
+.logo-item-card.category-item--disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  /* filter: grayscale(80%); uncomment if you prefer grayscale */
+}
+.logo-item-card.category-item--disabled .logo-image,
+.logo-item-card.category-item--disabled .logo-label {
+  /* Styles for children if needed, e.g., prevent color change on hover */
+}
+
 .logo-image {
   width: 50px; /* Adjusted for smaller card */
   height: 50px; /* Adjusted for smaller card */
@@ -225,4 +235,40 @@
   animation-duration: 0.3s; /* Adjust duration as needed */
   animation-fill-mode: backwards; /* Ensures styles are applied before animation starts if needed */
   animation-timing-function: ease-out;
+}
+
+/* Styles for the "Filter by Categories" button when disabled */
+/* This is actually for MainContent.tsx's filter button styling */
+/* but its definition should be here if it is styled here */
+.filter-button--disabled {
+  /* This style is for the button in MainContent.tsx but defined here */
+  opacity: 0.6 !important;
+  cursor: not-allowed !important;
+  background-color: #b0b0b0 !important;
+  color: #666666 !important;
+}
+.filter-button--disabled:hover {
+  background-color: #b0b0b0 !important;
+}
+
+.actions-container {
+  display: flex;
+  justify-content: center; /* Or space-between, space-around */
+  align-items: center;
+  gap: 20px; /* Space between toggle and button */
+  padding: 0.5rem 0; /* Reduced padding */
+  margin-top: 1rem;
+  /* border-top: 1px solid #eee; */ /* Keep or remove as per design */
+}
+
+.front-page-toggle .toggle-switch-label {
+  /* Example for specific styling */
+  font-weight: 500; /* Make label a bit bolder */
+}
+
+/* Adjust show-items-button-container if it's now .actions-container */
+.show-items-button-container {
+  /* If you kept this name for the wrapper */
+  /* ... existing styles or new flex styles ... */
+  /* This class might be replaced by .actions-container now, so these styles might need to be moved or removed */
 }

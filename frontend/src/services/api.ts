@@ -45,14 +45,21 @@ export const searchProducts = async (
 export const fetchProductsByFilter = async (
   storeIds: string[],
   categories: string[],
-  adPeriod: string = "current"
+  adPeriod: string = "current",
+  isFrontPageOnly: boolean = false
 ): Promise<Product[]> => {
   const params = new URLSearchParams();
   if (storeIds.length > 0) {
     params.append("store_ids", storeIds.join(","));
   }
-  if (categories.length > 0) {
-    params.append("categories", categories.join(","));
+
+  if (isFrontPageOnly) {
+    params.append("is_frontpage_only", "true");
+    // Categories are intentionally not appended if isFrontPageOnly is true
+  } else {
+    if (categories.length > 0) {
+      params.append("categories", categories.join(","));
+    }
   }
   params.append("ad_period", adPeriod);
 

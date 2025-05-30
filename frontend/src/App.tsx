@@ -28,6 +28,8 @@ import {
   loadFromLocalStorage,
   LS_SELECTED_STORE_IDS,
   LS_SELECTED_CATEGORIES,
+  LS_APP_THEME,
+  LS_FRONT_PAGE_ONLY_TOGGLE,
   LS_LAST_BROWSE_FILTER_KEY,
   LS_LAST_BROWSE_PRODUCTS,
   LS_FAVORITE_ITEMS,
@@ -222,7 +224,8 @@ function App() {
     // A more robust way might involve a separate state variable indicating hydration completion.
     const currentFilterKey = generateBrowseCacheKey(
       Array.from(selectedStoreIds).map(String),
-      Array.from(selectedCategories)
+      Array.from(selectedCategories),
+      false
     );
     const lastFilterKey = loadFromLocalStorage<string | null>(
       LS_LAST_BROWSE_FILTER_KEY,
@@ -265,15 +268,12 @@ function App() {
     };
   }, []); // Empty dependency array means this effect runs once on mount and cleanup on unmount
 
-  // Helper to generate cache key
-  const generateBrowseCacheKey = (
-    storeIds: string[],
-    categories: string[]
-  ): string => {
-    const sortedStoreIds = [...storeIds].sort().join(",");
-    const sortedCategories = [...categories].sort().join(",");
-    return `stores:${sortedStoreIds}_categories:${sortedCategories}`;
-  };
+  // State for last fetched browse criteria (including front page only mode)
+  const [lastFetchedBrowseCriteria, setLastFetchedBrowseCriteria] = useState<{
+    storeIds: string[];
+    categories: string[];
+    isFrontPageOnlyMode: boolean;
+  } | null>(null);
 
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
@@ -298,42 +298,43 @@ function App() {
 
   const handleFetchProductsByFilter = async (
     storeIds: string[],
-    categories: string[]
+    categories: string[],
+    isFrontPageOnlyMode: boolean
   ) => {
-    const cacheKey = generateBrowseCacheKey(storeIds, categories);
+    const cacheKey = generateBrowseCacheKey(
+      storeIds,
+      categories,
+      isFrontPageOnlyMode
+    );
 
     if (browseResultsCache.has(cacheKey)) {
-      const cachedProducts = browseResultsCache.get(cacheKey)!;
-      setFilteredBrowseProducts(cachedProducts);
-      setIsLoadingFilteredBrowseProducts(false);
-      // Set view mode instead of directly setting isBrowseResultsActive
+      setFilteredBrowseProducts(browseResultsCache.get(cacheKey)!);
       setViewMode("browse", "results");
-      // Save to local storage as well, as this might be a cache hit from memory cache
-      saveToLocalStorage(LS_LAST_BROWSE_FILTER_KEY, cacheKey);
-      saveToLocalStorage(LS_LAST_BROWSE_PRODUCTS, cachedProducts);
       return;
     }
 
-    // Set view mode to results
     setViewMode("browse", "results");
     setIsLoadingFilteredBrowseProducts(true);
     setFilteredBrowseProducts([]);
     try {
-      const products = await apiFetchProductsByFilter(storeIds, categories);
+      const products = await apiFetchProductsByFilter(
+        storeIds,
+        categories,
+        "current",
+        isFrontPageOnlyMode
+      );
       setFilteredBrowseProducts(products);
-      setBrowseResultsCache((prevCache) =>
-        new Map(prevCache).set(cacheKey, products)
-      ); // Update memory cache
-      // Save to local storage
-      saveToLocalStorage(LS_LAST_BROWSE_FILTER_KEY, cacheKey);
-      saveToLocalStorage(LS_LAST_BROWSE_PRODUCTS, products);
+      browseResultsCache.set(cacheKey, products);
+      setLastFetchedBrowseCriteria({
+        storeIds,
+        categories,
+        isFrontPageOnlyMode,
+      });
     } catch (error) {
       console.error("Error fetching filtered products:", error);
-    } finally {
-      setIsLoadingFilteredBrowseProducts(false);
-      // Always ensure we stay in results view after fetch completes
-      setViewMode("browse", "results");
+      setViewMode("browse", "default");
     }
+    setIsLoadingFilteredBrowseProducts(false);
   };
 
   const toggleBrowseView = () => {
@@ -376,8 +377,16 @@ function App() {
     const storeIdsAsString = Array.from(currentStoreIds).map(String);
     const categoryNames = Array.from(currentCategories);
 
-    if (storeIdsAsString.length > 0 || categoryNames.length > 0) {
-      handleFetchProductsByFilter(storeIdsAsString, categoryNames);
+    if (
+      storeIdsAsString.length > 0 ||
+      categoryNames.length > 0 ||
+      isFrontPageOnly
+    ) {
+      handleFetchProductsByFilter(
+        storeIdsAsString,
+        categoryNames,
+        isFrontPageOnly
+      );
     } else {
       setFilteredBrowseProducts([]);
       setViewMode("browse", "default");
@@ -474,6 +483,28 @@ function App() {
     resetSearch,
   });
 
+  // Near other state variables
+  const [isFrontPageOnly, setIsFrontPageOnly] = useState<boolean>(() => {
+    return loadFromLocalStorage<boolean>(LS_FRONT_PAGE_ONLY_TOGGLE, false);
+  });
+
+  // Near other useEffects
+  useEffect(() => {
+    saveToLocalStorage(LS_FRONT_PAGE_ONLY_TOGGLE, isFrontPageOnly);
+  }, [isFrontPageOnly]);
+
+  const generateBrowseCacheKey = (
+    storeIds: string[],
+    categories: string[],
+    isFrontPageOnlyMode: boolean
+  ): string => {
+    const sortedStoreIds = [...storeIds].sort().join(",");
+    const sortedCategories = isFrontPageOnlyMode
+      ? ""
+      : [...categories].sort().join(",");
+    return `stores:${sortedStoreIds}_categories:${sortedCategories}_fp:${isFrontPageOnlyMode}`;
+  };
+
   return (
     <ThemeContext.Provider
       value={{ themeName: currentThemeName, setThemeName: setCurrentThemeName }}
@@ -543,6 +574,9 @@ function App() {
           isFavorite={isFavorite}
           needsFavoriteListUpdate={needsFavoriteListUpdate}
           onFavoriteListUpdate={() => setNeedsFavoriteListUpdate(false)}
+          // New props
+          isFrontPageOnly={isFrontPageOnly}
+          setIsFrontPageOnly={setIsFrontPageOnly}
         />
         <BottomNav
           activeTab={activeTab}

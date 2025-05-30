@@ -1,6 +1,7 @@
 import React from "react";
 import { Retailer } from "../types/retailer";
 import "../styles/DefaultBrowseView.css";
+import ToggleSwitch from "../components/common/ToggleSwitch";
 
 // Export categories for use in other components
 export const PRODUCT_CATEGORIES_WITH_ICONS: { name: string; icon: string }[] = [
@@ -37,6 +38,8 @@ interface DefaultBrowseViewProps {
   selectedCategories: Set<string>;
   onToggleStoreSelection: (id: number) => void;
   onToggleCategorySelection: (categoryName: string) => void;
+  isFrontPageOnly: boolean;
+  setIsFrontPageOnly: (value: boolean) => void;
 }
 
 const DefaultBrowseView: React.FC<DefaultBrowseViewProps> = ({
@@ -50,6 +53,8 @@ const DefaultBrowseView: React.FC<DefaultBrowseViewProps> = ({
   selectedCategories,
   onToggleStoreSelection,
   onToggleCategorySelection,
+  isFrontPageOnly,
+  setIsFrontPageOnly,
 }) => {
   const canShowItems = selectedStoreIds.size > 0 || selectedCategories.size > 0;
 
@@ -102,10 +107,14 @@ const DefaultBrowseView: React.FC<DefaultBrowseViewProps> = ({
               <div
                 key={category.name}
                 className={`logo-item-card category-item icon-slide-in ${
-                  selectedCategories.has(category.name) ? "selected" : ""
-                }`}
+                  selectedCategories.has(category.name) && !isFrontPageOnly
+                    ? "selected"
+                    : ""
+                } ${isFrontPageOnly ? "category-item--disabled" : ""}`}
                 style={{ animationDelay: `${index * 0.03}s` }}
-                onClick={() => onToggleCategorySelection(category.name)}
+                onClick={() =>
+                  !isFrontPageOnly && onToggleCategorySelection(category.name)
+                }
               >
                 <span className="logo-image category-icon">
                   {category.icon}
@@ -117,11 +126,18 @@ const DefaultBrowseView: React.FC<DefaultBrowseViewProps> = ({
         </div>
       )}
 
-      <div className="show-items-button-container">
+      <div className="actions-container">
+        <ToggleSwitch
+          id="front-page-toggle"
+          label="Front Page Sales Only"
+          checked={isFrontPageOnly}
+          onChange={setIsFrontPageOnly}
+          className="front-page-toggle"
+        />
         <button
           className="show-items-button"
           onClick={onShowItemsRequest}
-          disabled={!canShowItems}
+          disabled={!canShowItems && !isFrontPageOnly}
         >
           View Deals {">>"}
         </button>
