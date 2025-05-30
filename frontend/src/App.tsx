@@ -161,6 +161,25 @@ function App() {
     dateSortDirection,
   ]);
 
+  // Apply the current sort to search results
+  const displayedSearchResults = useMemo(() => {
+    let direction: SortDirection;
+    if (activeSortField === "price") direction = priceSortDirection;
+    else if (activeSortField === "store") direction = storeSortDirection;
+    else if (activeSortField === "date") direction = dateSortDirection;
+    else direction = categorySortDirection; // Fallback or ensure 'category' is a valid SortField
+
+    // Ensure searchResults is always an array, even if undefined initially from useSearch
+    return sortProducts(searchResults || [], activeSortField, direction);
+  }, [
+    searchResults,
+    activeSortField,
+    priceSortDirection,
+    storeSortDirection,
+    categorySortDirection,
+    dateSortDirection,
+  ]);
+
   const isSearchActive = activeTab === "search";
 
   const {
@@ -430,22 +449,6 @@ function App() {
     dateSortDirection,
   ]);
 
-  const displayedSearchResults = useMemo(() => {
-    let direction: SortDirection;
-    if (activeSortField === "price") direction = priceSortDirection;
-    else if (activeSortField === "store") direction = storeSortDirection;
-    else direction = categorySortDirection; // for 'category'
-
-    return sortProducts(searchResults, activeSortField, direction);
-  }, [
-    searchResults,
-    activeSortField,
-    priceSortDirection,
-    storeSortDirection,
-    categorySortDirection,
-  ]);
-  // --- End derived sorted product lists ---
-
   const handleMainContentScroll = useCallback(
     (currentScrollY: number) => {
       const scrollingDown = currentScrollY > lastScrollY;
@@ -541,7 +544,7 @@ function App() {
           searchQuery={searchQuery}
           searchResults={displayedSearchResults}
           searchHistory={searchHistory}
-          performSearch={performSearch}
+          performSearch={handleNewSearch}
           totalResults={totalResults}
           isLoadingSearch={isLoadingSearch}
           searchError={searchError}
