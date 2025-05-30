@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import "../styles/DefaultSearchView.css";
 
 interface DefaultSearchViewProps {
@@ -12,6 +12,29 @@ const DefaultSearchView: React.FC<DefaultSearchViewProps> = ({
   onSearch,
   onRemoveSearchItem,
 }) => {
+  // Internal state to manage terms for display, allowing animation before actual removal from parent state
+  const [displayedInternalTerms, setDisplayedInternalTerms] = useState<
+    string[]
+  >([]);
+  const [removingItems, setRemovingItems] = useState<Set<string>>(new Set());
+
+  const defaultSuggestions = [
+    "🥚 Eggs",
+    "🥑 Avocados",
+    "🥭 Mangos",
+    "🍗 Chicken",
+  ];
+
+  // Effect to synchronize internal state with the searchHistory prop
+  useEffect(() => {
+    // We only want to display non-default suggestions from the searchHistory prop
+    // as default suggestions are added separately and are not "removable" in the same way.
+    const nonDefaultHistory = searchHistory.filter(
+      (term) => !defaultSuggestions.includes(term)
+    );
+    setDisplayedInternalTerms(nonDefaultHistory);
+  }, [searchHistory]); // Note: defaultSuggestions is stable, no need to include if defined outside useEffect
+
   const viewStyle: React.CSSProperties = {
     display: "flex",
     flexDirection: "column",
@@ -23,49 +46,63 @@ const DefaultSearchView: React.FC<DefaultSearchViewProps> = ({
     color: "var(--theme-text, #333)",
   };
 
-  // Combine search history with default suggestions
-  // Add default suggestions at the beginning, filter out duplicates
-  const defaultSuggestions = [
-    "🥚 Eggs",
-    "🥑 Avocados",
-    "🥭 Mangos",
-    "🍗 Chicken",
-  ];
-  const allSearchTerms = [
-    ...searchHistory.filter((term) => !defaultSuggestions.includes(term)),
-    ...defaultSuggestions,
-  ];
-
-  // Limit to a reasonable number of buttons
-  const displayedTerms = allSearchTerms.slice(0, 50);
+  // Combine unique internal terms with default suggestions for rendering
+  const termsToRender = [
+    ...displayedInternalTerms,
+    // Add default suggestions that are not already in displayedInternalTerms (if any case this happens)
+    ...defaultSuggestions.filter(
+      (term) => !displayedInternalTerms.includes(term)
+    ),
+  ].slice(0, 50); // Limit total buttons
 
   const handleSearchClick = (term: string) => {
     onSearch(term);
   };
 
   const handleRemoveClick = (e: React.MouseEvent, term: string) => {
-    e.stopPropagation(); // Prevent triggering the search when clicking the X
-    if (onRemoveSearchItem && !defaultSuggestions.includes(term)) {
-      onRemoveSearchItem(term);
+    e.stopPropagation();
+    // Prevent removal if it's a default suggestion or already being removed
+    if (defaultSuggestions.includes(term) || removingItems.has(term)) {
+      return;
     }
+
+    setRemovingItems((prev) => new Set(prev).add(term));
+
+    setTimeout(() => {
+      // Call the parent handler to remove from the actual search history (e.g., in useSearch hook)
+      if (onRemoveSearchItem) {
+        onRemoveSearchItem(term);
+      }
+      // Remove from internal display list *after* animation duration
+      // This ensures the item is still in the DOM for the animation to play
+      setDisplayedInternalTerms((prevTerms) =>
+        prevTerms.filter((t) => t !== term)
+      );
+      setRemovingItems((prev) => {
+        const next = new Set(prev);
+        next.delete(term);
+        return next;
+      });
+    }, 500); // Animation duration in ms
   };
 
   return (
     <div style={viewStyle}>
-      {/* <h2>Search</h2> */}
       <p>Search for items using the search bar above.</p>
 
       <div className="search-history-section">
         <h3>Quick Searches</h3>
         <div className="search-history-grid">
-          {displayedTerms.map((term, index) => (
+          {termsToRender.map((term) => (
             <button
-              key={index}
-              className="search-history-button"
+              key={term} // Assuming terms are unique for keys here; add index if not guaranteed
+              className={`search-history-button ${
+                removingItems.has(term) ? "removing" : ""
+              }`}
               onClick={() => handleSearchClick(term)}
             >
               {term}
-              {!defaultSuggestions.includes(term) && onRemoveSearchItem && (
+              {!defaultSuggestions.includes(term) && (
                 <span
                   className="search-history-remove"
                   onClick={(e) => handleRemoveClick(e, term)}
