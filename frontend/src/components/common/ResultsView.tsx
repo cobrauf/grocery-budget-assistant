@@ -28,6 +28,7 @@ interface ResultsViewProps {
   sortDirection?: string;
   // New prop for display limit notification
   displayLimit?: number;
+  children?: React.ReactNode; // Add children prop
 }
 
 const infoTextStyle: React.CSSProperties = {
@@ -56,6 +57,7 @@ const ResultsView: React.FC<ResultsViewProps> = ({
   isFavorite,
   inFavoritesView,
   displayLimit,
+  children, // Destructure children
 }) => {
   const scrollableDivRef = useRef<HTMLDivElement>(null);
 
@@ -208,6 +210,7 @@ const ResultsView: React.FC<ResultsViewProps> = ({
           <LoadingSpinner />
         </div>
       )}
+      {children} {/* Render children here */}
     </div>
   );
 };

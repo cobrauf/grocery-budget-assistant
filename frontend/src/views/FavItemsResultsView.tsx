@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Product } from "../types/product";
 import ResultsView from "../components/common/ResultsView";
 import ConfirmActionModal from "../components/modals/ConfirmActionModal";
+import CustomProductCard from "../components/common/CustomProductCard";
 
 interface FavItemsResultsViewProps {
   items: Product[];
@@ -102,30 +103,15 @@ const FavItemsResultsView: React.FC<FavItemsResultsViewProps> = ({
         inFavoritesView={true} // Indicate this is the favorites view
         sortField={sortField}
         sortDirection={sortDirection}
-      />
+      >
+        {items.length > 0 && !isLoading && (
+          <CustomProductCard
+            onRemoveAllClick={() => setIsClearFavsModalOpen(true)}
+            onRemoveExpiredClick={() => setIsClearExpiredFavsModalOpen(true)}
+          />
+        )}
+      </ResultsView>
 
-      {items.length > 0 && !isLoading && (
-        <div
-          style={{
-            textAlign: "center",
-            margin: "20px 0",
-          }}
-        >
-          <button
-            onClick={() => setIsClearFavsModalOpen(true)}
-            className="modal-button-confirm"
-            style={{ marginRight: "10px" }}
-          >
-            Remove All
-          </button>
-          <button
-            onClick={() => setIsClearExpiredFavsModalOpen(true)}
-            className="modal-button-confirm"
-          >
-            Remove Expired
-          </button>
-        </div>
-      )}
       <ConfirmActionModal
         isOpen={isClearFavsModalOpen}
         onClose={() => setIsClearFavsModalOpen(false)}

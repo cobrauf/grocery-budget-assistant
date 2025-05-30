@@ -147,7 +147,7 @@
 }
 
 .modal-button-confirm:hover {
-  background-color: var(--theme-primary-action-hover, #0056b3);
+  background-color: var(--theme-primary-action-hover, #737373);
 }
 
 .modal-button-confirm:disabled {
