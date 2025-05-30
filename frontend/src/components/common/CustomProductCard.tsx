@@ -13,7 +13,7 @@ const CustomProductCard: React.FC<CustomProductCardProps> = ({
     width: "150px",
     height: "40px",
     padding: "10px 15px",
-    backgroundColor: "#F7374F",
+    backgroundColor: "var(--theme-primary, #007bff)",
     color: "white",
     border: "none",
     borderRadius: "10px",
