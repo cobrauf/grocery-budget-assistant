@@ -16,6 +16,12 @@ export const sortProducts = (
 ): Product[] => {
   if (!products) return [];
 
+  // const today = new Date().toISOString().split('T')[0]; // Removed: No longer checking for expired
+
+  const getEffectiveEndDate = (p: Product) => {
+    return p.promotion_to || p.weekly_ad_valid_to || "";
+  };
+
   // Create a new array to avoid mutating the original, since we are reording this array in place
   const sortedProducts = [...products];
 
@@ -34,8 +40,8 @@ export const sortProducts = (
     const bCategory = b.category?.toLowerCase() || "";
     const aIsfrontpage = a.is_frontpage ? 1 : 0;
     const bIsfrontpage = b.is_frontpage ? 1 : 0;
-    const aDate = a.weekly_ad_valid_from || "";
-    const bDate = b.weekly_ad_valid_from || "";
+    // const aDate = a.weekly_ad_valid_from || ""; // Replaced by effective dates logic
+    // const bDate = b.weekly_ad_valid_from || ""; // Replaced by effective dates logic
 
     switch (field) {
       case "price":
@@ -56,8 +62,13 @@ export const sortProducts = (
         }
         break;
       case "date":
-        if (aDate < bDate) comparison = -1;
-        if (aDate > bDate) comparison = 1;
+        const endA = getEffectiveEndDate(a);
+        const endB = getEffectiveEndDate(b);
+
+        // Sort by effective end date (earlier or empty is older)
+        if (endA < endB) comparison = -1;
+        else if (endA > endB) comparison = 1;
+        // If end dates are the same, comparison remains 0 (no change in order for this field)
         break;
       default:
         return 0;
