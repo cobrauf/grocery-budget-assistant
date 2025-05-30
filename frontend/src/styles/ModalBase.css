@@ -134,7 +134,7 @@
 .modal-button-confirm,
 .modal-button-cancel {
   padding: 10px 20px;
-  border-radius: 50px;
+  border-radius: 10px;
   border: none;
   font-size: 1rem;
   cursor: pointer;

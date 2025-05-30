@@ -9,6 +9,20 @@ const CustomProductCard: React.FC<CustomProductCardProps> = ({
   onRemoveAllClick,
   onRemoveExpiredClick,
 }) => {
+  const buttonStyle: React.CSSProperties = {
+    width: "150px",
+    height: "40px",
+    padding: "10px 15px",
+    backgroundColor: "#F7374F",
+    color: "white",
+    border: "none",
+    borderRadius: "10px",
+    cursor: "pointer",
+    fontSize: "14px",
+    // fontWeight: "bold",
+    textAlign: "center",
+  };
+
   return (
     <div
       style={{
@@ -22,20 +36,20 @@ const CustomProductCard: React.FC<CustomProductCardProps> = ({
         flexDirection: "row",
         // alignItems: "center",
         justifyContent: "center",
-        gap: "50px",
+        gap: "30px",
       }}
     >
       <button
         onClick={onRemoveAllClick}
-        className="modal-button-confirm" // Assuming this class provides styling
-        style={{ width: "150px" }} // Added width for consistency
+        // className="modal-button-confirm" // Assuming this class provides styling
+        style={buttonStyle}
       >
         Remove All Favs
       </button>
       <button
         onClick={onRemoveExpiredClick}
-        className="modal-button-confirm" // Assuming this class provides styling
-        style={{ width: "150px" }} // Added width for consistency
+        // className="modal-button-confirm" // Assuming this class provides styling
+        style={buttonStyle}
       >
         Remove Expired
       </button>

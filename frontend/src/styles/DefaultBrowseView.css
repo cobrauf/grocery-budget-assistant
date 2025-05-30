@@ -170,7 +170,7 @@
   background-color: var(--theme-primary, #007bff);
   color: white;
   border: none;
-  border-radius: 50px;
+  border-radius: 10px;
   cursor: pointer;
   font-family: inherit;
 }
