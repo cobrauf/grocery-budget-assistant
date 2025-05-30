@@ -12,6 +12,7 @@ import {
   LS_PRICE_SORT_DIRECTION,
   LS_STORE_SORT_DIRECTION,
   LS_CATEGORY_SORT_DIRECTION,
+  LS_DATE_SORT_DIRECTION,
 } from "../utils/localStorageUtils";
 
 const defaultSortOptions: SortOptions = {
@@ -19,6 +20,7 @@ const defaultSortOptions: SortOptions = {
   priceSortDirection: "asc",
   storeSortDirection: "asc",
   categorySortDirection: "asc",
+  dateSortDirection: "asc",
 };
 
 export const useSort = (): SortStateAndActions => {
@@ -49,6 +51,13 @@ export const useSort = (): SortStateAndActions => {
         defaultSortOptions.categorySortDirection
       )
     );
+  const [dateSortDirection, setDateSortDirection] = useState<SortDirection>(
+    () =>
+      loadFromLocalStorage<SortDirection>(
+        LS_DATE_SORT_DIRECTION,
+        defaultSortOptions.dateSortDirection
+      )
+  );
 
   useEffect(() => {
     saveToLocalStorage(LS_ACTIVE_SORT_FIELD, activeSortField);
@@ -66,6 +75,10 @@ export const useSort = (): SortStateAndActions => {
     saveToLocalStorage(LS_CATEGORY_SORT_DIRECTION, categorySortDirection);
   }, [categorySortDirection]);
 
+  useEffect(() => {
+    saveToLocalStorage(LS_DATE_SORT_DIRECTION, dateSortDirection);
+  }, [dateSortDirection]);
+
   const toggleSortDirection = (field: SortField) => {
     switch (field) {
       case "price":
@@ -76,6 +89,9 @@ export const useSort = (): SortStateAndActions => {
         break;
       case "category":
         setCategorySortDirection((prev) => (prev === "asc" ? "desc" : "asc"));
+        break;
+      case "date":
+        setDateSortDirection((prev) => (prev === "asc" ? "desc" : "asc"));
         break;
       default:
         break;
@@ -95,10 +111,12 @@ export const useSort = (): SortStateAndActions => {
     priceSortDirection,
     storeSortDirection,
     categorySortDirection,
+    dateSortDirection,
     setActiveSortField,
     setPriceSortDirection,
     setStoreSortDirection,
     setCategorySortDirection,
+    setDateSortDirection,
     toggleSortDirection,
     handlePillClick,
   };

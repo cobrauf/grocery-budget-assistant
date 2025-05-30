@@ -288,6 +288,8 @@ const MainContent: React.FC<MainContentProps> = ({
                       ? sortProps.priceSortDirection
                       : sortProps.activeSortField === "store"
                       ? sortProps.storeSortDirection
+                      : sortProps.activeSortField === "date"
+                      ? sortProps.dateSortDirection
                       : sortProps.categorySortDirection
                   }
                   displayLimit={200}
@@ -356,6 +358,8 @@ const MainContent: React.FC<MainContentProps> = ({
                     ? sortProps.priceSortDirection
                     : sortProps.activeSortField === "store"
                     ? sortProps.storeSortDirection
+                    : sortProps.activeSortField === "date"
+                    ? sortProps.dateSortDirection
                     : sortProps.categorySortDirection
                 }
                 displayLimit={200}
@@ -402,6 +406,8 @@ const MainContent: React.FC<MainContentProps> = ({
                   ? sortProps.priceSortDirection
                   : sortProps.activeSortField === "store"
                   ? sortProps.storeSortDirection
+                  : sortProps.activeSortField === "date"
+                  ? sortProps.dateSortDirection
                   : sortProps.categorySortDirection
               }
             />

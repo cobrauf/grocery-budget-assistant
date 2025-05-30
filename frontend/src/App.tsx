@@ -84,6 +84,7 @@ function App() {
     priceSortDirection,
     storeSortDirection,
     categorySortDirection,
+    dateSortDirection,
   } = sortProps;
 
   // Favorites state
@@ -144,21 +145,20 @@ function App() {
 
   // Apply the current sort to favorites
   const displayedFavoriteProducts = useMemo(() => {
-    return sortProducts(
-      favoriteItems,
-      activeSortField,
-      activeSortField === "price"
-        ? priceSortDirection
-        : activeSortField === "store"
-        ? storeSortDirection
-        : categorySortDirection
-    );
+    let direction: SortDirection;
+    if (activeSortField === "price") direction = priceSortDirection;
+    else if (activeSortField === "store") direction = storeSortDirection;
+    else if (activeSortField === "date") direction = dateSortDirection;
+    else direction = categorySortDirection;
+
+    return sortProducts(favoriteItems, activeSortField, direction);
   }, [
     favoriteItems,
     activeSortField,
     priceSortDirection,
     storeSortDirection,
     categorySortDirection,
+    dateSortDirection,
   ]);
 
   const isSearchActive = activeTab === "search";
@@ -417,7 +417,8 @@ function App() {
     let direction: SortDirection;
     if (activeSortField === "price") direction = priceSortDirection;
     else if (activeSortField === "store") direction = storeSortDirection;
-    else direction = categorySortDirection; // for 'category'
+    else if (activeSortField === "date") direction = dateSortDirection;
+    else direction = categorySortDirection;
 
     return sortProducts(filteredBrowseProducts, activeSortField, direction);
   }, [
@@ -426,6 +427,7 @@ function App() {
     priceSortDirection,
     storeSortDirection,
     categorySortDirection,
+    dateSortDirection,
   ]);
 
   const displayedSearchResults = useMemo(() => {

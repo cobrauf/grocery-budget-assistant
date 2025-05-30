@@ -1,4 +1,4 @@
-export type SortField = "price" | "store" | "category";
+export type SortField = "price" | "store" | "category" | "date";
 export type SortDirection = "asc" | "desc";
 
 export interface SortOptions {
@@ -6,6 +6,7 @@ export interface SortOptions {
   priceSortDirection: SortDirection;
   storeSortDirection: SortDirection;
   categorySortDirection: SortDirection;
+  dateSortDirection: SortDirection;
 }
 
 export interface SortActions {
@@ -13,6 +14,7 @@ export interface SortActions {
   setPriceSortDirection: (direction: SortDirection) => void;
   setStoreSortDirection: (direction: SortDirection) => void;
   setCategorySortDirection: (direction: SortDirection) => void;
+  setDateSortDirection: (direction: SortDirection) => void;
   toggleSortDirection: (field: SortField) => void;
   handlePillClick: (field: SortField) => void;
 }

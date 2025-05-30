@@ -34,6 +34,8 @@ export const sortProducts = (
     const bCategory = b.category?.toLowerCase() || "";
     const aIsfrontpage = a.is_frontpage ? 1 : 0;
     const bIsfrontpage = b.is_frontpage ? 1 : 0;
+    const aDate = a.weekly_ad_valid_from || "";
+    const bDate = b.weekly_ad_valid_from || "";
 
     switch (field) {
       case "price":
@@ -52,6 +54,10 @@ export const sortProducts = (
           if (aCategory < bCategory) comparison = -1;
           if (aCategory > bCategory) comparison = 1;
         }
+        break;
+      case "date":
+        if (aDate < bDate) comparison = -1;
+        if (aDate > bDate) comparison = 1;
         break;
       default:
         return 0;
