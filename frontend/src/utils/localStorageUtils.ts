@@ -47,3 +47,9 @@ export const LS_ACTIVE_SORT_FIELD = "appState.sort.activeSortField";
 export const LS_PRICE_SORT_DIRECTION = "appState.sort.priceSortDirection";
 export const LS_STORE_SORT_DIRECTION = "appState.sort.storeSortDirection";
 export const LS_CATEGORY_SORT_DIRECTION = "appState.sort.categorySortDirection";
+export const LS_DATE_SORT_DIRECTION = "appState.sort.dateSortDirection";
+
+// Shared state across the application (e.g., theme, global settings)
+export const LS_APP_THEME = "appState.theme";
+export const LS_LAST_SYNC_TIME = "appState.lastSyncTime";
+export const LS_FRONT_PAGE_ONLY_TOGGLE = "appState.browse.frontPageOnlyToggle";

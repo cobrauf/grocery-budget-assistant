@@ -41,7 +41,11 @@ interface MainContentProps {
   retailerApiError: string | null;
   getLogoPath: (name: string) => string;
 
-  onFetchProductsByFilter: (storeIds: string[], categories: string[]) => void;
+  onFetchProductsByFilter: (
+    storeIds: string[],
+    categories: string[],
+    isFrontPageOnly: boolean
+  ) => void;
   filteredBrowseProducts: Product[];
   isLoadingFilteredBrowseProducts: boolean;
 
@@ -71,6 +75,9 @@ interface MainContentProps {
   searchHistory: string[];
   performSearch: (query: string) => void;
   removeFromSearchHistory?: (query: string) => void;
+
+  isFrontPageOnly: boolean;
+  setIsFrontPageOnly: (value: boolean) => void;
 }
 
 const MainContent: React.FC<MainContentProps> = ({
@@ -114,6 +121,8 @@ const MainContent: React.FC<MainContentProps> = ({
   searchHistory,
   performSearch,
   removeFromSearchHistory,
+  isFrontPageOnly,
+  setIsFrontPageOnly,
 }) => {
   const handleResultsViewScroll = useCallback(
     (scrollY: number) => {
@@ -146,23 +155,25 @@ const MainContent: React.FC<MainContentProps> = ({
   const canShowItems = selectedStoreIds.size > 0 || selectedCategories.size > 0;
 
   const handleShowItemsClick = () => {
-    if (canShowItems) {
+    if (canShowItems || isFrontPageOnly) {
       const storeIdsAsString = Array.from(selectedStoreIds).map(String);
       const categoryNames = Array.from(selectedCategories);
-      onFetchProductsByFilter(storeIdsAsString, categoryNames);
-
+      onFetchProductsByFilter(storeIdsAsString, categoryNames, isFrontPageOnly);
       setViewMode("browse", "results");
     } else {
-      console.log("Show Items clicked with no selection.");
+      console.log(
+        "Show Items clicked with no selection and Front Page Only is off."
+      );
     }
   };
 
   const storeButtonText =
     selectedStoreIds.size > 0 ? `Stores (${selectedStoreIds.size})` : "+ Store";
-  const categoryButtonText =
-    selectedCategories.size > 0
-      ? `Categ. (${selectedCategories.size})`
-      : "+ Categ.";
+  const categoryButtonText = isFrontPageOnly
+    ? "FP Only"
+    : selectedCategories.size > 0
+    ? `Categ. (${selectedCategories.size})`
+    : "+ Categ.";
 
   const showHeaderBackArrow = viewMode.browse === "results";
   const showHeaderForwardArrow = viewMode.browse === "default" && canShowItems;
@@ -219,9 +230,12 @@ const MainContent: React.FC<MainContentProps> = ({
         </button>
         <button
           className={`filter-button ${
-            selectedCategories.size > 0 ? "active-filter" : ""
-          }`}
-          onClick={() => setIsCategoryModalOpen(true)}
+            selectedCategories.size > 0 && !isFrontPageOnly
+              ? "active-filter"
+              : ""
+          } ${isFrontPageOnly ? "filter-button--disabled" : ""}`}
+          onClick={() => !isFrontPageOnly && setIsCategoryModalOpen(true)}
+          disabled={isFrontPageOnly}
         >
           {categoryButtonText}
         </button>
@@ -274,6 +288,8 @@ const MainContent: React.FC<MainContentProps> = ({
                       ? sortProps.priceSortDirection
                       : sortProps.activeSortField === "store"
                       ? sortProps.storeSortDirection
+                      : sortProps.activeSortField === "date"
+                      ? sortProps.dateSortDirection
                       : sortProps.categorySortDirection
                   }
                   displayLimit={200}
@@ -291,6 +307,8 @@ const MainContent: React.FC<MainContentProps> = ({
                   selectedCategories={selectedCategories}
                   onToggleStoreSelection={onToggleStoreSelection}
                   onToggleCategorySelection={onToggleCategorySelection}
+                  isFrontPageOnly={isFrontPageOnly}
+                  setIsFrontPageOnly={setIsFrontPageOnly}
                 />
               )}
             </div>
@@ -340,6 +358,8 @@ const MainContent: React.FC<MainContentProps> = ({
                     ? sortProps.priceSortDirection
                     : sortProps.activeSortField === "store"
                     ? sortProps.storeSortDirection
+                    : sortProps.activeSortField === "date"
+                    ? sortProps.dateSortDirection
                     : sortProps.categorySortDirection
                 }
                 displayLimit={200}
@@ -386,6 +406,8 @@ const MainContent: React.FC<MainContentProps> = ({
                   ? sortProps.priceSortDirection
                   : sortProps.activeSortField === "store"
                   ? sortProps.storeSortDirection
+                  : sortProps.activeSortField === "date"
+                  ? sortProps.dateSortDirection
                   : sortProps.categorySortDirection
               }
             />

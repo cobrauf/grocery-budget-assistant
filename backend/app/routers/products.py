@@ -91,6 +91,7 @@ async def get_filtered_products_endpoint(
         None, description="Comma-separated list of categories. E.g., 'Dairy,Meats'"),
     ad_period: str = Query(
         "current", description="Ad period (e.g., 'current', 'upcoming')."),
+    is_frontpage_only: bool = Query(False, description="Filter for front page items only. If true, categories are ignored."),
     db: Session = Depends(get_db),
     limit: int = Query(200, ge=1, le=500,
                        description="Maximum number of products to return."),
@@ -109,6 +110,7 @@ async def get_filtered_products_endpoint(
             store_ids=parsed_store_ids,
             categories=parsed_categories,
             ad_period=ad_period,
+            is_frontpage_only=is_frontpage_only,
             limit=limit,
             offset=offset
         )

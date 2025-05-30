@@ -6,7 +6,8 @@ import "../../styles/SortPillsBar.css";
 const PILL_CONFIG: { label: string; field: SortField }[] = [
   { label: "Price", field: "price" },
   { label: "Store", field: "store" },
-  { label: "Categ.", field: "category" },
+  { label: "Date", field: "date" },
+  // { label: "Categ.", field: "category" },
 ];
 
 // Use the SortStateAndActions for props type
@@ -17,12 +18,14 @@ const SortPillsBar: React.FC<SortPillsBarProps> = ({
   priceSortDirection,
   storeSortDirection,
   categorySortDirection,
+  dateSortDirection,
   handlePillClick,
 }) => {
   const getDirectionForField = (field: SortField) => {
     if (field === "price") return priceSortDirection;
     if (field === "store") return storeSortDirection;
     if (field === "category") return categorySortDirection;
+    if (field === "date") return dateSortDirection;
     return "asc"; // Should not happen
   };
 

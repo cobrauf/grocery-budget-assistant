@@ -126,9 +126,10 @@ async def search_products(
 
 async def get_products_by_filter(
     db: Session,
-    store_ids: List[str] = None,  # Made optional, default to None
-    categories: List[str] = None,  # Made optional, default to None
-    ad_period: str = "current",  # Default to current, but can be overridden
+    store_ids: List[str] = None,
+    categories: List[str] = None,
+    ad_period: str = "current",
+    is_frontpage_only: bool = False,
     limit: int = 100,
     offset: int = 0
 ) -> List[ProductWithDetails]:
@@ -140,13 +141,10 @@ async def get_products_by_filter(
     query = (
         db.query(ProductModel)
         .join(WeeklyAdModel, ProductModel.weekly_ad_id == WeeklyAdModel.id)
-        # Ensure Retailer is joined for retailer_name
         .join(RetailerModel, ProductModel.retailer_id == RetailerModel.id)
     )
 
     if store_ids:
-        # Convert string IDs to integers if your ProductModel.retailer_id is an integer
-        # Assuming retailer_id in ProductModel is an integer. If it's string, no conversion needed.
         try:
             int_store_ids = [int(id_str) for id_str in store_ids]
             query = query.filter(ProductModel.retailer_id.in_(int_store_ids))
@@ -154,11 +152,15 @@ async def get_products_by_filter(
             raise HTTPException(
                 status_code=400, detail="Invalid store ID format. Store IDs must be integers.")
 
-    if categories:
-        query = query.filter(ProductModel.category.in_(categories))
-
-    # Apply the ad_period filter
-    query = query.filter(WeeklyAdModel.ad_period == ad_period)
+    if is_frontpage_only:
+        query = query.filter(ProductModel.is_frontpage == True)
+        # Categories are ignored if is_frontpage_only is True
+    else:
+        if categories: # Only apply category filter if not in front_page_only mode
+            query = query.filter(ProductModel.category.in_(categories))
+    
+    # Apply the ad_period filter (always applies)
+    query = query.filter(WeeklyAdModel.ad_period == ad_period) 
 
     products_orm = (
         query.options(
