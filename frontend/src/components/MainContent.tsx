@@ -169,10 +169,11 @@ const MainContent: React.FC<MainContentProps> = ({
 
   const storeButtonText =
     selectedStoreIds.size > 0 ? `Stores (${selectedStoreIds.size})` : "+ Store";
-  const categoryButtonText =
-    selectedCategories.size > 0
-      ? `Categ. (${selectedCategories.size})`
-      : "+ Categ.";
+  const categoryButtonText = isFrontPageOnly
+    ? "FP Only"
+    : selectedCategories.size > 0
+    ? `Categ. (${selectedCategories.size})`
+    : "+ Categ.";
 
   const showHeaderBackArrow = viewMode.browse === "results";
   const showHeaderForwardArrow = viewMode.browse === "default" && canShowItems;

@@ -248,7 +248,6 @@
   cursor: not-allowed !important;
   background-color: #b0b0b0 !important;
   color: #666666 !important;
-  text-decoration: line-through !important;
 }
 .filter-button--disabled:hover {
   background-color: #b0b0b0 !important;
