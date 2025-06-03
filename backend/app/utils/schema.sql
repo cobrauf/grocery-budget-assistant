@@ -53,9 +53,8 @@ CREATE TABLE IF NOT EXISTS products (
 CREATE INDEX IF NOT EXISTS idx_products_weekly_ad_id ON products(weekly_ad_id);
 CREATE INDEX IF NOT EXISTS idx_products_name ON products(name);
 CREATE INDEX IF NOT EXISTS idx_products_category ON products(category);
--- Consider adding an index for vector search, e.g., HNSW or IVFFlat
+-- I have added this in Supabase already
 -- CREATE INDEX IF NOT EXISTS idx_products_embedding ON products USING hnsw (embedding vector_l2_ops); -- Example for HNSW
--- CREATE INDEX IF NOT EXISTS idx_products_embedding ON products USING ivfflat (embedding vector_l2_ops) WITH (lists = 100); -- Example for IVFFlat
 
 -- Add tsvector columns and triggers for full-text search (optional but recommended)
 ALTER TABLE products ADD COLUMN IF NOT EXISTS fts_vector tsvector;

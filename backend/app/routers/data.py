@@ -1,10 +1,12 @@
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, BackgroundTasks
 from sqlalchemy.orm import Session
+from typing import Dict, Any
 
 from .. import models
 from ..database import get_db 
 from ..services import json_to_db_service
 from ..services import json_enhancement_service
+from ..services import batch_embedding_service
 
 '''
 Defines API endpoints for retrieving data (Retailers, Weekly Ads, Products),
@@ -18,6 +20,7 @@ router = APIRouter(
     prefix="/data",  # Optional prefix for all routes in this router
     tags=["Data Management"]  # Tag for Swagger UI documentation
 )
+
 
 # Keeping get retailers/weekly ads here for now. Products endpoints moved to products.py + product_service.py
 @router.get("/retailers/")
@@ -45,6 +48,20 @@ async def enhance_json_files_endpoint(): # ensure this is async def
         print(f"Error during JSON enhancement process: {e}")
         raise HTTPException(status_code=500, detail=f"An error occurred during JSON enhancement: {str(e)}")
    
+
+@router.post("/embed_products", response_model=Dict[str, Any])
+async def trigger_batch_embedding(background_tasks: BackgroundTasks, db: Session = Depends(get_db)):
+    """
+    Endpoint to trigger the batch embedding process for products.
+    The process runs in the background.
+    """
+    background_tasks.add_task(batch_embedding_service.batch_embed_products, db)
+    print("Batch product embedding task has been scheduled to run in the background.")
+    return {
+        "message": "Batch product embedding process initiated in the background.",
+        "details": "The process will fetch products with ad_period='current' and no existing embeddings, "
+                   "generate embeddings, and update them in the database."
+    }
 
 
 
