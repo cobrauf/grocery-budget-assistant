@@ -1,7 +1,7 @@
 -- SQL schema based on docs/Feature_PostgresDB
 
 -- Enable extensions if needed (e.g., for pgvector later)
--- CREATE EXTENSION IF NOT EXISTS vector;
+CREATE EXTENSION IF NOT EXISTS vector;
 
 -- Table: retailers
 CREATE TABLE IF NOT EXISTS retailers (
@@ -45,14 +45,17 @@ CREATE TABLE IF NOT EXISTS products (
     gen_terms TEXT DEFAULT NULL,
     created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
     is_frontpage BOOLEAN DEFAULT FALSE,
-    emoji VARCHAR(10)
-    -- vector_embedding VECTOR(1536) -- Example placeholder for future pgvector integration (dimension depends on model)
+    emoji VARCHAR(10),
+    embedding VECTOR(768) NULL
 );
 
 -- Indexes for products
 CREATE INDEX IF NOT EXISTS idx_products_weekly_ad_id ON products(weekly_ad_id);
 CREATE INDEX IF NOT EXISTS idx_products_name ON products(name);
 CREATE INDEX IF NOT EXISTS idx_products_category ON products(category);
+-- Consider adding an index for vector search, e.g., HNSW or IVFFlat
+-- CREATE INDEX IF NOT EXISTS idx_products_embedding ON products USING hnsw (embedding vector_l2_ops); -- Example for HNSW
+-- CREATE INDEX IF NOT EXISTS idx_products_embedding ON products USING ivfflat (embedding vector_l2_ops) WITH (lists = 100); -- Example for IVFFlat
 
 -- Add tsvector columns and triggers for full-text search (optional but recommended)
 ALTER TABLE products ADD COLUMN IF NOT EXISTS fts_vector tsvector;
@@ -76,12 +79,3 @@ FOR EACH ROW EXECUTE FUNCTION update_product_fts_vector();
 
 -- Index for full-text search
 CREATE INDEX IF NOT EXISTS idx_products_fts ON products USING GIN(fts_vector);
-
--- Grant usage permissions for the anon role if using Supabase RLS
--- You might need to adjust these depending on your RLS policies
--- GRANT SELECT ON TABLE retailers TO anon;
--- GRANT SELECT ON TABLE weekly_ads TO anon;
--- GRANT SELECT ON TABLE products TO anon;
--- GRANT INSERT, UPDATE, DELETE ON TABLE retailers TO service_role;
--- GRANT INSERT, UPDATE, DELETE ON TABLE weekly_ads TO service_role;
--- GRANT INSERT, UPDATE, DELETE ON TABLE products TO service_role; 

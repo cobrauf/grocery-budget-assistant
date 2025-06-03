@@ -18,6 +18,7 @@ google-generativeai
 # Database
 supabase==2.3.5
 psycopg2-binary==2.9.9
+pgvector==0.2.0
 
 # Frontend/API
 fastapi==0.109.2

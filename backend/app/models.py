@@ -2,6 +2,7 @@ from sqlalchemy import Column, Integer, String, Date, Numeric, Text, ForeignKey,
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from sqlalchemy.dialects.postgresql import TIMESTAMP, TSVECTOR
+from pgvector.sqlalchemy import Vector
 
 from .database import Base
 
@@ -63,6 +64,7 @@ class Product(Base):
     gen_terms = Column(Text, nullable=True) # Added for LLM-generated keywords
     created_at = Column(TIMESTAMP(timezone=True), server_default=func.now())
     fts_vector = Column(TSVECTOR) # For full-text search
+    embedding = Column(Vector(768), nullable=True)
     retailer_id = Column(BigInteger, ForeignKey("retailers.id", ondelete="CASCADE"), nullable=False)
     is_frontpage = Column(Boolean, default=False)
     emoji = Column(String(10), nullable=True)
@@ -74,5 +76,5 @@ class Product(Base):
         Index('idx_products_weekly_ad_id', 'weekly_ad_id'),
         Index('idx_products_name', 'name'),
         Index('idx_products_category', 'category'),
-        Index('idx_products_fts', 'fts_vector', postgresql_using='gin'), # Index for FTS
+        Index('idx_products_fts', 'fts_vector', postgresql_using='gin'),
     ) 
