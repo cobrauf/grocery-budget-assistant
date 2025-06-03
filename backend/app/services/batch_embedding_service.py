@@ -25,8 +25,8 @@ else:
 if not GEMINI_EMBEDDINGS_MODEL:
     logger.warning("GEMINI_EMBEDDINGS_MODEL not found in environment variables. Embedding generation will fail.")
 
-BATCH_SIZE = 100  # Number of products to process from DB at a time
-EMBEDDING_API_BATCH_SIZE = 100 # Max number of texts to send to Gemini API in one call (Gemini API limit is often 100)
+BATCH_SIZE = 5  # Number of products to process from DB at a time
+EMBEDDING_API_BATCH_SIZE = 5 # Max number of texts to send to Gemini API in one call (Gemini API limit is often 100)
 TEST_ROUND_LIMIT = 1
 
 
@@ -97,10 +97,10 @@ async def batch_embed_products(db: Session) -> Dict[str, Any]:
             logger.info("No more products found to embed.")
             break
         
-        db_batches_processed += 1
         if db_batches_processed >= TEST_ROUND_LIMIT:
             print(f"!!!!!!!!!!!!!TEST ROUND LIMIT REACHED. Exiting after {db_batches_processed} DB batches.")
             return
+        db_batches_processed += 1
         logger.info(f"Processing DB batch {db_batches_processed}. Products in this DB batch: {len(products_for_this_db_batch)}")
         total_products_queried_from_db += len(products_for_this_db_batch)
 
@@ -112,6 +112,7 @@ async def batch_embed_products(db: Session) -> Dict[str, Any]:
                 product_text_pairs.append({"product": product, "text": text_to_embed})
             else:
                 logger.warning(f"Product ID {product.id} ('{product.name}') has no content to embed. Skipping.")
+        print(f"Product text pairs: {product_text_pairs}")
 
         if not product_text_pairs:
             logger.info(f"No products with text to embed in DB batch {db_batches_processed}. Continuing.")
