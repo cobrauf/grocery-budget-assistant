@@ -34,7 +34,7 @@ if not GEMINI_EMBEDDINGS_MODEL:
     logger.warning("GEMINI_EMBEDDINGS_MODEL not found in environment variables. Embedding generation will fail.")
 
 BATCH_SIZE = 100  # Number of products to process from DB at a time (gemini API limit is often 100)
-TEST_ROUND_LIMIT = 1
+TEST_ROUND_LIMIT = 5
 
 
 def construct_text_for_embedding(product: models.Product) -> str:
@@ -52,7 +52,7 @@ def construct_text_for_embedding(product: models.Product) -> str:
     if product.gen_terms:
         parts.append(f"Generated Terms: {product.gen_terms}")
         
-    print(f"Constructed text for embedding: {parts}")
+    # print(f"Constructed text for embedding: {parts}")
     return "\n".join(parts)
 
 def _generate_embeddings_batch(texts: List[str]) -> List[Optional[List[float]]]: # optional b/c LLM may not return embeddings for some texts

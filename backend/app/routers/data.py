@@ -110,9 +110,13 @@ async def test_similarity_query(
             status_code=500, 
             detail=f"An error occurred during similarity search: {str(e)}"
         )
-
-
-
-
-
+    
+    
+# class TestQueryResponse(BaseModel):
+#     results_count: int
+#     product_name: List[str]
+    
+# @router.get("/test_1", response_model=TestQueryResponse)
+# async def test_1(db: Session = Depends(get_db)):
+    
 

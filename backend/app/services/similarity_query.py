@@ -143,6 +143,7 @@ async def similarity_search_products(
                 weekly_ad_valid_to=row.valid_to,
                 weekly_ad_ad_period=row.ad_period,
             )
+            logger.info(f"+++ Product ID: {row.id}, Name: '{row.name}', Similarity Score: {row.similarity_score:.4f}")
             products_with_details.append(details)
             
         logger.info(f"Successfully converted {len(products_with_details)} results to ProductWithDetails")
