@@ -49,7 +49,7 @@ async def enhance_json_files_endpoint(): # ensure this is async def
         raise HTTPException(status_code=500, detail=f"An error occurred during JSON enhancement: {str(e)}")
    
 
-@router.post("/embed_products", response_model=Dict[str, Any])
+@router.post("/embed_products", response_model=Dict[str, Any]) # response_model is used to specify the expected return type of the endpoint (the message) (not required)
 async def trigger_batch_embedding(background_tasks: BackgroundTasks, db: Session = Depends(get_db)):
     """
     Endpoint to trigger the batch embedding process for products.

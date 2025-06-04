@@ -8,6 +8,14 @@ import google.generativeai as genai
 from dotenv import load_dotenv
 from .. import models
 
+'''
+Database Integration: It queries the database for products needing embeddings and then updates their records with the newly generated vectors using SQLAlchemy's ORM.
+Product Text Preparation: It constructs a combined text string for each product, drawing from its name, category, and promotional details, which is crucial for generating relevant embeddings.
+Batch Embedding with Gemini: It efficiently sends these prepared product texts in batches to the Google Gemini API to generate high-dimensional numerical embeddings.
+Progressive Updates & Logging: The process updates products iteratively, commits changes to the database in batches, and logs its progress and outcomes for monitoring.
+Robust Error Handling: The service includes robust error handling for API calls, gracefully managing situations where embedding generation might fail for individual texts or entire batches.
+'''
+
 load_dotenv() 
 
 logging.basicConfig(level=logging.INFO)
@@ -25,8 +33,7 @@ else:
 if not GEMINI_EMBEDDINGS_MODEL:
     logger.warning("GEMINI_EMBEDDINGS_MODEL not found in environment variables. Embedding generation will fail.")
 
-BATCH_SIZE = 5  # Number of products to process from DB at a time
-EMBEDDING_API_BATCH_SIZE = 5 # Max number of texts to send to Gemini API in one call (Gemini API limit is often 100)
+BATCH_SIZE = 100  # Number of products to process from DB at a time (gemini API limit is often 100)
 TEST_ROUND_LIMIT = 1
 
 
@@ -48,28 +55,22 @@ def construct_text_for_embedding(product: models.Product) -> str:
     print(f"Constructed text for embedding: {parts}")
     return "\n".join(parts)
 
-def _generate_embeddings_batch(texts: List[str]) -> List[Optional[List[float]]]:
+def _generate_embeddings_batch(texts: List[str]) -> List[Optional[List[float]]]: # optional b/c LLM may not return embeddings for some texts
     """
     Generates embeddings for a batch of texts using Gemini API.
     Returns a list of embeddings or None for each text if an error occurs for that text or the batch.
     """
     if not texts:
         return []
-    if not GEMINI_API_KEY or not GEMINI_EMBEDDINGS_MODEL:
-        logger.error("Gemini API key or model not configured. Cannot generate embeddings.")
-        return [None] * len(texts)
-
     try:
         result = genai.embed_content(
             model=GEMINI_EMBEDDINGS_MODEL,
             content=texts,  # API expects a list of strings for batching
             task_type="RETRIEVAL_QUERY" 
         )
-        # result['embedding'] will be a list of lists (embeddings)
-        return result.get('embedding', [None] * len(texts)) 
+        return result.get('embedding', [None] * len(texts))  # result['embedding'] will be a list of lists (embeddings)
     except Exception as e:
         logger.error(f"Error generating batch embeddings for {len(texts)} texts: {e}")
-        # Return a list of Nones, so we can map it back to products and skip them
         return [None] * len(texts)
 
 
@@ -77,7 +78,7 @@ async def batch_embed_products(db: Session) -> Dict[str, Any]:
     """
     Fetches products, generates embeddings in batches, and updates them.
     """
-    logger.info(f"Starting batch embedding process. DB Batch size: {BATCH_SIZE}. API Batch Size: {EMBEDDING_API_BATCH_SIZE}. Model: {GEMINI_EMBEDDINGS_MODEL or 'Not Configured'}")
+    logger.info(f"Starting batch embedding process. DB Batch size: {BATCH_SIZE}. Model: {GEMINI_EMBEDDINGS_MODEL or 'Not Configured'}")
 
     if not GEMINI_API_KEY or not GEMINI_EMBEDDINGS_MODEL:
         logger.error("Embedding service is not configured (API key or model missing). Aborting.")
@@ -98,7 +99,7 @@ async def batch_embed_products(db: Session) -> Dict[str, Any]:
             break
         
         if db_batches_processed >= TEST_ROUND_LIMIT:
-            print(f"!!!!!!!!!!!!!TEST ROUND LIMIT REACHED. Exiting after {db_batches_processed} DB batches.")
+            print(f"====TEST ROUND LIMIT REACHED====. Exiting after {db_batches_processed} DB batches.")
             return
         db_batches_processed += 1
         logger.info(f"Processing DB batch {db_batches_processed}. Products in this DB batch: {len(products_for_this_db_batch)}")
@@ -112,50 +113,44 @@ async def batch_embed_products(db: Session) -> Dict[str, Any]:
                 product_text_pairs.append({"product": product, "text": text_to_embed})
             else:
                 logger.warning(f"Product ID {product.id} ('{product.name}') has no content to embed. Skipping.")
-        print(f"Product text pairs: {product_text_pairs}")
+        # print(f"Product text pairs: {product_text_pairs}")
 
         if not product_text_pairs:
             logger.info(f"No products with text to embed in DB batch {db_batches_processed}. Continuing.")
-            if len(products_for_this_db_batch) < BATCH_SIZE: # Last DB batch was processed
+            if len(products_for_this_db_batch) < BATCH_SIZE: # Last DB batch is less that batch size, so no more products to embed
                  break
             continue
             
-        # Process texts in chunks for the embedding API
-        for i in range(0, len(product_text_pairs), EMBEDDING_API_BATCH_SIZE):
-            api_batch_product_text_pairs = product_text_pairs[i:i + EMBEDDING_API_BATCH_SIZE]
-            texts_for_api_batch = [pair["text"] for pair in api_batch_product_text_pairs]
-            
-            if not texts_for_api_batch:
-                continue
+        texts_for_api_batch = [pair["text"] for pair in product_text_pairs]
 
-            logger.info(f"Sending {len(texts_for_api_batch)} texts to Gemini API for embedding (DB Batch {db_batches_processed}).")
-            embedding_vectors = _generate_embeddings_batch(texts_for_api_batch)
+        logger.info(f"Sending {len(texts_for_api_batch)} texts to Gemini API for embedding (DB Batch {db_batches_processed}).")
+        embedding_vectors = _generate_embeddings_batch(texts_for_api_batch)
 
-            updates_in_api_batch = 0
-            for idx, pair in enumerate(api_batch_product_text_pairs):
-                product_to_update = pair["product"]
-                embedding_vector = embedding_vectors[idx] if idx < len(embedding_vectors) else None
+        updates_in_db_batch = 0 # Renamed from updates_in_api_batch for clarity
+        for idx, pair in enumerate(product_text_pairs): # Iterate over product_text_pairs directly
+            product_to_update = pair["product"]
+            embedding_vector = embedding_vectors[idx] if idx < len(embedding_vectors) else None
 
-                if embedding_vector:
-                    try:
-                        stmt = update(models.Product).where(models.Product.id == product_to_update.id).values(embedding=embedding_vector)
-                        db.execute(stmt)
-                        updates_in_api_batch += 1
-                    except Exception as e:
-                        logger.error(f"Error updating embedding for product ID {product_to_update.id} ('{product_to_update.name}'): {e}")
-                else:
-                    logger.warning(f"Failed to generate embedding for product ID {product_to_update.id} ('{product_to_update.name}'). Skipping update.")
-            
-            if updates_in_api_batch > 0:
+            if embedding_vector:
                 try:
-                    db.commit()
-                    logger.info(f"Committed {updates_in_api_batch} product embedding updates for API batch.")
-                    total_products_successfully_embedded += updates_in_api_batch
+                    stmt = update(models.Product).where(models.Product.id == product_to_update.id).values(embedding=embedding_vector)
+                    db.execute(stmt)
+                    updates_in_db_batch += 1
                 except Exception as e:
-                    db.rollback()
-                    logger.error(f"Error committing API batch updates: {e}. Rolled back.")
+                    logger.error(f"Error updating embedding for product ID {product_to_update.id} ('{product_to_update.name}'): {e}")
             else:
-                logger.info("No embeddings were successfully generated or updated in this API batch. No commit needed.")
+                logger.warning(f"Failed to generate embedding for product ID {product_to_update.id} ('{product_to_update.name}'). Skipping update.")
+        
+        if updates_in_db_batch > 0:
+            try:
+                db.commit()
+                logger.info(f"Committed {updates_in_db_batch} product embedding updates for DB batch {db_batches_processed}.")
+                total_products_successfully_embedded += updates_in_db_batch
+            except Exception as e:
+                db.rollback()
+                logger.error(f"Error committing updates for DB batch {db_batches_processed}: {e}. Rolled back.")
+        else:
+            logger.info(f"No embeddings were successfully generated or updated in DB batch {db_batches_processed}. No commit needed.")
 
         if len(products_for_this_db_batch) < BATCH_SIZE: # Last DB batch was processed
             logger.info("Processed the last potential DB batch of products.")
