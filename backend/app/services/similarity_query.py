@@ -1,10 +1,11 @@
 import logging
 import os
 from sqlalchemy.orm import Session, joinedload
-from sqlalchemy import text
+from sqlalchemy import text, func
 from typing import List, Optional
 import google.generativeai as genai
 from dotenv import load_dotenv
+# from pgvector.sqlalchemy import Vector
 
 from ..models import Product as ProductModel, WeeklyAd as WeeklyAdModel, Retailer as RetailerModel
 from ..schemas.data_schemas import ProductWithDetails
@@ -47,7 +48,7 @@ def _generate_query_embedding(query_text: str) -> Optional[List[float]]:
             task_type="RETRIEVAL_QUERY"
         )
         embeddings = result.get('embedding', [])
-        print(f"============== query embeddings: {embeddings[0][:5]} ...")
+        logger.info(f"======== query embeddings: {embeddings[0][:5]} ...")
         if embeddings:
             return embeddings[0]  # Return the first (and only) embedding
         else:
@@ -84,17 +85,84 @@ async def similarity_search_products(
         logger.error("Embedding service is not configured (API key or model missing).")
         return []
     
-    # Generate embedding for the query
     query_embedding = _generate_query_embedding(query)
     if not query_embedding:
         logger.error("Failed to generate embedding for query. Returning empty results.")
         return []
     
     try:
-        # Use PostgreSQL's vector similarity search with pgvector
-        # The <=> operator calculates cosine distance (lower is more similar)
-        # We calculate similarity as 1 - distance to get a 0-1 similarity score
-        # Format the query embedding as a vector string to avoid parameter casting issues
+        # Option 1: Using SQLAlchemy ORM with pgvector operators
+        similarity_expr = 1 - ProductModel.embedding.cosine_distance(query_embedding)
+        
+        query_results_orm = (
+            db.query(
+                ProductModel,
+                RetailerModel.name.label('retailer_name'),
+                WeeklyAdModel.valid_from,
+                WeeklyAdModel.valid_to,
+                WeeklyAdModel.ad_period,
+                similarity_expr.label('similarity_score')
+            )
+            .join(WeeklyAdModel, ProductModel.weekly_ad_id == WeeklyAdModel.id)
+            .join(RetailerModel, ProductModel.retailer_id == RetailerModel.id)
+            .filter(ProductModel.embedding.isnot(None))
+            .filter(WeeklyAdModel.ad_period == ad_period)
+            .filter(similarity_expr >= similarity_threshold)
+            .order_by(ProductModel.embedding.cosine_distance(query_embedding))
+            .limit(limit)
+            .all()
+        )
+        
+        # Convert results to ProductWithDetails objects
+        products_with_details: List[ProductWithDetails] = []
+        for row in query_results_orm:
+            product, retailer_name, valid_from, valid_to, ad_period, similarity_score = row
+            details = ProductWithDetails(
+                id=product.id,
+                name=product.name,
+                price=product.price,
+                original_price=product.original_price,
+                unit=product.unit,
+                description=product.description,
+                category=product.category,
+                promotion_details=product.promotion_details,
+                promotion_from=product.promotion_from,
+                promotion_to=product.promotion_to,
+                is_frontpage=product.is_frontpage,
+                emoji=product.emoji,
+                retailer=retailer_name,
+                retailer_id=product.retailer_id,
+                weekly_ad_id=product.weekly_ad_id,
+                retailer_name=retailer_name,
+                weekly_ad_valid_from=valid_from,
+                weekly_ad_valid_to=valid_to,
+                weekly_ad_ad_period=ad_period,
+            )
+            logger.info(f"+++ Product ID: {product.id}, Name: '{product.name}', Similarity Score: {similarity_score:.4f}")
+            products_with_details.append(details)
+            
+        logger.info(f">>>>>>> ORM method:Successfully converted {len(products_with_details)} results to ProductWithDetails")
+        return products_with_details
+        
+    except Exception as e:
+        logger.error(f"Error during similarity search: {e}")
+        # Fallback to the parameter binding approach if ORM approach fails
+        return await _similarity_search_fallback(db, query_embedding, ad_period, limit, similarity_threshold)
+
+
+async def _similarity_search_fallback(
+    db: Session,
+    query_embedding: List[float],
+    ad_period: str,
+    limit: int,
+    similarity_threshold: float
+) -> List[ProductWithDetails]:
+    """
+    Fallback method using proper parameter binding with raw SQL.
+    """
+    try:
+        logger.info("Using fallback SQL approach for similarity search")
+        
         vector_str = '[' + ','.join(map(str, query_embedding)) + ']'
         
         sql_query = text(f"""
@@ -117,7 +185,7 @@ async def similarity_search_products(
         })
         
         rows = result.fetchall()
-        logger.info(f"Found {len(rows)} products matching similarity search")
+        logger.info(f"Fallback found {len(rows)} products matching similarity search")
         
         # Convert results to ProductWithDetails objects
         products_with_details: List[ProductWithDetails] = []
@@ -143,12 +211,10 @@ async def similarity_search_products(
                 weekly_ad_valid_to=row.valid_to,
                 weekly_ad_ad_period=row.ad_period,
             )
-            logger.info(f"+++ Product ID: {row.id}, Name: '{row.name}', Similarity Score: {row.similarity_score:.4f}")
             products_with_details.append(details)
             
-        logger.info(f"Successfully converted {len(products_with_details)} results to ProductWithDetails")
         return products_with_details
         
     except Exception as e:
-        logger.error(f"Error during similarity search: {e}")
+        logger.error(f"Error during fallback similarity search: {e}")
         return [] 
