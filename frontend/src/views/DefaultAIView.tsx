@@ -74,8 +74,9 @@ const DefaultAIView: React.FC = () => {
     }
   };
 
-  const handleKeyPress = (event: React.KeyboardEvent<HTMLInputElement>) => {
-    if (event.key === "Enter") {
+  const handleKeyPress = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (event.key === "Enter" && !event.shiftKey) {
+      event.preventDefault(); // Prevents adding a new line
       handleSendOrStop();
     }
   };
@@ -100,13 +101,13 @@ const DefaultAIView: React.FC = () => {
         <div ref={messagesEndRef} />
       </div>
       <div className="chat-input-area">
-        <input
-          type="textarea"
+        <textarea
           className="chat-input"
           placeholder="Type a message..."
           value={inputValue}
           onChange={(e) => setInputValue(e.target.value)}
           onKeyPress={handleKeyPress}
+          rows={1}
         />
         <button
           className="send-button"

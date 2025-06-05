@@ -34,7 +34,7 @@ Additional instructions:
 Your output should not have any parentheses.
 Becareful of prices that are non-standard, like 2/$4, which means 2 items for $4,
 in that case, calculate the price per item, and put the 2/$4 in the promotion_details field.
-Ignore Spanish text. Don't output Spanish text unless it's a product name.
+Ignore Spanish/Korean or other language text. There's usually english under the Korean. Don't output Spanish text unless it's a product name.
 If you cannot find the price of the product, or if part of the ad isn't legible, skip the product entirely.
 For Albertsons and Vons combo ads, use Albertsons as the retailer.
 
@@ -141,6 +141,7 @@ PRODUCT_CATEGORIES = [
 PRODUCT_UNITS = [
     "Each",
     "Pack",
+    "Box",
     "Count",
     "Dozen",
     "Case",

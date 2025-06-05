@@ -76,7 +76,7 @@ async def process_single_json_file_for_enhancement(filepath: Path) -> Optional[E
             "Please return the complete, modified JSON data with the 'gen_terms' added to each product."
         ]
         prompt = "\\n".join(prompt_parts)
-        logging.info(f"------------------ Prompt-----------:\n{prompt}")
+        # logging.info(f"------------------ Prompt-----------:\n{prompt}")
         logging.info(f"Sending content of {filepath.name} to Gemini ('{MODEL_NAME}') for enhancement.")
         
         response = await model.generate_content_async(prompt)
