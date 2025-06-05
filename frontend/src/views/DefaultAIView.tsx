@@ -7,14 +7,13 @@ const generateUniqueId = () => {
 };
 
 const DefaultAIView: React.FC = () => {
-  const [messages, setMessages] = useState<ChatMessage[]>([
-    {
-      id: generateUniqueId(),
-      text: "Ask about deals this week.",
-      sender: "ai",
-      timestamp: new Date(),
-    },
-  ]);
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  // {
+  //   id: generateUniqueId(),
+  //   text: "Ask about deals this week.",
+  //   sender: "ai",
+  //   timestamp: new Date(),
+  // },
   const [inputValue, setInputValue] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
   const timeoutIdRef = useRef<NodeJS.Timeout | null>(null);
@@ -63,7 +62,7 @@ const DefaultAIView: React.FC = () => {
       timeoutIdRef.current = setTimeout(() => {
         const aiEchoMessage: ChatMessage = {
           id: generateUniqueId(),
-          text: `You said: ${currentInputValue}`,
+          text: `Simulated AI response for: ${currentInputValue}`,
           sender: "ai",
           timestamp: new Date(),
         };
@@ -103,7 +102,7 @@ const DefaultAIView: React.FC = () => {
       <div className="chat-input-area">
         <textarea
           className="chat-input"
-          placeholder="Type a message..."
+          placeholder="Work in progress, not actual AI yet..."
           value={inputValue}
           onChange={(e) => setInputValue(e.target.value)}
           onKeyPress={handleKeyPress}
