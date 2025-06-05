@@ -101,7 +101,7 @@ const DefaultAIView: React.FC = () => {
       </div>
       <div className="chat-input-area">
         <input
-          type="text"
+          type="textarea"
           className="chat-input"
           placeholder="Type a message..."
           value={inputValue}
