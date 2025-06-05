@@ -5,6 +5,7 @@ import DefaultBrowseView from "../views/DefaultBrowseView";
 import BrowseResultsView from "../views/BrowseResultsView";
 import DefaultFavItemsView from "../views/DefaultFavItemsView";
 import FavItemsResultsView from "../views/FavItemsResultsView";
+import DefaultAIView from "../views/DefaultAIView";
 import SortPillsBar from "./common/SortPillsBar";
 import FavItemBar from "./common/FavItemBar";
 import { Product } from "../types/product";
@@ -414,13 +415,7 @@ const MainContent: React.FC<MainContentProps> = ({
           </>
         );
       case "ai":
-        return (
-          <div style={{ textAlign: "center", paddingTop: "20px" }}>
-            <div className="default-fav-items-icon">✨</div>
-            <h2>AI</h2>
-            <p>(Coming soon)</p>
-          </div>
-        );
+        return <DefaultAIView />;
       default:
         return (
           <div style={{ textAlign: "center", paddingTop: "20px" }}>

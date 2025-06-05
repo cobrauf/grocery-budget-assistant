@@ -48,23 +48,23 @@ export const themes: Theme[] = [
   {
     name: "Light",
     colors: {
-      background: "#F5EFFF",
-      text: "#212529",
-      primary: "#7b2cbf",
-      secondary: "#6c757d",
-      headerBackground: "#7b2cbf",
-      headerText: "#ffffff",
-      sidebarBackground: "#f8f9fa",
-      sidebarText: "#212529",
-      sidebarHighlight: "#7b2cbf",
-      sidebarDivider: "#e0e0e0",
-      searchInputBackground: "#ffffff",
-      searchInputText: "#495057",
-      searchInputPlaceholder: "#6c757d",
-      bottomNavBackground: "#5a2a82",
-      bottomNavTextInactive: "rgba(255, 255, 255, 0.7)",
-      bottomNavTextActive: "#ffffff",
-      bottomNavIndicatorActive: "#ffffff",
+      background: "#F5EFFF", // Very light lavender
+      text: "#212529", // Dark charcoal gray
+      primary: "#7b2cbf", // Deep purple
+      secondary: "#6c757d", // Medium gray
+      headerBackground: "#7b2cbf", // Deep purple
+      headerText: "#ffffff", // Pure white
+      sidebarBackground: "#f8f9fa", // Very light gray
+      sidebarText: "#212529", // Dark charcoal gray
+      sidebarHighlight: "#7b2cbf", // Deep purple
+      sidebarDivider: "#e0e0e0", // Light gray
+      searchInputBackground: "#ffffff", // Pure white
+      searchInputText: "#495057", // Dark gray
+      searchInputPlaceholder: "#6c757d", // Medium gray
+      bottomNavBackground: "#5a2a82", // Dark purple
+      bottomNavTextInactive: "rgba(255, 255, 255, 0.7)", // Semi-transparent white
+      bottomNavTextActive: "#ffffff", // Pure white
+      bottomNavIndicatorActive: "#ffffff", // Pure white
       bottomNavItemActiveBackground: "#7b2cbf", // Matches headerBackground
       // Light Theme Sort Pill Colors
       sortPillBackground: "#7d7d7d", // Light grey, distinct from page bg
@@ -80,23 +80,23 @@ export const themes: Theme[] = [
   {
     name: "Dark",
     colors: {
-      background: "#1a1a1a",
-      text: "#e0e0e0",
-      primary: "#00aaff",
-      secondary: "#8c959d",
-      headerBackground: "#005bb5",
-      headerText: "#ffffff",
+      background: "#1a1a1a", // Very dark gray
+      text: "#e0e0e0", // Light gray
+      primary: "#00aaff", // Bright blue
+      secondary: "#8c959d", // Medium gray
+      headerBackground: "#005bb5", // Dark blue
+      headerText: "#ffffff", // Pure white
       sidebarBackground: "#2c3e50", // Dark blue-grey
-      sidebarText: "#ecf0f1",
-      sidebarHighlight: "#3498db",
-      sidebarDivider: "#34495e",
-      searchInputBackground: "#252525",
-      searchInputText: "#e0e0e0",
-      searchInputPlaceholder: "#777777",
-      bottomNavBackground: "#003f7f",
-      bottomNavTextInactive: "rgba(220, 220, 220, 0.7)",
-      bottomNavTextActive: "#ffffff",
-      bottomNavIndicatorActive: "#00aaff",
+      sidebarText: "#ecf0f1", // Very light gray
+      sidebarHighlight: "#3498db", // Light blue
+      sidebarDivider: "#34495e", // Dark gray-blue
+      searchInputBackground: "#252525", // Dark gray
+      searchInputText: "#e0e0e0", // Light gray
+      searchInputPlaceholder: "#777777", // Medium gray
+      bottomNavBackground: "#003f7f", // Very dark blue
+      bottomNavTextInactive: "rgba(220, 220, 220, 0.7)", // Semi-transparent light gray
+      bottomNavTextActive: "#ffffff", // Pure white
+      bottomNavIndicatorActive: "#00aaff", // Bright blue
       bottomNavItemActiveBackground: "#005bb5", // Matches headerBackground
       // Dark Theme Sort Pill Colors
       sortPillBackground: "#7d7d7d", // Dark grey
@@ -117,18 +117,18 @@ export const themes: Theme[] = [
       primary: "#f2a2a0", // Soft pink primary
       secondary: "#a0d2f2", // Soft blue secondary
       headerBackground: "#f2bfa0", // Peachy header
-      headerText: "#ffffff",
+      headerText: "#ffffff", // Pure white
       sidebarBackground: "#f0e2d2", // Light beige sidebar
-      sidebarText: "#5d5d5d",
-      sidebarHighlight: "#f2a2a0",
-      sidebarDivider: "#d3c1b1",
-      searchInputBackground: "#ffffff",
-      searchInputText: "#5d5d5d",
-      searchInputPlaceholder: "#a0a0a0",
-      bottomNavBackground: "#e0a9a0",
-      bottomNavTextInactive: "rgba(255, 255, 255, 0.75)",
-      bottomNavTextActive: "#ffffff",
-      bottomNavIndicatorActive: "#ffffff",
+      sidebarText: "#5d5d5d", // Medium gray
+      sidebarHighlight: "#f2a2a0", // Soft pink
+      sidebarDivider: "#d3c1b1", // Light brown-beige
+      searchInputBackground: "#ffffff", // Pure white
+      searchInputText: "#5d5d5d", // Medium gray
+      searchInputPlaceholder: "#a0a0a0", // Light gray
+      bottomNavBackground: "#e0a9a0", // Muted peachy pink
+      bottomNavTextInactive: "rgba(255, 255, 255, 0.75)", // Semi-transparent white
+      bottomNavTextActive: "#ffffff", // Pure white
+      bottomNavIndicatorActive: "#ffffff", // Pure white
       bottomNavItemActiveBackground: "#f2bfa0", // Matches headerBackground
       // Pastel Theme Sort Pill Colors
       sortPillBackground: "#7d7d7d", // Light beige, same as sidebar
@@ -160,10 +160,10 @@ export const themes: Theme[] = [
       searchInputBackground: "#ffffff", // White/Off-white (Button text color)
       searchInputText: "#212121", // Dark Grey/Black
       searchInputPlaceholder: "#757575", // Medium Grey placeholder text
-      bottomNavBackground: "#2a2a2a",
-      bottomNavTextInactive: "rgba(200, 200, 200, 0.7)",
-      bottomNavTextActive: "#e0e0e0",
-      bottomNavIndicatorActive: "#D91656",
+      bottomNavBackground: "#2a2a2a", // Very dark gray
+      bottomNavTextInactive: "rgba(200, 200, 200, 0.7)", // Semi-transparent light gray
+      bottomNavTextActive: "#e0e0e0", // Light gray
+      bottomNavIndicatorActive: "#D91656", // Bright red
       bottomNavItemActiveBackground: "#424242", // Matches headerBackground
       // Retro Theme Sort Pill Colors
       sortPillBackground: "#7d7d7d", // Medium-light grey

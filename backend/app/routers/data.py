@@ -1,10 +1,15 @@
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, BackgroundTasks
 from sqlalchemy.orm import Session
+from typing import Dict, Any, List
+from pydantic import BaseModel
 
 from .. import models
 from ..database import get_db 
 from ..services import json_to_db_service
 from ..services import json_enhancement_service
+from ..services import batch_embedding_service
+from ..services import similarity_query
+from ..schemas.data_schemas import ProductWithDetails
 
 '''
 Defines API endpoints for retrieving data (Retailers, Weekly Ads, Products),
@@ -46,8 +51,72 @@ async def enhance_json_files_endpoint(): # ensure this is async def
         raise HTTPException(status_code=500, detail=f"An error occurred during JSON enhancement: {str(e)}")
    
 
+@router.post("/embed_products", response_model=Dict[str, Any]) # response_model is used to specify the expected return type of the endpoint (the message) (not required)
+async def trigger_batch_embedding( db: Session = Depends(get_db)):
+    """
+    Endpoint to trigger the batch embedding process for products.
+    """
+    print("Embedding products began...")
+    await batch_embedding_service.batch_embed_products(db)
+    return {
+        "message": "Batch product embedding process finished."
+    }
 
+# Pydantic model for similarity query request body
+class SimilarityQueryRequest(BaseModel):
+    query: str
+    ad_period: str = "current"
+    limit: int = 20
+    similarity_threshold: float = 0.3
 
+# Pydantic model for similarity query response
+class SimilarityQueryResponse(BaseModel):
+    query: str
+    results_count: int
+    products: List[ProductWithDetails]
 
-
+@router.post("/test_similarity_query", response_model=SimilarityQueryResponse)
+async def test_similarity_query(
+    request: SimilarityQueryRequest,
+    db: Session = Depends(get_db)
+):
+    """
+    Test endpoint for similarity-based product search using vector embeddings.
+    Returns the top matching products based on semantic similarity.
+    """
+    print(f"Similarity query request: {request.query}")
+    
+    try:
+        products = await similarity_query.similarity_search_products(
+            db=db,
+            query=request.query,
+            ad_period=request.ad_period,
+            limit=request.limit,
+            similarity_threshold=request.similarity_threshold
+        )
+        
+        response = SimilarityQueryResponse(
+            query=request.query,
+            results_count=len(products),
+            products=products
+        )
+        
+        print(f"Similarity query completed. Found {len(products)} results.")
+        return response
+        
+    except Exception as e:
+        print(f"Error during similarity query: {e}")
+        raise HTTPException(
+            status_code=500, 
+            detail=f"An error occurred during similarity search: {str(e)}"
+        )
+    
+    
+# class TestQueryResponse(BaseModel):
+#     results_count: int
+#     product_name: List[str]
+    
+# @router.get("/test_1", response_model=TestQueryResponse)
+# async def test_1(db: Session = Depends(get_db)):
+    
 
