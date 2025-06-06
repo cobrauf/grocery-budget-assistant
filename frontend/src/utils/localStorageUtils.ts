@@ -53,3 +53,4 @@ export const LS_DATE_SORT_DIRECTION = "appState.sort.dateSortDirection";
 export const LS_APP_THEME = "appState.theme";
 export const LS_LAST_SYNC_TIME = "appState.lastSyncTime";
 export const LS_FRONT_PAGE_ONLY_TOGGLE = "appState.browse.frontPageOnlyToggle";
+export const LS_AI_CHAT_HISTORY = "aiChatHistory";

@@ -1,13 +1,20 @@
 import React, { useState, useRef, useEffect } from "react";
 import "../styles/DefaultAIView.css";
 import { ChatMessage } from "../types/chatMessage";
+import {
+  saveToLocalStorage,
+  loadFromLocalStorage,
+  LS_AI_CHAT_HISTORY,
+} from "../utils/localStorageUtils";
 
 const generateUniqueId = () => {
   return `msg_${new Date().getTime()}_${Math.random()}`;
 };
 
 const DefaultAIView: React.FC = () => {
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [messages, setMessages] = useState<ChatMessage[]>(() => {
+    return loadFromLocalStorage<ChatMessage[]>(LS_AI_CHAT_HISTORY, []);
+  });
   // {
   //   id: generateUniqueId(),
   //   text: "Ask about deals this week.",
@@ -18,6 +25,16 @@ const DefaultAIView: React.FC = () => {
   const [isProcessing, setIsProcessing] = useState(false);
   const timeoutIdRef = useRef<NodeJS.Timeout | null>(null);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
+
+  // Effect to save messages to local storage whenever they change
+  useEffect(() => {
+    // Enforce a 20-message limit
+    if (messages.length > 20) {
+      saveToLocalStorage(LS_AI_CHAT_HISTORY, messages.slice(-20));
+    } else {
+      saveToLocalStorage(LS_AI_CHAT_HISTORY, messages);
+    }
+  }, [messages]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -39,7 +56,7 @@ const DefaultAIView: React.FC = () => {
         id: generateUniqueId(),
         text: "You stopped the previous message. How can I help next?",
         sender: "ai",
-        timestamp: new Date(),
+        timestamp: new Date().getTime(),
       };
       setMessages((prevMessages) => [...prevMessages, stopMessage]);
     } else {
@@ -50,7 +67,7 @@ const DefaultAIView: React.FC = () => {
         id: generateUniqueId(),
         text: inputValue,
         sender: "user",
-        timestamp: new Date(),
+        timestamp: new Date().getTime(),
       };
 
       setMessages((prevMessages) => [...prevMessages, userMessage]);
@@ -64,7 +81,7 @@ const DefaultAIView: React.FC = () => {
           id: generateUniqueId(),
           text: `Simulated AI response for: ${currentInputValue}`,
           sender: "ai",
-          timestamp: new Date(),
+          timestamp: new Date().getTime(),
         };
         setMessages((prevMessages) => [...prevMessages, aiEchoMessage]);
         setIsProcessing(false);
