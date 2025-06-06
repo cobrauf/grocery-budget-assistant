@@ -85,7 +85,11 @@ const DefaultAIView: React.FC = () => {
       <div className="chat-messages">
         {messages.map((msg) => (
           <div key={msg.id} className={`message-bubble ${msg.sender}`}>
-            {msg.text}
+            {msg.sender === "ai" ? (
+              <span>AI: {msg.text}</span>
+            ) : (
+              <span>{msg.text}</span>
+            )}
           </div>
         ))}
         {isProcessing && (
@@ -105,15 +109,14 @@ const DefaultAIView: React.FC = () => {
           placeholder="Work in progress, not actual AI yet..."
           value={inputValue}
           onChange={(e) => setInputValue(e.target.value)}
-          onKeyPress={handleKeyPress}
-          rows={1}
+          onKeyDown={handleKeyPress}
         />
         <button
           className="send-button"
           onClick={handleSendOrStop}
           disabled={!inputValue && !isProcessing}
         >
-          {isProcessing ? "Stop" : "Send"}
+          {isProcessing ? "▢" : ">"}
         </button>
       </div>
     </div>

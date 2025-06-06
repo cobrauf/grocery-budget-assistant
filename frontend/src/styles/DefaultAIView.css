@@ -20,8 +20,9 @@
 .message-bubble {
   padding: 10px 15px;
   border-radius: 20px;
-  max-width: 70%;
+  max-width: 85%;
   word-wrap: break-word;
+  font-size: 1rem;
 }
 
 .message-bubble.user {
@@ -44,9 +45,11 @@
   left: 0;
   right: 0;
   display: flex;
-  padding: 10px;
-  border-top: 1px solid var(--theme-border, #ccc);
+  padding: 5px 15px 15px 15px;
+  /* margin: 0.5rem; */
+  border-top: 0px solid var(--theme-border, #ccc);
   background-color: var(--theme-background, #fff);
+  /* background-color: #e10000; */
   z-index: 10;
 }
 
@@ -57,26 +60,34 @@
   padding-right: 80px;
   border: 1px solid var(--theme-border, #ccc);
   border-radius: 20px;
-  background-color: var(--theme-input-background, #f1f1f1);
+  background-color: var(--theme-background, #f1f1f1);
   color: var(--theme-text, #000);
   resize: none;
   line-height: 1.5;
   min-height: 80px;
   max-height: 150px;
   overflow-y: auto;
+  font-size: 1rem;
 }
 
 .send-button {
   position: absolute;
-  right: 15px;
-  bottom: 15px;
-  padding: 8px 16px;
+  right: 25px;
+  bottom: 25px;
+  width: 45px;
+  height: 45px;
+  padding: 0px;
+  border-radius: 50%;
   border: none;
-  border-radius: 20px;
   background-color: var(--theme-primary, #7b2cbf);
   color: white;
   cursor: pointer;
-  font-weight: bold;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 2rem;
+  /* font-weight: bold; */
+  /* padding-bottom: 2px; */
 }
 
 .send-button:hover {
