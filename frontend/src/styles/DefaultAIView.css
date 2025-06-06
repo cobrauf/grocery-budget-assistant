@@ -23,6 +23,7 @@
   max-width: 85%;
   word-wrap: break-word;
   font-size: 1rem;
+  position: relative;
 }
 
 .message-bubble.user {
@@ -38,6 +39,25 @@
   align-self: flex-start;
   border-bottom-left-radius: 5px;
 }
+
+.view-products-button {
+  display: block;
+  margin-top: 10px;
+  padding: 5px 10px;
+  border: 1px solid white;
+  background-color: transparent;
+  color: white;
+  border-radius: 15px;
+  /* cursor: pointer; */
+  font-size: 0.8rem;
+  font-weight: bold;
+  /* transition: background-color 0.2s, color 0.2s; */
+}
+
+/* .view-products-button:hover {
+  background-color: var(--theme-primary, #7b2cbf);
+  color: #fff;
+} */
 
 .chat-input-container {
   position: fixed;

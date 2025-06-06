@@ -8,6 +8,7 @@ import {
   removeFromLocalStorage,
   LS_AI_CHAT_HISTORY,
 } from "../utils/localStorageUtils";
+import { processUserQueryWithSemanticSearch } from "../services/aiChatService";
 
 interface DefaultAIViewProps {
   clearChatHistory?: boolean;
@@ -95,24 +96,26 @@ const DefaultAIView: React.FC<DefaultAIViewProps> = ({
         sender: "user",
         timestamp: new Date().getTime(),
       };
-
       setMessages((prevMessages) => [...prevMessages, userMessage]);
-      setIsProcessing(true);
 
       const currentInputValue = inputValue;
-      setInputValue(""); // Clear input immediately after sending
+      setInputValue(""); // Clear input immediately for responsiveness
+      setIsProcessing(true);
 
-      timeoutIdRef.current = setTimeout(() => {
-        const aiEchoMessage: ChatMessage = {
+      // Call the new AI service
+      processUserQueryWithSemanticSearch(currentInputValue).then((result) => {
+        const aiMessage: ChatMessage = {
           id: generateUniqueId(),
-          text: `Simulated AI response for: ${currentInputValue}`,
+          text: result.summary,
           sender: "ai",
           timestamp: new Date().getTime(),
+          isProductFocused: result.products.length > 0,
+          searchQueryPerformed: currentInputValue,
+          associatedProductList: result.products,
         };
-        setMessages((prevMessages) => [...prevMessages, aiEchoMessage]);
+        setMessages((prevMessages) => [...prevMessages, aiMessage]);
         setIsProcessing(false);
-        timeoutIdRef.current = null;
-      }, 1000);
+      });
     }
   };
 
@@ -137,9 +140,17 @@ const DefaultAIView: React.FC<DefaultAIViewProps> = ({
         {messages.map((msg) => (
           <div key={msg.id} className={`message-bubble ${msg.sender}`}>
             {msg.sender === "ai" ? (
-              <span>AI: {msg.text}</span>
+              <span>✨ AI: {msg.text}</span>
             ) : (
               <span>{msg.text}</span>
+            )}
+
+            {/* Product focosed = {msg.isProductFocused}
+            {msg.isProductFocused && (
+              <button className="view-products-button">View Products</button>
+              )} */}
+            {msg.sender === "ai" && (
+              <button className="view-products-button">View Products</button>
             )}
           </div>
         ))}
