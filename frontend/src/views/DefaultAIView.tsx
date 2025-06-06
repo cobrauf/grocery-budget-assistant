@@ -137,25 +137,43 @@ const DefaultAIView: React.FC<DefaultAIViewProps> = ({
         <p>Clear chat history?</p>
       </ConfirmActionModal>
       <div className="chat-messages">
-        {messages.map((msg) => (
-          <div key={msg.id} className={`message-bubble ${msg.sender}`}>
-            {msg.sender === "ai" ? (
-              <span>✨ AI: {msg.text}</span>
-            ) : (
-              <span>{msg.text}</span>
-            )}
+        {messages.length === 0 && !isProcessing ? (
+          <div>
+            <p
+              style={{
+                textAlign: "center",
+                fontSize: "1.2em",
+                lineHeight: "1.5",
+                padding: "20px",
+              }}
+            >
+              <br />
+              <br />
+              <br />
+              <br />✨ Ask me about sales to get started!
+            </p>
+          </div>
+        ) : (
+          messages.map((msg) => (
+            <div key={msg.id} className={`message-bubble ${msg.sender}`}>
+              {msg.sender === "ai" ? (
+                <span>✨ AI: {msg.text}</span>
+              ) : (
+                <span>{msg.text}</span>
+              )}
 
-            {/* Product focosed = {msg.isProductFocused}
+              {/* Product focosed = {msg.isProductFocused}
             {msg.isProductFocused && (
               <button className="view-products-button">View Products</button>
               )} */}
-            {msg.sender === "ai" && (
-              <button className="view-products-button">
-                View Products (WIP)
-              </button>
-            )}
-          </div>
-        ))}
+              {msg.sender === "ai" && (
+                <button className="view-products-button">
+                  View Products (WIP)
+                </button>
+              )}
+            </div>
+          ))
+        )}
         {isProcessing && (
           <div className="message-bubble ai">
             <div className="typing-indicator">

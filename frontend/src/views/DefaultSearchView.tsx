@@ -21,26 +21,26 @@ const DefaultSearchView: React.FC<DefaultSearchViewProps> = ({
   const defaultSuggestions = [
     "🥚 Eggs",
     "🍗 Chicken",
-    "🐖 Pork",
+    // "🐖 Pork",
     "🐟 Fish",
     "🥩 Beef",
     "🥑 Avocados",
-    "🥛 Milk",
-    "🍌 Bananas",
-    "🍎 Apples",
+    // "🥛 Milk",
+    // "🍌 Bananas",
+    "🍎 Fruits",
     "🧀 Cheese",
     "☕ Coffee",
-    "🍪 Cookies",
+    // "🍪 Cookies",
     "🍦 Ice Cream",
-    "🥣 Cereal",
-    "🍋 Lemons",
+    "🍫 Snacks",
+    // "🍋 Lemons",
     "🍺 Beer",
-    "🥔 Chips",
-    "🧈 Butter",
-    "🥓 Bacon",
+    // "🥔 Chips",
+    // "🧈 Butter",
+    // "🥓 Bacon",
     "🍕 Pizza",
-    "🍫 Chocolate",
-    "🌶️ Hot Sauce",
+    // "🍫 Chocolate",
+    // "🌶️ Hot Sauce",
   ];
 
   // Effect to synchronize internal state with the searchHistory prop
@@ -106,7 +106,7 @@ const DefaultSearchView: React.FC<DefaultSearchViewProps> = ({
 
   return (
     <div style={viewStyle}>
-      <p>▲ Search for items above.</p>
+      <p>🔍 Search for items above.</p>
 
       <div className="search-history-section">
         <h3>Quick Searches</h3>
