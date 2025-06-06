@@ -132,7 +132,7 @@ const DefaultAIView: React.FC<DefaultAIViewProps> = ({
         isOpen={isClearModalOpen}
         onClose={() => setIsClearModalOpen(false)}
         onConfirm={handleClearChat}
-        title="Clear Chat History"
+        title="Start new chat"
       >
         <p>Clear chat history?</p>
       </ConfirmActionModal>
@@ -150,7 +150,9 @@ const DefaultAIView: React.FC<DefaultAIViewProps> = ({
               <button className="view-products-button">View Products</button>
               )} */}
             {msg.sender === "ai" && (
-              <button className="view-products-button">View Products</button>
+              <button className="view-products-button">
+                View Products (WIP)
+              </button>
             )}
           </div>
         ))}

@@ -32,7 +32,7 @@ export async function processUserQueryWithSemanticSearch(
     const productNames = products.slice(0, 5).map((p) => p.name);
     const summary = `I've found the following items for you: ${productNames.join(
       ", "
-    )}.`;
+    )} (and more...)`;
 
     return { summary, products };
   } catch (error) {
