@@ -1,33 +1,53 @@
 import React, { useState, useRef, useEffect } from "react";
 import "../styles/DefaultAIView.css";
 import { ChatMessage } from "../types/chatMessage";
+import ConfirmActionModal from "../components/modals/ConfirmActionModal";
 import {
   saveToLocalStorage,
   loadFromLocalStorage,
+  removeFromLocalStorage,
   LS_AI_CHAT_HISTORY,
 } from "../utils/localStorageUtils";
+
+interface DefaultAIViewProps {
+  clearChatHistory?: boolean;
+  onChatHistoryCleared?: () => void;
+}
 
 const generateUniqueId = () => {
   return `msg_${new Date().getTime()}_${Math.random()}`;
 };
 
-const DefaultAIView: React.FC = () => {
+const DefaultAIView: React.FC<DefaultAIViewProps> = ({
+  clearChatHistory,
+  onChatHistoryCleared,
+}) => {
   const [messages, setMessages] = useState<ChatMessage[]>(() => {
     return loadFromLocalStorage<ChatMessage[]>(LS_AI_CHAT_HISTORY, []);
   });
-  // {
-  //   id: generateUniqueId(),
-  //   text: "Ask about deals this week.",
-  //   sender: "ai",
-  //   timestamp: new Date(),
-  // },
+  const [isClearModalOpen, setIsClearModalOpen] = useState(false);
   const [inputValue, setInputValue] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
   const timeoutIdRef = useRef<NodeJS.Timeout | null>(null);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
+  // Effect to clear messages when signal is received
+  useEffect(() => {
+    if (clearChatHistory) {
+      setMessages([]);
+      onChatHistoryCleared?.(); // Notify parent that state has been cleared
+    }
+  }, [clearChatHistory, onChatHistoryCleared]);
+
   // Effect to save messages to local storage whenever they change
   useEffect(() => {
+    // Do not save an empty array if it's the initial state, unless it was intentional
+    if (
+      messages.length === 0 &&
+      !loadFromLocalStorage(LS_AI_CHAT_HISTORY, []).length
+    ) {
+      return;
+    }
     // Enforce a 20-message limit
     if (messages.length > 20) {
       saveToLocalStorage(LS_AI_CHAT_HISTORY, messages.slice(-20));
@@ -35,6 +55,12 @@ const DefaultAIView: React.FC = () => {
       saveToLocalStorage(LS_AI_CHAT_HISTORY, messages);
     }
   }, [messages]);
+
+  const handleClearChat = () => {
+    setMessages([]);
+    removeFromLocalStorage(LS_AI_CHAT_HISTORY);
+    setIsClearModalOpen(false);
+  };
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -99,6 +125,14 @@ const DefaultAIView: React.FC = () => {
 
   return (
     <div className="default-ai-view">
+      <ConfirmActionModal
+        isOpen={isClearModalOpen}
+        onClose={() => setIsClearModalOpen(false)}
+        onConfirm={handleClearChat}
+        title="Clear Chat History"
+      >
+        <p>Clear chat history?</p>
+      </ConfirmActionModal>
       <div className="chat-messages">
         {messages.map((msg) => (
           <div key={msg.id} className={`message-bubble ${msg.sender}`}>
@@ -120,21 +154,31 @@ const DefaultAIView: React.FC = () => {
         )}
         <div ref={messagesEndRef} />
       </div>
-      <div className="chat-input-area">
-        <textarea
-          className="chat-input"
-          placeholder="Work in progress, not actual AI yet..."
-          value={inputValue}
-          onChange={(e) => setInputValue(e.target.value)}
-          onKeyDown={handleKeyPress}
-        />
-        <button
-          className="send-button"
-          onClick={handleSendOrStop}
-          disabled={!inputValue && !isProcessing}
-        >
-          {isProcessing ? "▢" : ">"}
-        </button>
+      <div className="chat-input-container">
+        {messages.length > 0 && (
+          <button
+            className="clear-chat-button"
+            onClick={() => setIsClearModalOpen(true)}
+          >
+            🖋 New Chat
+          </button>
+        )}
+        <div className="chat-input-area">
+          <textarea
+            className="chat-input"
+            placeholder="Work in progress, not actual AI yet..."
+            value={inputValue}
+            onChange={(e) => setInputValue(e.target.value)}
+            onKeyDown={handleKeyPress}
+          />
+          <button
+            className="send-button"
+            onClick={handleSendOrStop}
+            disabled={!inputValue && !isProcessing}
+          >
+            {isProcessing ? "▢" : ">"}
+          </button>
+        </div>
       </div>
     </div>
   );
