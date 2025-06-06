@@ -46,10 +46,22 @@
 
 .limit-exceeded-notification {
   text-align: center;
-  padding: 0.75rem 1rem;
-  margin-bottom: 1rem;
+  padding: 0.5rem 1rem;
+  margin-bottom: 0.5rem;
   background-color: var(--theme-warning-bg, #fff3cd);
   color: var(--theme-warning-text, #856404);
+  border-radius: 4px;
+  font-size: 0.8rem;
+  width: 100%;
+  animation: fade-in 0.5s ease-in-out;
+}
+
+.showing-results-notification {
+  text-align: center;
+  padding: 0.5rem 1rem;
+  margin-bottom: 0.5rem;
+  background-color: var(--theme-info-bg, #d1ecf1);
+  color: var(--theme-info-text, #0c5460);
   border-radius: 4px;
   font-size: 0.8rem;
   width: 100%;

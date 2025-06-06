@@ -39,6 +39,12 @@ export interface Theme {
     // sortPillArrowColor: string;
     // sortPillArrowColorActive: string; // Added for active arrow if different
 
+    // Notification Colors
+    warningBg: string;
+    warningText: string;
+    infoBg: string;
+    infoText: string;
+
     // Add more specific component colors as needed
     // e.g., buttonBackground, cardBackground, etc.
   };
@@ -75,6 +81,10 @@ export const themes: Theme[] = [
       // sortPillArrowColorActive: "#ffffff", // Same as active pill text e0e0e0
       marginBlockBackgroundGradientStart: "#7b2cbf", // Light gray for margin blocks
       marginBlockBackgroundGradientEnd: "#7A73D1", // Slightly darker for gradient 7b2cbf
+      warningBg: "#fff3cd",
+      warningText: "#856404",
+      infoBg: "#d1ecf1",
+      infoText: "#0c5460",
     },
   },
   {
@@ -107,6 +117,10 @@ export const themes: Theme[] = [
       // sortPillArrowColorActive: "#1a1a1a", // Same as active pill text
       marginBlockBackgroundGradientStart: "#333446", // Very dark gray for margin blocks
       marginBlockBackgroundGradientEnd: "#1f1f1f", // Subtly lighter for gradient
+      warningBg: "#332701",
+      warningText: "#ffc107",
+      infoBg: "#032a33",
+      infoText: "#17a2b8",
     },
   },
   {
@@ -139,6 +153,10 @@ export const themes: Theme[] = [
       // sortPillArrowColorActive: "#ffffff", // Same as active pill text
       marginBlockBackgroundGradientStart: "#E6B2BA", // Light desaturated warm color for margin blocks
       marginBlockBackgroundGradientEnd: "#FBE4D6", // Subtly darker/desaturated for gradient
+      warningBg: "#fef5e2",
+      warningText: "#c58c00",
+      infoBg: "#e2f5fe",
+      infoText: "#007a99",
     },
   },
   {
@@ -174,6 +192,10 @@ export const themes: Theme[] = [
       // sortPillArrowColorActive: "#ffffff", // White arrow on active
       marginBlockBackgroundGradientStart: "#D4C9BE", // Medium gray for margin blocks
       marginBlockBackgroundGradientEnd: "#909090", // Slightly darker for gradient
+      warningBg: "#3e1c00",
+      warningText: "#ff8a65",
+      infoBg: "#1a3a3a",
+      infoText: "#4db6ac",
     },
   },
 ];

@@ -95,11 +95,25 @@ const ResultsView: React.FC<ResultsViewProps> = ({
     displayLimit &&
     items.length === displayLimit;
 
+  // New logic for the "showing results" notification
+  const shouldShowResultsNotification =
+    !isLoading && !shouldShowLimitExceededNotification && items.length > 0;
+
   // Limit exceeded notification element
   const limitExceededElement = shouldShowLimitExceededNotification ? (
     <div className="limit-exceeded-notification">
-      Showing first {displayLimit} results only. Try narrowing your
-      filters/search.
+      Showing first {displayLimit} results only.
+      <br />
+      Try narrowing your filters/search.
+    </div>
+  ) : null;
+
+  // "Showing results" notification element
+  const showingResultsElement = shouldShowResultsNotification ? (
+    <div className="showing-results-notification">
+      {inFavoritesView
+        ? `You favorited ${items.length} item${items.length !== 1 ? "s" : ""}.`
+        : `Showing ${items.length} results.`}
     </div>
   ) : null;
 
@@ -169,6 +183,7 @@ const ResultsView: React.FC<ResultsViewProps> = ({
   return (
     <div id={scrollableId} ref={scrollableDivRef} style={resultsContainerStyle}>
       {limitExceededElement}
+      {!limitExceededElement && showingResultsElement}
       <InfiniteScroll
         dataLength={items.length}
         next={loadMore}
