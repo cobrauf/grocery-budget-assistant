@@ -15,7 +15,7 @@ export const api = axios.create({
   headers: {
     "Content-Type": "application/json",
   },
-  timeout: 5000,
+  timeout: 1000,
 });
 
 // Import Product and Retailer types

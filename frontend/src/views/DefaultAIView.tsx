@@ -31,6 +31,7 @@ const DefaultAIView: React.FC<DefaultAIViewProps> = ({
   const [isProcessing, setIsProcessing] = useState(false);
   const timeoutIdRef = useRef<NodeJS.Timeout | null>(null);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
+  const isInitialMount = useRef(true);
 
   // Effect to clear messages when signal is received
   useEffect(() => {
@@ -68,8 +69,13 @@ const DefaultAIView: React.FC<DefaultAIViewProps> = ({
   };
 
   useEffect(() => {
+    // Don't scroll on initial render
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+      return;
+    }
     scrollToBottom();
-  }, [messages, isProcessing]);
+  }, [messages]);
 
   const handleSendOrStop = () => {
     if (isProcessing) {
@@ -143,14 +149,12 @@ const DefaultAIView: React.FC<DefaultAIViewProps> = ({
               style={{
                 textAlign: "center",
                 fontSize: "1.2em",
-                lineHeight: "1.5",
-                padding: "20px",
+                // lineHeight: "1.5",
+                // padding: "20px",
               }}
             >
               <br />
-              <br />
-              <br />
-              <br />✨ Ask me about sales to get started!
+              <br />✨ Ask me about weekly sales.
             </p>
           </div>
         ) : (

@@ -7,6 +7,8 @@ const DefaultFavItemsView: React.FC = () => {
       <div className="default-fav-items-content">
         {/* <div className="default-fav-items-icon">❤️</div> */}
         {/* <h2 className="default-fav-items-title">Favorites</h2> */}
+        <br />
+        <br />
         <p>Click the ❤️ icon in other tabs to save items here.</p>
       </div>
     </div>
