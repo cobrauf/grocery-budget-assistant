@@ -32,6 +32,7 @@ const DefaultAIView: React.FC<DefaultAIViewProps> = ({
   const timeoutIdRef = useRef<NodeJS.Timeout | null>(null);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const isInitialMount = useRef(true);
+  const abortControllerRef = useRef<AbortController | null>(null);
 
   // Effect to clear messages when signal is received
   useEffect(() => {
@@ -80,9 +81,9 @@ const DefaultAIView: React.FC<DefaultAIViewProps> = ({
   const handleSendOrStop = () => {
     if (isProcessing) {
       // Stop functionality
-      if (timeoutIdRef.current) {
-        clearTimeout(timeoutIdRef.current);
-        timeoutIdRef.current = null;
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+        abortControllerRef.current = null;
       }
       setIsProcessing(false);
       const stopMessage: ChatMessage = {
@@ -108,19 +109,28 @@ const DefaultAIView: React.FC<DefaultAIViewProps> = ({
       setInputValue(""); // Clear input immediately for responsiveness
       setIsProcessing(true);
 
+      const controller = new AbortController();
+      abortControllerRef.current = controller;
+
       // Call the new AI service
-      processUserQueryWithSemanticSearch(currentInputValue).then((result) => {
-        const aiMessage: ChatMessage = {
-          id: generateUniqueId(),
-          text: result.summary,
-          sender: "ai",
-          timestamp: new Date().getTime(),
-          isProductFocused: result.products.length > 0,
-          searchQueryPerformed: currentInputValue,
-          associatedProductList: result.products,
-        };
-        setMessages((prevMessages) => [...prevMessages, aiMessage]);
+      processUserQueryWithSemanticSearch(
+        currentInputValue,
+        controller.signal
+      ).then((result) => {
+        abortControllerRef.current = null; // Clear the controller
         setIsProcessing(false);
+        if (result) {
+          const aiMessage: ChatMessage = {
+            id: generateUniqueId(),
+            text: result.summary,
+            sender: "ai",
+            timestamp: new Date().getTime(),
+            isProductFocused: result.products.length > 0,
+            searchQueryPerformed: currentInputValue,
+            associatedProductList: result.products,
+          };
+          setMessages((prevMessages) => [...prevMessages, aiMessage]);
+        }
       });
     }
   };

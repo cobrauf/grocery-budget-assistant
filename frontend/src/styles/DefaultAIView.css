@@ -19,7 +19,7 @@
 
 .message-bubble {
   padding: 10px 15px;
-  border-radius: 20px;
+  border-radius: 10px;
   max-width: 85%;
   word-wrap: break-word;
   font-size: 1rem;
@@ -30,14 +30,14 @@
   background-color: var(--theme-secondary, #6c757d);
   color: #fff;
   align-self: flex-end;
-  border-bottom-right-radius: 5px;
+  border-bottom-right-radius: 0px;
 }
 
 .message-bubble.ai {
   background-color: var(--theme-primary, #7b2cbf);
   color: #fff;
   align-self: flex-start;
-  border-bottom-left-radius: 5px;
+  border-bottom-left-radius: 0px;
 }
 
 .view-products-button {

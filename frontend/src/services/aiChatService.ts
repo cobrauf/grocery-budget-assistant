@@ -1,5 +1,6 @@
 import { api } from "./api";
 import { Product } from "../types/product";
+import axios from "axios";
 
 interface SimilarityQueryResponse {
   query: string;
@@ -8,8 +9,9 @@ interface SimilarityQueryResponse {
 }
 
 export async function processUserQueryWithSemanticSearch(
-  userMessage: string
-): Promise<{ summary: string; products: Product[] }> {
+  userMessage: string,
+  signal: AbortSignal
+): Promise<{ summary: string; products: Product[] } | null> {
   try {
     const response = await api.post<SimilarityQueryResponse>(
       "/data/test_similarity_query",
@@ -17,7 +19,8 @@ export async function processUserQueryWithSemanticSearch(
         query: userMessage,
         limit: 20,
         similarity_threshold: 0.5,
-      }
+      },
+      { signal }
     );
 
     const products = response.data.products;
@@ -36,6 +39,10 @@ export async function processUserQueryWithSemanticSearch(
 
     return { summary, products };
   } catch (error) {
+    if (axios.isCancel(error)) {
+      console.log("Request canceled by user.");
+      return null;
+    }
     console.error("Error during semantic search:", error);
     return {
       summary: "Sorry, I had trouble searching for products right now.",
