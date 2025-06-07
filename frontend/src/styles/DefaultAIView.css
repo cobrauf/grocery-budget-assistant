@@ -27,14 +27,14 @@
 }
 
 .message-bubble.user {
-  background-color: var(--theme-secondary-light, #6c757d);
+  background-color: var(--theme-secondary, #6c757d);
   color: #fff;
   align-self: flex-end;
   border-bottom-right-radius: 5px;
 }
 
 .message-bubble.ai {
-  background-color: var(--theme-primary-light, #7b2cbf);
+  background-color: var(--theme-primary, #7b2cbf);
   color: #fff;
   align-self: flex-start;
   border-bottom-left-radius: 5px;

@@ -33,7 +33,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: var(--theme-secondary, #ccc); /* Color when off */
+  background-color: #666666;
   transition: 0.3s;
   border-radius: 24px; /* Fully rounded track */
 }
