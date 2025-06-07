@@ -171,7 +171,7 @@ const DefaultAIView: React.FC<DefaultAIViewProps> = ({
           messages.map((msg) => (
             <div key={msg.id} className={`message-bubble ${msg.sender}`}>
               {msg.sender === "ai" ? (
-                <span>✨ AI: {msg.text}</span>
+                <span>✨ {msg.text}</span>
               ) : (
                 <span>{msg.text}</span>
               )}

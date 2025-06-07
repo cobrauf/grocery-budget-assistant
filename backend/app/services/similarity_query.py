@@ -32,6 +32,63 @@ else:
 if not GEMINI_EMBEDDINGS_MODEL:
     logger.warning("GEMINI_EMBEDDINGS_MODEL not found in environment variables. Similarity search will fail.")
 
+useExpandedQuery = True
+
+def _expand_query_with_llm(query_text: str) -> str:
+    """
+    Expands a user query using an LLM to get a more comprehensive list of items for semantic search.
+    """
+    if not query_text.strip():
+        logger.warning("Empty query text provided for expansion.")
+        return ""
+
+    try:
+        # Use the same model as other services, or a default
+        model_name = os.getenv("GEMINI_MODEL", 'gemini-pro')
+        model = genai.GenerativeModel(model_name)
+
+        prompt = f"""
+You are a grocery shopping assistant. Your task is to expand user queries into a list of relevant items or categories that are commonly associated with the original query.
+This helps in finding relevant sales in grocery stores. Most items are groceries, but include other items like household items, cleaning supplies, etc.
+Return the expanded terms as a comma-separated list. If the query is already specific, just return the original query. Try to gauge the user's intent and expand the query accordingly.
+You can add up to 50 items to the list.
+
+Examples:
+- Query: "eggs"
+- Expanded: "eggs"
+
+- Query: "dairy"
+- Expanded: "dairy, milk, cheese, yogurt, butter, sour cream"
+
+- Query: "bbq"
+- Expanded: "bbq sauce, hot dogs, hamburgers, burger buns, corn on the cob, ribs, steak, chicken wings, potato salad"
+
+- Query: "pasta night"
+- Expanded: "pasta, spaghetti, lasagna, tomato sauce, meatballs, parmesan cheese, garlic bread"
+
+- Query: "drinks"
+- Expanded: "soda, juice, water, sparkling water, sports drinks, coffee, tea"
+
+---
+Now, expand the following query:
+- Query: "{query_text}"
+- Expanded:
+"""
+        response = model.generate_content(prompt)
+
+        if response.parts:
+            expanded_query = "".join(part.text for part in response.parts).strip()
+            logger.info(f"useExpandedQuery: {useExpandedQuery}. Original query: '{query_text}'. Expanded query: '{expanded_query}'")
+            return expanded_query
+        else:
+            logger.warning(f"LLM did not return an expansion for query: '{query_text}'. Using original query.")
+            return query_text
+
+    except Exception as e:
+        logger.error(f"Error during query expansion for '{query_text}': {e}")
+        # Fallback to the original query in case of an error
+        return query_text
+
 
 def _generate_query_embedding(query_text: str) -> Optional[List[float]]:
     """
@@ -81,11 +138,12 @@ async def similarity_search_products(
     """
     logger.info(f"Starting similarity search for query: '{query}' with limit: {limit}")
     
-    if not GEMINI_API_KEY or not GEMINI_EMBEDDINGS_MODEL:
-        logger.error("Embedding service is not configured (API key or model missing).")
-        return []
+    if useExpandedQuery:
+        expanded_query = _expand_query_with_llm(query)
+    else:
+        expanded_query = query
     
-    query_embedding = _generate_query_embedding(query)
+    query_embedding = _generate_query_embedding(expanded_query)
     if not query_embedding:
         logger.error("Failed to generate embedding for query. Returning empty results.")
         return []
