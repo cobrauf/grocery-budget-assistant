@@ -20,7 +20,7 @@
 .message-bubble {
   padding: 10px 15px;
   border-radius: 10px;
-  max-width: 85%;
+  max-width: 90%;
   word-wrap: break-word;
   font-size: 1rem;
   position: relative;
@@ -38,6 +38,7 @@
   color: #fff;
   align-self: flex-start;
   border-bottom-left-radius: 0px;
+  white-space: pre-line;
 }
 
 .view-products-button {

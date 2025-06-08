@@ -12,7 +12,8 @@ from ..schemas.data_schemas import ProductWithDetails
 
 '''
 Similarity Query Service: Uses vector embeddings to find products similar to a natural language query.
-This service generates an embedding for the user's query and finds the most similar products 
+1. Expands the query using an LLM to get a more comprehensive list of items for semantic search.
+2. Generates an embedding for the user's query and finds the most similar products 
 using cosine similarity with the stored product embeddings.
 '''
 
@@ -23,11 +24,23 @@ logger = logging.getLogger(__name__)
 
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 GEMINI_EMBEDDINGS_MODEL = os.getenv("GEMINI_EMBEDDINGS_MODEL")
+GEMINI_GENERATIVE_MODEL_NAME = os.getenv("GEMINI_MODEL")
 
+# --- Top-level initializations ---
+generative_model = None
 if GEMINI_API_KEY:
     genai.configure(api_key=GEMINI_API_KEY)
+    try:
+        generative_model = genai.GenerativeModel(GEMINI_GENERATIVE_MODEL_NAME)
+    except Exception as e:
+        logger.error(
+            f"Failed to initialize GenerativeModel ('{GEMINI_GENERATIVE_MODEL_NAME}'): {e}"
+        )
 else:
-    logger.warning("GEMINI_API_KEY not found in environment variables. Similarity search will fail.")
+    logger.warning(
+        "GEMINI_API_KEY not found in environment variables."
+    )
+
 
 if not GEMINI_EMBEDDINGS_MODEL:
     logger.warning("GEMINI_EMBEDDINGS_MODEL not found in environment variables. Similarity search will fail.")
@@ -42,11 +55,12 @@ def _expand_query_with_llm(query_text: str) -> str:
         logger.warning("Empty query text provided for expansion.")
         return ""
 
-    try:
-        # Use the same model as other services, or a default
-        model_name = os.getenv("GEMINI_MODEL", 'gemini-pro')
-        model = genai.GenerativeModel(model_name)
+    if not generative_model:
+        logger.error("Generative model not available. Cannot expand query.")
+        return query_text
 
+    try:
+        # The model is now initialized at the top level.
         prompt = f"""
 You are a grocery shopping assistant. Your task is to expand user queries into a list of relevant items or categories that are commonly associated with the original query.
 This helps in finding relevant sales in grocery stores. Most items are groceries, but include other items like household items, cleaning supplies, etc.
@@ -74,7 +88,7 @@ Now, expand the following query:
 - Query: "{query_text}"
 - Expanded:
 """
-        response = model.generate_content(prompt)
+        response = generative_model.generate_content(prompt)
 
         if response.parts:
             expanded_query = "".join(part.text for part in response.parts).strip()

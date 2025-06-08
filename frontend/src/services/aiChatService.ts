@@ -32,10 +32,18 @@ export async function processUserQueryWithSemanticSearch(
       };
     }
 
-    const productNames = products.slice(0, 5).map((p) => p.name);
-    const summary = `I've found the following items for you: ${productNames.join(
-      ", "
-    )} (and more...)`;
+    const topProductsWithDetails = products.slice(0, 10).map((p) => {
+      const price = p.price;
+      const unit = p.unit ? `/${p.unit.toLowerCase()}` : "";
+      // const retailer = p.retailer_name ? ` @ ${p.retailer_name}` : "";
+      const truncatedName =
+        p.name.length > 15 ? p.name.substring(0, 15) + "..." : p.name;
+      return `${truncatedName},  $${price}${unit}`;
+    });
+
+    const summary = `I've found the following items:\n${topProductsWithDetails.join(
+      "\n"
+    )}\n(and more...)`;
 
     return { summary, products };
   } catch (error) {

@@ -182,7 +182,7 @@ const DefaultAIView: React.FC<DefaultAIViewProps> = ({
               )} */}
               {msg.sender === "ai" && (
                 <button className="view-products-button">
-                  View Products (WIP)
+                  View Sale Items (WIP)
                 </button>
               )}
             </div>
