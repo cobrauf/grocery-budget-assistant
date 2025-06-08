@@ -1,45 +1,96 @@
 import React, { useState, useRef, useEffect } from "react";
 import "../styles/DefaultAIView.css";
 import { ChatMessage } from "../types/chatMessage";
+import ConfirmActionModal from "../components/modals/ConfirmActionModal";
+import {
+  saveToLocalStorage,
+  loadFromLocalStorage,
+  removeFromLocalStorage,
+  LS_AI_CHAT_HISTORY,
+} from "../utils/localStorageUtils";
+import { processUserQueryWithSemanticSearch } from "../services/aiChatService";
+
+interface DefaultAIViewProps {
+  clearChatHistory?: boolean;
+  onChatHistoryCleared?: () => void;
+}
 
 const generateUniqueId = () => {
   return `msg_${new Date().getTime()}_${Math.random()}`;
 };
 
-const DefaultAIView: React.FC = () => {
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
-  // {
-  //   id: generateUniqueId(),
-  //   text: "Ask about deals this week.",
-  //   sender: "ai",
-  //   timestamp: new Date(),
-  // },
+const DefaultAIView: React.FC<DefaultAIViewProps> = ({
+  clearChatHistory,
+  onChatHistoryCleared,
+}) => {
+  const [messages, setMessages] = useState<ChatMessage[]>(() => {
+    return loadFromLocalStorage<ChatMessage[]>(LS_AI_CHAT_HISTORY, []);
+  });
+  const [isClearModalOpen, setIsClearModalOpen] = useState(false);
   const [inputValue, setInputValue] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
   const timeoutIdRef = useRef<NodeJS.Timeout | null>(null);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
+  const isInitialMount = useRef(true);
+  const abortControllerRef = useRef<AbortController | null>(null);
+
+  // Effect to clear messages when signal is received
+  useEffect(() => {
+    if (clearChatHistory) {
+      setMessages([]);
+      onChatHistoryCleared?.(); // Notify parent that state has been cleared
+    }
+  }, [clearChatHistory, onChatHistoryCleared]);
+
+  // Effect to save messages to local storage whenever they change
+  useEffect(() => {
+    // Do not save an empty array if it's the initial state, unless it was intentional
+    if (
+      messages.length === 0 &&
+      !loadFromLocalStorage(LS_AI_CHAT_HISTORY, []).length
+    ) {
+      return;
+    }
+    // Enforce a 20-message limit
+    if (messages.length > 20) {
+      saveToLocalStorage(LS_AI_CHAT_HISTORY, messages.slice(-20));
+    } else {
+      saveToLocalStorage(LS_AI_CHAT_HISTORY, messages);
+    }
+  }, [messages]);
+
+  const handleClearChat = () => {
+    setMessages([]);
+    removeFromLocalStorage(LS_AI_CHAT_HISTORY);
+    setIsClearModalOpen(false);
+  };
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
   useEffect(() => {
+    // Don't scroll on initial render
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+      return;
+    }
     scrollToBottom();
-  }, [messages, isProcessing]);
+  }, [messages]);
 
   const handleSendOrStop = () => {
     if (isProcessing) {
       // Stop functionality
-      if (timeoutIdRef.current) {
-        clearTimeout(timeoutIdRef.current);
-        timeoutIdRef.current = null;
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+        abortControllerRef.current = null;
       }
       setIsProcessing(false);
       const stopMessage: ChatMessage = {
         id: generateUniqueId(),
         text: "You stopped the previous message. How can I help next?",
         sender: "ai",
-        timestamp: new Date(),
+        timestamp: new Date().getTime(),
       };
       setMessages((prevMessages) => [...prevMessages, stopMessage]);
     } else {
@@ -50,26 +101,37 @@ const DefaultAIView: React.FC = () => {
         id: generateUniqueId(),
         text: inputValue,
         sender: "user",
-        timestamp: new Date(),
+        timestamp: new Date().getTime(),
       };
-
       setMessages((prevMessages) => [...prevMessages, userMessage]);
-      setIsProcessing(true);
 
       const currentInputValue = inputValue;
-      setInputValue(""); // Clear input immediately after sending
+      setInputValue(""); // Clear input immediately for responsiveness
+      setIsProcessing(true);
 
-      timeoutIdRef.current = setTimeout(() => {
-        const aiEchoMessage: ChatMessage = {
-          id: generateUniqueId(),
-          text: `Simulated AI response for: ${currentInputValue}`,
-          sender: "ai",
-          timestamp: new Date(),
-        };
-        setMessages((prevMessages) => [...prevMessages, aiEchoMessage]);
+      const controller = new AbortController();
+      abortControllerRef.current = controller;
+
+      // Call the new AI service
+      processUserQueryWithSemanticSearch(
+        currentInputValue,
+        controller.signal
+      ).then((result) => {
+        abortControllerRef.current = null; // Clear the controller
         setIsProcessing(false);
-        timeoutIdRef.current = null;
-      }, 1000);
+        if (result) {
+          const aiMessage: ChatMessage = {
+            id: generateUniqueId(),
+            text: result.summary,
+            sender: "ai",
+            timestamp: new Date().getTime(),
+            isProductFocused: result.products.length > 0,
+            searchQueryPerformed: currentInputValue,
+            associatedProductList: result.products,
+          };
+          setMessages((prevMessages) => [...prevMessages, aiMessage]);
+        }
+      });
     }
   };
 
@@ -82,12 +144,50 @@ const DefaultAIView: React.FC = () => {
 
   return (
     <div className="default-ai-view">
+      <ConfirmActionModal
+        isOpen={isClearModalOpen}
+        onClose={() => setIsClearModalOpen(false)}
+        onConfirm={handleClearChat}
+        title="Start new chat"
+      >
+        <p>Clear chat history?</p>
+      </ConfirmActionModal>
       <div className="chat-messages">
-        {messages.map((msg) => (
-          <div key={msg.id} className={`message-bubble ${msg.sender}`}>
-            {msg.text}
+        {messages.length === 0 && !isProcessing ? (
+          <div>
+            <p
+              style={{
+                textAlign: "center",
+                fontSize: "1.2em",
+                // lineHeight: "1.5",
+                // padding: "20px",
+              }}
+            >
+              <br />
+              <br />✨ Ask me about weekly sales.
+            </p>
           </div>
-        ))}
+        ) : (
+          messages.map((msg) => (
+            <div key={msg.id} className={`message-bubble ${msg.sender}`}>
+              {msg.sender === "ai" ? (
+                <span>✨ {msg.text}</span>
+              ) : (
+                <span>{msg.text}</span>
+              )}
+
+              {/* Product focosed = {msg.isProductFocused}
+            {msg.isProductFocused && (
+              <button className="view-products-button">View Products</button>
+              )} */}
+              {msg.sender === "ai" && (
+                <button className="view-products-button">
+                  View Sale Items (WIP)
+                </button>
+              )}
+            </div>
+          ))
+        )}
         {isProcessing && (
           <div className="message-bubble ai">
             <div className="typing-indicator">
@@ -99,22 +199,31 @@ const DefaultAIView: React.FC = () => {
         )}
         <div ref={messagesEndRef} />
       </div>
-      <div className="chat-input-area">
-        <textarea
-          className="chat-input"
-          placeholder="Work in progress, not actual AI yet..."
-          value={inputValue}
-          onChange={(e) => setInputValue(e.target.value)}
-          onKeyPress={handleKeyPress}
-          rows={1}
-        />
-        <button
-          className="send-button"
-          onClick={handleSendOrStop}
-          disabled={!inputValue && !isProcessing}
-        >
-          {isProcessing ? "Stop" : "Send"}
-        </button>
+      <div className="chat-input-container">
+        {messages.length > 0 && (
+          <button
+            className="clear-chat-button"
+            onClick={() => setIsClearModalOpen(true)}
+          >
+            🖋 New Chat
+          </button>
+        )}
+        <div className="chat-input-area">
+          <textarea
+            className="chat-input"
+            placeholder="Work in progress, not actual AI yet..."
+            value={inputValue}
+            onChange={(e) => setInputValue(e.target.value)}
+            onKeyDown={handleKeyPress}
+          />
+          <button
+            className="send-button"
+            onClick={handleSendOrStop}
+            disabled={!inputValue && !isProcessing}
+          >
+            {isProcessing ? "▢" : ">"}
+          </button>
+        </div>
       </div>
     </div>
   );

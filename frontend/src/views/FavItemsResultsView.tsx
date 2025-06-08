@@ -116,7 +116,7 @@ const FavItemsResultsView: React.FC<FavItemsResultsViewProps> = ({
         isOpen={isClearFavsModalOpen}
         onClose={() => setIsClearFavsModalOpen(false)}
         onConfirm={handleClearAllFavorites}
-        title=""
+        title="Remove favs"
       >
         <p>Remove all favorites?</p>
       </ConfirmActionModal>
@@ -125,7 +125,7 @@ const FavItemsResultsView: React.FC<FavItemsResultsViewProps> = ({
         isOpen={isClearExpiredFavsModalOpen}
         onClose={() => setIsClearExpiredFavsModalOpen(false)}
         onConfirm={handleClearExpiredFavorites}
-        title=""
+        title="Remove favs"
       >
         <p>Remove expired favorites?</p>
       </ConfirmActionModal>
