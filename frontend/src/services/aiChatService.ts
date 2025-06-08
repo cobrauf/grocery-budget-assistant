@@ -25,6 +25,14 @@ export async function processUserQueryWithSemanticSearch(
 
     const products = response.data.products;
 
+    // Check for the special chat response signal
+    if (products && products.length === 1 && String(products[0].id) === "-1") {
+      return {
+        summary: products[0].name, // The chat message is in the 'name' field
+        products: [],
+      };
+    }
+
     if (!products || products.length === 0) {
       return {
         summary: "I couldn't find any related items.",
