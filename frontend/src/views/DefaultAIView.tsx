@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import "../styles/DefaultAIView.css";
 import { ChatMessage } from "../types/chatMessage";
+import { Product } from "../types/product";
 import ConfirmActionModal from "../components/modals/ConfirmActionModal";
 import {
   saveToLocalStorage,
@@ -13,6 +14,7 @@ import { processUserQueryWithSemanticSearch } from "../services/aiChatService";
 interface DefaultAIViewProps {
   clearChatHistory?: boolean;
   onChatHistoryCleared?: () => void;
+  onViewProducts: (products: Product[], query: string | undefined) => void;
 }
 
 const generateUniqueId = () => {
@@ -22,6 +24,7 @@ const generateUniqueId = () => {
 const DefaultAIView: React.FC<DefaultAIViewProps> = ({
   clearChatHistory,
   onChatHistoryCleared,
+  onViewProducts,
 }) => {
   const [messages, setMessages] = useState<ChatMessage[]>(() => {
     return loadFromLocalStorage<ChatMessage[]>(LS_AI_CHAT_HISTORY, []);
@@ -176,13 +179,17 @@ const DefaultAIView: React.FC<DefaultAIViewProps> = ({
                 <span>{msg.text}</span>
               )}
 
-              {/* Product focosed = {msg.isProductFocused}
-            {msg.isProductFocused && (
-              <button className="view-products-button">View Products</button>
-              )} */}
-              {msg.sender === "ai" && (
-                <button className="view-products-button">
-                  View Sale Items (WIP)
+              {msg.sender === "ai" && msg.isProductFocused && (
+                <button
+                  className="view-products-button"
+                  onClick={() =>
+                    onViewProducts(
+                      msg.associatedProductList || [],
+                      msg.searchQueryPerformed
+                    )
+                  }
+                >
+                  View Sale Items
                 </button>
               )}
             </div>

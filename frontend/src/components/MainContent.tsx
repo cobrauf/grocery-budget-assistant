@@ -6,6 +6,7 @@ import BrowseResultsView from "../views/BrowseResultsView";
 import DefaultFavItemsView from "../views/DefaultFavItemsView";
 import FavItemsResultsView from "../views/FavItemsResultsView";
 import DefaultAIView from "../views/DefaultAIView";
+import AIResultsView from "../views/AIResultsView";
 import SortPillsBar from "./common/SortPillsBar";
 import FavItemBar from "./common/FavItemBar";
 import { Product } from "../types/product";
@@ -135,6 +136,11 @@ const MainContent: React.FC<MainContentProps> = ({
   );
   const [isStoreModalOpen, setIsStoreModalOpen] = useState(false);
   const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
+  const [aiViewMode, setAiViewMode] = useState<"default" | "results">(
+    "default"
+  );
+  const [aiProducts, setAiProducts] = useState<Product[]>([]);
+  const [aiQuery, setAiQuery] = useState<string>("");
 
   const mainContentStyle: React.CSSProperties = {
     padding: "0",
@@ -201,6 +207,21 @@ const MainContent: React.FC<MainContentProps> = ({
     );
 
     onToggleBrowseView();
+  };
+
+  const handleShowAiResults = (
+    products: Product[],
+    query: string | undefined
+  ) => {
+    setAiProducts(products);
+    setAiQuery(query || "your recent query");
+    setAiViewMode("results");
+  };
+
+  const handleBackToAiChat = () => {
+    setAiViewMode("default");
+    setAiProducts([]);
+    setAiQuery("");
   };
 
   const renderBrowseFilterHeader = () => {
@@ -415,7 +436,19 @@ const MainContent: React.FC<MainContentProps> = ({
           </>
         );
       case "ai":
-        return <DefaultAIView />;
+        if (aiViewMode === "results") {
+          return (
+            <AIResultsView
+              products={aiProducts}
+              query={aiQuery}
+              onBack={handleBackToAiChat}
+              addFavorite={addFavorite}
+              removeFavorite={removeFavorite}
+              isFavorite={isFavorite}
+            />
+          );
+        }
+        return <DefaultAIView onViewProducts={handleShowAiResults} />;
       default:
         return (
           <div style={{ textAlign: "center", paddingTop: "20px" }}>
