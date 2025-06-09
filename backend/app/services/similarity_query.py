@@ -81,11 +81,11 @@ Examples:
 - Query: "bbq" (idea, theme, etc.)
 - Response: `SEARCH_QUERY: bbq sauce, hot dogs, hamburgers, burger buns, corn on the cob, ribs, steak, chicken wings, potato salad`
 
-- Query: "are you open?"
-- Response: `CHAT_RESPONSE: I'm an automated assistant, so I'm always available to help you find the best grocery deals!`
-
 - Query: "hi"
 - Response: `CHAT_RESPONSE: Hello! How can I help you with your grocery shopping today?`
+
+- Query: "what's 2 + 4?"
+- Response: `CHAT_RESPONSE: 2 + 4 = 6! That's a fun math problem, but I'm here to help you with your grocery shopping needs.`
 
 ---
 Now, process the following query:

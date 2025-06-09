@@ -40,18 +40,18 @@ export async function processUserQueryWithSemanticSearch(
       };
     }
 
-    const topProductsWithDetails = products.slice(0, 10).map((p) => {
+    const topProductsWithDetails = products.slice(0, 5).map((p) => {
       const price = p.price;
       const unit = p.unit ? `/${p.unit.toLowerCase()}` : "";
-      // const retailer = p.retailer_name ? ` @ ${p.retailer_name}` : "";
+      const retailer = p.retailer_name ? `, @${p.retailer_name}` : "";
       const truncatedName =
-        p.name.length > 15 ? p.name.substring(0, 15) + "..." : p.name;
-      return `${truncatedName},  $${price}${unit}`;
+        p.name.length > 25 ? p.name.substring(0, 25) + "..." : p.name;
+      return `${truncatedName}\n>> $${price}${unit}${retailer}`;
     });
 
-    const summary = `I've found the following items:\n${topProductsWithDetails.join(
+    const summary = `You might be interested in:\n\n${topProductsWithDetails.join(
       "\n"
-    )}\n(and more...)`;
+    )}\n(and more...)\n`;
 
     return { summary, products };
   } catch (error) {
