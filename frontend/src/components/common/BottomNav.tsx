@@ -28,20 +28,20 @@ const BottomNav: React.FC<BottomNavProps> = ({
   const navItems: { label: string; tab: AppTab; icon?: string }[] = [
     {
       label:
-        viewMode.browse === "results"
-          ? "< Browse"
-          : activeTab === "browse" && viewMode.browse === "default"
-          ? "Browse >"
+        activeTab === "browse"
+          ? viewMode.browse === "results"
+            ? "< Browse"
+            : "Browse >"
           : "Browse",
       tab: "browse",
       icon: "",
     },
     {
       label:
-        viewMode.search === "results"
-          ? "< Search"
-          : activeTab === "search" && viewMode.search === "default"
-          ? "Search >"
+        activeTab === "search"
+          ? viewMode.search === "results"
+            ? "< Search"
+            : "Search >"
           : "Search",
       tab: "search",
       icon: "",
@@ -49,10 +49,10 @@ const BottomNav: React.FC<BottomNavProps> = ({
     { label: favoritesLabel, tab: "favorites", icon: "" },
     {
       label:
-        viewMode.ai === "results"
-          ? "✨ < AI"
-          : activeTab === "ai" && viewMode.ai === "default"
-          ? "✨ AI >"
+        activeTab === "ai"
+          ? viewMode.ai === "results"
+            ? "✨ < AI"
+            : "✨ AI >"
           : "AI",
       tab: "ai",
       icon: "",
