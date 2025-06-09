@@ -9,7 +9,7 @@ export type ViewMode = "default" | "results";
 
 export interface TabState {
   activeTab: AppTab;
-  viewMode: Record<"browse" | "search", ViewMode>;
+  viewMode: Record<"browse" | "search" | "ai", ViewMode>;
 }
 
 const INITIAL_TAB_STATE: TabState = {
@@ -17,6 +17,7 @@ const INITIAL_TAB_STATE: TabState = {
   viewMode: {
     browse: "default",
     search: "default",
+    ai: "default",
   },
 };
 
@@ -32,8 +33,11 @@ export const useAppTab = () => {
 
   const setActiveTab = useCallback((tab: AppTab) => {
     setCurrentTabState((prev) => {
-      // If clicking the same tab (browse or search) that's already active, toggle the view mode
-      if (tab === prev.activeTab && (tab === "browse" || tab === "search")) {
+      // If clicking the same tab (browse, search, or ai) that's already active, toggle the view mode
+      if (
+        tab === prev.activeTab &&
+        (tab === "browse" || tab === "search" || tab === "ai")
+      ) {
         return {
           ...prev,
           viewMode: {
@@ -52,7 +56,7 @@ export const useAppTab = () => {
 
   // Helper function to directly set the view mode
   const setViewMode = useCallback(
-    (tab: "browse" | "search", mode: ViewMode) => {
+    (tab: "browse" | "search" | "ai", mode: ViewMode) => {
       setCurrentTabState((prev) => ({
         ...prev,
         viewMode: {

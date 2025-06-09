@@ -8,7 +8,7 @@ interface BottomNavProps {
   setActiveTab: (tab: AppTab) => void;
   areNavBarsVisible: boolean;
   favoriteItems: Product[]; // Add favorites count
-  viewMode: Record<"browse" | "search", ViewMode>; // Add viewMode
+  viewMode: Record<"browse" | "search" | "ai", ViewMode>; // Add viewMode
 }
 
 const BottomNav: React.FC<BottomNavProps> = ({
@@ -47,7 +47,16 @@ const BottomNav: React.FC<BottomNavProps> = ({
       icon: "",
     },
     { label: favoritesLabel, tab: "favorites", icon: "" },
-    { label: "✨ AI", tab: "ai", icon: "" },
+    {
+      label:
+        viewMode.ai === "results"
+          ? "✨ < AI"
+          : activeTab === "ai" && viewMode.ai === "default"
+          ? "✨ AI >"
+          : "AI",
+      tab: "ai",
+      icon: "",
+    },
   ];
 
   return (

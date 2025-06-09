@@ -22,8 +22,8 @@ interface MainContentProps {
   onResultsViewScroll?: (scrollY: number) => void;
   children?: React.ReactNode;
   activeTab: AppTab;
-  viewMode: Record<"browse" | "search", ViewMode>;
-  setViewMode: (tab: "browse" | "search", mode: ViewMode) => void;
+  viewMode: Record<"browse" | "search" | "ai", ViewMode>;
+  setViewMode: (tab: "browse" | "search" | "ai", mode: ViewMode) => void;
   areNavBarsVisible: boolean;
 
   // Search Tab Props
@@ -136,9 +136,6 @@ const MainContent: React.FC<MainContentProps> = ({
   );
   const [isStoreModalOpen, setIsStoreModalOpen] = useState(false);
   const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
-  const [aiViewMode, setAiViewMode] = useState<"default" | "results">(
-    "default"
-  );
   const [aiProducts, setAiProducts] = useState<Product[]>([]);
   const [aiQuery, setAiQuery] = useState<string>("");
 
@@ -215,11 +212,11 @@ const MainContent: React.FC<MainContentProps> = ({
   ) => {
     setAiProducts(products);
     setAiQuery(query || "your recent query");
-    setAiViewMode("results");
+    setViewMode("ai", "results");
   };
 
   const handleBackToAiChat = () => {
-    setAiViewMode("default");
+    setViewMode("ai", "default");
     setAiProducts([]);
     setAiQuery("");
   };
@@ -436,7 +433,7 @@ const MainContent: React.FC<MainContentProps> = ({
           </>
         );
       case "ai":
-        if (aiViewMode === "results") {
+        if (viewMode.ai === "results") {
           return (
             <>
               <div className="filters-header">
