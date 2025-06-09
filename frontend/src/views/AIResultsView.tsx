@@ -1,29 +1,25 @@
 import React, { useMemo, useState, useCallback, useEffect } from "react";
 import { Product } from "../types/product";
 import { useSort } from "../hooks/useSort";
-import SortPillsBar from "../components/common/SortPillsBar";
 import ResultsView from "../components/common/ResultsView";
-import "../styles/AIResultsView.css";
 
 interface AIResultsViewProps {
   products: Product[];
   query: string;
-  onBack: () => void;
   addFavorite?: (product: Product) => void;
   removeFavorite?: (productId: string, retailerId: number) => void;
   isFavorite?: (productId: string, retailerId: number) => boolean;
+  sortProps: ReturnType<typeof useSort>;
 }
 
 const AIResultsView: React.FC<AIResultsViewProps> = ({
   products: initialProducts,
   query,
-  onBack,
   addFavorite,
   removeFavorite,
   isFavorite,
+  sortProps,
 }) => {
-  const sortProps = useSort();
-
   const sortedItems = useMemo(() => {
     let items = [...initialProducts];
     const { activeSortField } = sortProps;
@@ -87,54 +83,36 @@ const AIResultsView: React.FC<AIResultsViewProps> = ({
 
   if (initialProducts.length === 0) {
     return (
-      <div className="ai-results-view">
-        <div className="ai-results-header">
-          <button onClick={onBack} className="back-link">
-            &larr; Back to Chat
-          </button>
-          <h1 className="ai-results-title">AI Search Results</h1>
-        </div>
-        <p style={{ textAlign: "center", padding: "2rem" }}>
-          No product results to display.
-        </p>
-      </div>
+      <p style={{ textAlign: "center", padding: "2rem" }}>
+        No product results to display.
+      </p>
     );
   }
 
   return (
-    <div className="ai-results-view">
-      <div className="ai-results-header">
-        <button onClick={onBack} className="back-link">
-          &larr; Back to Chat
-        </button>
-        <h1 className="ai-results-title">AI Search Results</h1>
-        <p className="ai-results-query">Showing results for: "{query}"</p>
-      </div>
-      <SortPillsBar {...sortProps} />
-      <ResultsView
-        items={displayedItems}
-        isLoading={false}
-        error={null}
-        hasMore={hasMore}
-        loadMore={loadMore}
-        scrollableId="aiResultsScrollableDiv"
-        totalResults={sortedItems.length}
-        renderInitialLoaderFullPage={false}
-        viewType="search"
-        searchQuery={query}
-        addFavorite={addFavorite}
-        removeFavorite={removeFavorite}
-        isFavorite={isFavorite}
-        sortField={sortProps.activeSortField}
-        sortDirection={
-          sortProps.activeSortField === "price"
-            ? sortProps.priceSortDirection
-            : sortProps.activeSortField === "store"
-            ? sortProps.storeSortDirection
-            : sortProps.dateSortDirection
-        }
-      />
-    </div>
+    <ResultsView
+      items={displayedItems}
+      isLoading={false}
+      error={null}
+      hasMore={hasMore}
+      loadMore={loadMore}
+      scrollableId="aiResultsScrollableDiv"
+      totalResults={sortedItems.length}
+      renderInitialLoaderFullPage={false}
+      viewType="search"
+      searchQuery={query}
+      addFavorite={addFavorite}
+      removeFavorite={removeFavorite}
+      isFavorite={isFavorite}
+      sortField={sortProps.activeSortField}
+      sortDirection={
+        sortProps.activeSortField === "price"
+          ? sortProps.priceSortDirection
+          : sortProps.activeSortField === "store"
+          ? sortProps.storeSortDirection
+          : sortProps.dateSortDirection
+      }
+    />
   );
 };
 

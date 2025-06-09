@@ -438,17 +438,44 @@ const MainContent: React.FC<MainContentProps> = ({
       case "ai":
         if (aiViewMode === "results") {
           return (
-            <AIResultsView
-              products={aiProducts}
-              query={aiQuery}
-              onBack={handleBackToAiChat}
-              addFavorite={addFavorite}
-              removeFavorite={removeFavorite}
-              isFavorite={isFavorite}
-            />
+            <>
+              <div className="filters-header">
+                <button
+                  onClick={handleBackToAiChat}
+                  className="browse-nav-arrow back-arrow"
+                  style={{ fontSize: "1.5rem" }}
+                >
+                  {" << "}
+                </button>
+                <span style={{ margin: "0 1rem" }}>
+                  Results for: "
+                  {aiQuery.length > 20
+                    ? `${aiQuery.substring(0, 20)}...`
+                    : aiQuery}
+                  "
+                </span>
+              </div>
+              <div className="sort-pills-bar-container">
+                <SortPillsBar {...sortProps} />
+              </div>
+
+              <AIResultsView
+                products={aiProducts}
+                query={aiQuery}
+                addFavorite={addFavorite}
+                removeFavorite={removeFavorite}
+                isFavorite={isFavorite}
+                sortProps={sortProps}
+              />
+            </>
           );
         }
-        return <DefaultAIView onViewProducts={handleShowAiResults} />;
+        return (
+          <DefaultAIView
+            onViewProducts={handleShowAiResults}
+            clearChatHistory={false}
+          />
+        );
       default:
         return (
           <div style={{ textAlign: "center", paddingTop: "20px" }}>
