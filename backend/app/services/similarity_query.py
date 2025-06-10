@@ -134,10 +134,6 @@ CURRENT USER QUERY:
                     f"LLM Response for '{query_text}': '{llm_response}'"
                 )
                 return llm_response
-            elif "SEARCH_QUERY:" in llm_response:
-                search_terms = llm_response.replace("SEARCH_QUERY:", "").strip()
-                logger.info(f"Converting legacy SEARCH_QUERY format to MESSAGE/TERMS")
-                return f'MESSAGE: I found some relevant products for you!\nTERMS: {search_terms}'
             else:
                 # If LLM fails to follow instructions, fallback to treating as search
                 logger.warning(f"LLM did not provide a prefixed response. Treating as search. Response: {llm_response}")
@@ -245,9 +241,9 @@ async def similarity_search_products(
         
         logger.info(f"Extracted LLM message: '{llm_message_content}', terms: '{expanded_query_terms}'")
     else:
-        # Fallback for legacy or malformed responses
+        # Fallback for malformed responses
         llm_message_content = "I found some relevant products for you!"
-        expanded_query_terms = llm_response_text.replace("SEARCH_QUERY:", "").strip() if "SEARCH_QUERY:" in llm_response_text else query
+        expanded_query_terms = query
         logger.info(f"Using fallback LLM message: '{llm_message_content}', terms: '{expanded_query_terms}'")
     
     # Use expanded query for embedding if available, otherwise use original

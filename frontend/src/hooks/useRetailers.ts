@@ -23,7 +23,7 @@ export const useRetailers = (isSearchActive: boolean) => {
   const getLogoPath = useCallback((retailerName: string): string => {
     const imageName =
       retailerName.replace(/\s+/g, "").replace(/&/g, "and") + ".png";
-    console.log(`---/assets/logos/${imageName}`);
+    // console.log(`---/assets/logos/${imageName}`);
     return `/assets/logos/${imageName}`; // Assuming public folder is root for assets
   }, []);
 
