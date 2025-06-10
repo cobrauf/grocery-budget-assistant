@@ -20,13 +20,19 @@ const AIResultsView: React.FC<AIResultsViewProps> = ({
   isFavorite,
   sortProps,
 }) => {
+  const {
+    activeSortField,
+    priceSortDirection,
+    storeSortDirection,
+    dateSortDirection,
+  } = sortProps;
+
   const sortedItems = useMemo(() => {
     let items = [...initialProducts];
-    const { activeSortField } = sortProps;
     let direction = "asc";
-    if (activeSortField === "price") direction = sortProps.priceSortDirection;
-    if (activeSortField === "store") direction = sortProps.storeSortDirection;
-    if (activeSortField === "date") direction = sortProps.dateSortDirection;
+    if (activeSortField === "price") direction = priceSortDirection;
+    if (activeSortField === "store") direction = storeSortDirection;
+    if (activeSortField === "date") direction = dateSortDirection;
 
     items.sort((a, b) => {
       let aValue: string | number, bValue: string | number;
@@ -58,7 +64,13 @@ const AIResultsView: React.FC<AIResultsViewProps> = ({
     });
 
     return items;
-  }, [initialProducts, sortProps]);
+  }, [
+    initialProducts,
+    activeSortField,
+    priceSortDirection,
+    storeSortDirection,
+    dateSortDirection,
+  ]);
 
   const loadMore = () => {
     // No pagination needed - backend controls the limit
@@ -82,18 +94,18 @@ const AIResultsView: React.FC<AIResultsViewProps> = ({
       scrollableId="aiResultsScrollableDiv"
       totalResults={sortedItems.length}
       renderInitialLoaderFullPage={false}
-      viewType="search"
+      viewType="ai"
       searchQuery={query}
       addFavorite={addFavorite}
       removeFavorite={removeFavorite}
       isFavorite={isFavorite}
-      sortField={sortProps.activeSortField}
+      sortField={activeSortField}
       sortDirection={
-        sortProps.activeSortField === "price"
-          ? sortProps.priceSortDirection
-          : sortProps.activeSortField === "store"
-          ? sortProps.storeSortDirection
-          : sortProps.dateSortDirection
+        activeSortField === "price"
+          ? priceSortDirection
+          : activeSortField === "store"
+          ? storeSortDirection
+          : dateSortDirection
       }
     />
   );
