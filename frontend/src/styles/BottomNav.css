@@ -91,7 +91,7 @@
 }
 
 .toggle-switch {
-  width: 15vw;
+  width: 50px;
   height: 3px;
   background-color: rgba(255, 255, 255, 0.3);
   position: relative;
@@ -99,20 +99,21 @@
 }
 
 .toggle-dot {
-  width: 8vw;
+  width: 25px;
   height: 3px;
   background-color: var(--theme-bottom-nav-text-active, #ffffff);
   position: absolute;
   top: 0;
-  transition: all 0.3s ease;
+  transition: transform 0.3s ease;
+  transform: translateX(0);
 }
 
 .toggle-left .toggle-dot {
-  left: 0;
+  transform: translateX(0);
 }
 
 .toggle-right .toggle-dot {
-  left: 7vw; /* 15vw - 8vw = 7vw */
+  transform: translateX(25px);
 }
 
 /* Make the toggle more visible when tab is active */
@@ -125,7 +126,7 @@
     max-width: 800px;
     margin-left: auto;
     margin-right: auto;
-    left: 0; /* Required for fixed with margin auto */
-    right: 0; /* Required for fixed with margin auto */
+    left: 0;
+    right: 0;
   }
 }
