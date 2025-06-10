@@ -137,10 +137,12 @@ const DefaultAIView: React.FC<DefaultAIViewProps> = ({
         if (result) {
           const aiMessage: ChatMessage = {
             id: generateUniqueId(),
-            text: result.summary,
+            text:
+              result.message || "I found some relevant information for you!",
             sender: "ai",
             timestamp: new Date().getTime(),
-            isProductFocused: result.products.length > 0,
+            isProductFocused:
+              result.type === "search" && result.products.length > 0,
             searchQueryPerformed: currentInputValue,
             associatedProductList: result.products,
           };

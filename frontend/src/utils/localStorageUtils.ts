@@ -2,7 +2,7 @@ export function saveToLocalStorage<T>(key: string, value: T): void {
   try {
     const serializedValue = JSON.stringify(value);
     localStorage.setItem(key, serializedValue);
-    console.log(`Saved to local storage (key: ${key}):`, serializedValue);
+    // console.log(`Saved to local storage (key: ${key}):`, serializedValue);
   } catch (error) {
     console.error(`Error saving to local storage (key: ${key}):`, error);
   }
@@ -14,7 +14,7 @@ export function loadFromLocalStorage<T>(key: string, defaultValue: T): T {
     if (serializedValue === null) {
       return defaultValue;
     }
-    console.log(`Loaded from local storage (key: ${key}):`, serializedValue);
+    // console.log(`Loaded from local storage (key: ${key}):`, serializedValue);
     return JSON.parse(serializedValue) as T;
   } catch (error) {
     console.error(`Error loading from local storage (key: ${key}):`, error);

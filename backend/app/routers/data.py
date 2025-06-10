@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, Query, BackgroundTasks
 from sqlalchemy.orm import Session
-from typing import Dict, Any, List
+from typing import Dict, Any, List, Optional
 from pydantic import BaseModel
 
 from .. import models
@@ -71,7 +71,9 @@ class SimilarityQueryRequest(BaseModel):
 
 # Pydantic model for similarity query response
 class SimilarityQueryResponse(BaseModel):
-    query: str
+    query_type: str  # e.g., "CHAT_RESPONSE", "SEARCH_RESULT", "CURATED_LIST"
+    llm_message: Optional[str] = None  # The LLM's contextual message
+    query: str  # For SEARCH_RESULT: expanded search terms; For others: original query or descriptor
     results_count: int
     products: List[ProductWithDetails]
 
@@ -87,7 +89,7 @@ async def test_similarity_query(
     print(f"Similarity query request: {request.query}")
     
     try:
-        products = await similarity_query.similarity_search_products(
+        results_dict = await similarity_query.similarity_search_products(
             db=db,
             query=request.query,
             ad_period=request.ad_period,
@@ -95,13 +97,9 @@ async def test_similarity_query(
             similarity_threshold=request.similarity_threshold
         )
         
-        response = SimilarityQueryResponse(
-            query=request.query,
-            results_count=len(products),
-            products=products
-        )
+        response = SimilarityQueryResponse(**results_dict)
         
-        print(f"Similarity query completed. Found {len(products)} results.")
+        print(f"Similarity query completed. Found {results_dict['results_count']} results.")
         return response
         
     except Exception as e:

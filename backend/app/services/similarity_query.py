@@ -71,15 +71,27 @@ First, classify the user's query into one of two categories: 'product_search' or
 
 Based on the classification, respond as follows:
 
--   If the intent is **product_search**, depending on query specifics, expand the user's query into a comma-separated list of relevant grocery items and categories. Prefix your response with `SEARCH_QUERY:`.
+-   If the intent is **product_search**, provide both a short, friendly, contextual message related to the search AND expanded search terms. Use this exact format with separate lines:
+    ```
+    MESSAGE: [your friendly message here]
+    TERMS: [expanded search terms here]
+    ```
 -   If the intent is **chat**, provide a friendly, conversational response. Prefix your response with `CHAT_RESPONSE:`.
 
 Examples:
 - Query: "eggs" (specific item)
-- Response: `SEARCH_QUERY: eggs'
+- Response: 
+```
+MESSAGE: Great choice! Eggs are such a versatile staple. Let me find the best deals for you.
+TERMS: eggs
+```
 
 - Query: "bbq" (idea, theme, etc.)
-- Response: `SEARCH_QUERY: bbq sauce, hot dogs, hamburgers, burger buns, corn on the cob, ribs, steak, chicken wings, potato salad`
+- Response:
+```
+MESSAGE: A BBQ sounds fun! Burgers and hotdogs are staples in a BBQ. I found these sales that you might like.
+TERMS: bbq sauce, hot dogs, hamburgers, burger buns, corn on the cob, ribs, steak, chicken wings, potato salad
+```
 
 - Query: "hi"
 - Response: `CHAT_RESPONSE: Hello! How can I help you with your grocery shopping today?`
@@ -100,20 +112,25 @@ Now, process the following query:
             if llm_response.startswith('`') and llm_response.endswith('`'):
                 llm_response = llm_response[1:-1].strip()
 
-            if "SEARCH_QUERY:" in llm_response or "CHAT_RESPONSE:" in llm_response:
+            if ("MESSAGE:" in llm_response and "TERMS:" in llm_response) or "CHAT_RESPONSE:" in llm_response:
                 logger.info(
                     f"LLM Response for '{query_text}': '{llm_response}'"
                 )
                 return llm_response
+            elif "SEARCH_QUERY:" in llm_response:
+                # Handle legacy format by converting to new format
+                search_terms = llm_response.replace("SEARCH_QUERY:", "").strip()
+                logger.info(f"Converting legacy SEARCH_QUERY format to MESSAGE/TERMS")
+                return f'MESSAGE: I found some relevant products for you!\nTERMS: {search_terms}'
             else:
                 # If LLM fails to follow instructions, fallback to treating as search
                 logger.warning(f"LLM did not provide a prefixed response. Treating as search. Response: {llm_response}")
-                return f"SEARCH_QUERY: {llm_response}"
+                return f'MESSAGE: I found some relevant products for you!\nTERMS: {llm_response}'
         else:
             logger.warning(
                 f"LLM did not return a response for query: '{query_text}'. Treating as standard search."
             )
-            return f"SEARCH_QUERY: {query_text}"
+            return f'MESSAGE: I found some relevant products for you!\nTERMS: {query_text}'
 
     except Exception as e:
         logger.error(f"Error during query expansion for '{query_text}': {e}")
@@ -153,7 +170,7 @@ async def similarity_search_products(
     ad_period: str = "current",
     limit: int = 20,
     similarity_threshold: float = 0.3
-) -> List[ProductWithDetails]:
+) -> dict:
     """
     Performs similarity search on products using vector embeddings.
     
@@ -165,7 +182,7 @@ async def similarity_search_products(
         similarity_threshold: Minimum similarity score (0-1, default: 0.3)
     
     Returns:
-        List of ProductWithDetails objects ordered by similarity score
+        Dictionary with keys: query_type, llm_message, query, results_count, products
     """
     logger.info(f"Starting similarity search for query: '{query}' with limit: {limit}")
 
@@ -173,30 +190,61 @@ async def similarity_search_products(
 
     if llm_response_text.startswith("CHAT_RESPONSE:"):
         chat_message = llm_response_text.replace("CHAT_RESPONSE:", "").strip()
-        # Return a "fake" product with a special ID to signal a chat response to the client
-        return [
-            ProductWithDetails(
-                id="-1",
-                name=chat_message,
-                price=0,
-                unit="",
-                retailer="N/A",
-                retailer_id=0,
-                weekly_ad_id=0,
-                retailer_name="N/A",
-                weekly_ad_valid_from="1970-01-01",
-                weekly_ad_valid_to="1970-01-01",
-                weekly_ad_ad_period="N/A",
-            )
-        ]
+        # Return a dictionary for chat response
+        return {
+            "query_type": "CHAT_RESPONSE",
+            "llm_message": chat_message,
+            "query": query,
+            "results_count": 1,
+            "products": [
+                ProductWithDetails(
+                    id="-1",
+                    name=chat_message,
+                    price=0,
+                    unit="",
+                    retailer="N/A",
+                    retailer_id=0,
+                    weekly_ad_id=0,
+                    retailer_name="N/A",
+                    weekly_ad_valid_from="1970-01-01",
+                    weekly_ad_valid_to="1970-01-01",
+                    weekly_ad_ad_period="N/A",
+                )
+            ]
+        }
 
-    # If it's a search query, extract it from the prefix
-    expanded_query = llm_response_text.replace("SEARCH_QUERY:", "").strip() if useExpandedQuery else query
+    # If it's a search query with message, extract both components
+    if "MESSAGE:" in llm_response_text and "TERMS:" in llm_response_text:
+        lines = llm_response_text.strip().split('\n')
+        llm_message_content = ""
+        expanded_query_terms = ""
+        
+        for line in lines:
+            if line.startswith("MESSAGE:"):
+                llm_message_content = line.replace("MESSAGE:", "").strip()
+            elif line.startswith("TERMS:"):
+                expanded_query_terms = line.replace("TERMS:", "").strip()
+        
+        logger.info(f"Extracted LLM message: '{llm_message_content}', terms: '{expanded_query_terms}'")
+    else:
+        # Fallback for legacy or malformed responses
+        llm_message_content = "I found some relevant products for you!"
+        expanded_query_terms = llm_response_text.replace("SEARCH_QUERY:", "").strip() if "SEARCH_QUERY:" in llm_response_text else query
+        logger.info(f"Using fallback LLM message: '{llm_message_content}', terms: '{expanded_query_terms}'")
+    
+    # Use expanded query for embedding if available, otherwise use original
+    expanded_query = expanded_query_terms if useExpandedQuery and expanded_query_terms else query
     
     query_embedding = _generate_query_embedding(expanded_query)
     if not query_embedding:
         logger.error("Failed to generate embedding for query. Returning empty results.")
-        return []
+        return {
+            "query_type": "SEARCH_RESULT",
+            "llm_message": llm_message_content,
+            "query": expanded_query_terms,
+            "results_count": 0,
+            "products": []
+        }
     
     try:
         # Option 1: Using SQLAlchemy ORM with pgvector operators
@@ -250,12 +298,27 @@ async def similarity_search_products(
             products_with_details.append(details)
             
         logger.info(f">>>>>>> ORM method:Successfully converted {len(products_with_details)} results to ProductWithDetails")
-        return products_with_details
+        result_dict = {
+            "query_type": "SEARCH_RESULT",
+            "llm_message": llm_message_content,
+            "query": expanded_query_terms,
+            "results_count": len(products_with_details),
+            "products": products_with_details
+        }
+        logger.info(f"Returning search result with message: '{llm_message_content}'")
+        return result_dict
         
     except Exception as e:
         logger.error(f"Error during similarity search: {e}")
         # Fallback to the parameter binding approach if ORM approach fails
-        return await _similarity_search_fallback(db, query_embedding, ad_period, limit, similarity_threshold)
+        fallback_products = await _similarity_search_fallback(db, query_embedding, ad_period, limit, similarity_threshold)
+        return {
+            "query_type": "SEARCH_RESULT",
+            "llm_message": llm_message_content,
+            "query": expanded_query_terms,
+            "results_count": len(fallback_products),
+            "products": fallback_products
+        }
 
 
 async def _similarity_search_fallback(
