@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useCallback, useEffect } from "react";
+import React, { useMemo } from "react";
 import { Product } from "../types/product";
 import { useSort } from "../hooks/useSort";
 import ResultsView from "../components/common/ResultsView";
@@ -60,17 +60,9 @@ const AIResultsView: React.FC<AIResultsViewProps> = ({
     return items;
   }, [initialProducts, sortProps]);
 
-  const [displayedItems, setDisplayedItems] = useState<Product[]>([]);
-  const [hasMore, setHasMore] = useState(false);
-
-  useEffect(() => {
-    setDisplayedItems(sortedItems);
-    setHasMore(false);
-  }, [sortedItems]);
-
-  const loadMore = useCallback(() => {
+  const loadMore = () => {
     // No pagination needed - backend controls the limit
-  }, []);
+  };
 
   if (initialProducts.length === 0) {
     return (
@@ -82,10 +74,10 @@ const AIResultsView: React.FC<AIResultsViewProps> = ({
 
   return (
     <ResultsView
-      items={displayedItems}
+      items={sortedItems}
       isLoading={false}
       error={null}
-      hasMore={hasMore}
+      hasMore={false}
       loadMore={loadMore}
       scrollableId="aiResultsScrollableDiv"
       totalResults={sortedItems.length}

@@ -2,7 +2,7 @@ import React, { useRef, useEffect } from "react";
 import { Product } from "../../types/product";
 import ProductCard from "./ProductCard";
 import LoadingSpinner from "./LoadingSpinner";
-import InfiniteScroll from "react-infinite-scroll-component";
+
 import "../../styles/ResultsView.css"; // Common styles
 
 interface ResultsViewProps {
@@ -171,25 +171,12 @@ const ResultsView: React.FC<ResultsViewProps> = ({
     <div id={scrollableId} ref={scrollableDivRef} style={resultsContainerStyle}>
       {limitExceededElement}
       {!limitExceededElement && showingResultsElement}
-      <InfiniteScroll
-        dataLength={items.length}
-        next={loadMore}
-        hasMore={hasMore && !isLoading}
-        loader={
-          <div
-            style={{ width: "100%", textAlign: "center", padding: "1rem 0" }}
-          >
-            <LoadingSpinner />
-          </div>
-        }
-        endMessage={endMessageElement}
-        scrollableTarget={scrollableId}
+      <div
         style={{
           display: "grid",
           gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))",
           gap: "1rem",
           width: "100%",
-          overflow: "visible", // Handled by parent scrollable div
         }}
       >
         {items.map((item, index) => (
@@ -205,7 +192,8 @@ const ResultsView: React.FC<ResultsViewProps> = ({
             animationDelay={index * 0.05}
           />
         ))}
-      </InfiniteScroll>
+      </div>
+      {endMessageElement}
       {/* For cases where initial loader isn't full page, but still loading */}
       {!renderInitialLoaderFullPage && isLoading && items.length === 0 && (
         <div style={{ width: "100%", textAlign: "center", padding: "1rem 0" }}>
