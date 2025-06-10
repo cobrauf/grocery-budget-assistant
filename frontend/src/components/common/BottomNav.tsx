@@ -53,9 +53,9 @@ const BottomNav: React.FC<BottomNavProps> = ({
       label:
         activeTab === "ai"
           ? viewMode.ai === "results"
-            ? "< AI"
-            : "AI >"
-          : "AI",
+            ? "< Chat AI"
+            : "Chat AI >"
+          : "Chat AI",
       tab: "ai",
       icon: "",
     },

@@ -2,6 +2,11 @@ import { useCallback, useEffect, useRef } from "react";
 import { AppTab } from "./useAppTab";
 import { BrowserHistoryState } from "../types/viewHistory";
 import { Product } from "../types/product";
+import {
+  saveToLocalStorage,
+  loadFromLocalStorage,
+  LS_LAST_VIEW_STATE,
+} from "../utils/localStorageUtils";
 
 interface UseViewHistoryParams {
   activeTab: AppTab;

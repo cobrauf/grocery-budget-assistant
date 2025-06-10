@@ -54,3 +54,6 @@ export const LS_APP_THEME = "appState.theme";
 export const LS_LAST_SYNC_TIME = "appState.lastSyncTime";
 export const LS_FRONT_PAGE_ONLY_TOGGLE = "appState.browse.frontPageOnlyToggle";
 export const LS_AI_CHAT_HISTORY = "aiChatHistory";
+export const LS_LAST_VIEW_STATE = "appState.lastViewState";
+export const LS_IS_BROWSE_RESULTS_ACTIVE =
+  "appState.browse.isBrowseResultsActive";

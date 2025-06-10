@@ -1,8 +1,9 @@
 import { useState, useCallback, useEffect } from "react";
-// import {
-//   loadFromLocalStorage,
-//   LS_LAST_SEARCH_QUERY,
-// } from "../utils/localStorageUtils";
+import {
+  loadFromLocalStorage,
+  saveToLocalStorage,
+  LS_LAST_VIEW_STATE,
+} from "../utils/localStorageUtils";
 
 export type AppTab = "browse" | "search" | "ai" | "favorites";
 export type ViewMode = "default" | "results";
@@ -22,13 +23,24 @@ const INITIAL_TAB_STATE: TabState = {
 };
 
 export const useAppTab = () => {
-  const [currentTabState, setCurrentTabState] =
-    useState<TabState>(INITIAL_TAB_STATE);
+  const [currentTabState, setCurrentTabState] = useState<TabState>(() => {
+    // Load the last view state from localStorage on initialization
+    const savedViewState = loadFromLocalStorage<TabState | null>(
+      LS_LAST_VIEW_STATE,
+      null
+    );
+    if (savedViewState) {
+      return savedViewState;
+    }
+    return INITIAL_TAB_STATE;
+  });
 
-  // Log tab changes
+  // Log tab changes and save to localStorage
   useEffect(() => {
     console.log("[useAppTab] Tab changed to:", currentTabState.activeTab);
     console.log("[useAppTab] View mode:", currentTabState.viewMode);
+    // Save the current view state to localStorage whenever it changes
+    saveToLocalStorage(LS_LAST_VIEW_STATE, currentTabState);
   }, [currentTabState.activeTab, currentTabState.viewMode]);
 
   const setActiveTab = useCallback((tab: AppTab) => {

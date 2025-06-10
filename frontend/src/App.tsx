@@ -33,6 +33,7 @@ import {
   LS_LAST_BROWSE_FILTER_KEY,
   LS_LAST_BROWSE_PRODUCTS,
   LS_FAVORITE_ITEMS,
+  LS_IS_BROWSE_RESULTS_ACTIVE,
 } from "./utils/localStorageUtils"; // Import localStorage utilities
 
 // --- Theme Context ---
@@ -199,12 +200,21 @@ function App() {
     useState(false);
 
   // State to manage if the detailed browse results view is active vs. filter selection view
-  const [isBrowseResultsActive, setIsBrowseResultsActive] = useState(false);
+  const [isBrowseResultsActive, setIsBrowseResultsActive] = useState<boolean>(
+    () => {
+      return loadFromLocalStorage<boolean>(LS_IS_BROWSE_RESULTS_ACTIVE, false);
+    }
+  );
 
   // Keep isBrowseResultsActive in sync with viewMode.browse
   useEffect(() => {
     setIsBrowseResultsActive(viewMode.browse === "results");
   }, [viewMode.browse]);
+
+  // Save isBrowseResultsActive to localStorage whenever it changes
+  useEffect(() => {
+    saveToLocalStorage(LS_IS_BROWSE_RESULTS_ACTIVE, isBrowseResultsActive);
+  }, [isBrowseResultsActive]);
 
   // Cache for browse results
   const [browseResultsCache, setBrowseResultsCache] = useState<
@@ -271,21 +281,21 @@ function App() {
     }
   }, [selectedStoreIds, selectedCategories]); // Dependencies to ensure it runs after LS hydration of filters
 
-  // Add effect for beforeunload confirmation
-  useEffect(() => {
-    const handleBeforeUnload = (event: BeforeUnloadEvent) => {
-      event.preventDefault();
-      // Standard for most browsers, but Chrome requires returnValue to be set.
-      event.returnValue = "";
-    };
+  // // Add effect for beforeunload confirmation
+  // useEffect(() => {
+  //   const handleBeforeUnload = (event: BeforeUnloadEvent) => {
+  //     event.preventDefault();
+  //     // Standard for most browsers, but Chrome requires returnValue to be set.
+  //     event.returnValue = "";
+  //   };
 
-    window.addEventListener("beforeunload", handleBeforeUnload);
+  //   window.addEventListener("beforeunload", handleBeforeUnload);
 
-    // Cleanup the event listener on component unmount
-    return () => {
-      window.removeEventListener("beforeunload", handleBeforeUnload);
-    };
-  }, []); // Empty dependency array means this effect runs once on mount and cleanup on unmount
+  //   // Cleanup the event listener on component unmount
+  //   return () => {
+  //     window.removeEventListener("beforeunload", handleBeforeUnload);
+  //   };
+  // }, []); // Empty dependency array means this effect runs once on mount and cleanup on unmount
 
   // State for last fetched browse criteria (including front page only mode)
   const [lastFetchedBrowseCriteria, setLastFetchedBrowseCriteria] = useState<{
