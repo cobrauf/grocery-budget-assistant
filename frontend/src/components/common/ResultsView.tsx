@@ -16,7 +16,7 @@ interface ResultsViewProps {
   // True if we want a full screen loader when items.length === 0 && isLoading
   renderInitialLoaderFullPage?: boolean;
   searchQuery?: string; // For "no results" message in search context
-  viewType: "browse" | "search"; // To differentiate messages and behavior
+  viewType: "browse" | "search" | "ai"; // To differentiate messages and behavior
   onScrollUpdate?: (scrollY: number) => void; // New prop for scroll handling
   // Props for favorites functionality
   addFavorite?: (product: Product) => void;
@@ -111,9 +111,22 @@ const ResultsView: React.FC<ResultsViewProps> = ({
   // "Showing results" notification element
   const showingResultsElement = shouldShowResultsNotification ? (
     <div className="showing-results-notification">
-      {inFavoritesView
-        ? `You favorited ${items.length} item${items.length !== 1 ? "s" : ""}.`
-        : `Showing ${items.length} results.`}
+      {(() => {
+        const pluralS = items.length !== 1 ? "s" : "";
+        if (inFavoritesView) {
+          return `You favorited ${items.length} item${pluralS}.`;
+        }
+        switch (viewType) {
+          case "browse":
+            return `Showing ${items.length} item${pluralS} from FILTERS.`;
+          case "search":
+            return `Showing ${items.length} item${pluralS} from SEARCH.`;
+          case "ai":
+            return `Showing ${items.length} item${pluralS} from CHAT.`;
+          default:
+            return `Showing ${items.length} result${pluralS}.`;
+        }
+      })()}
     </div>
   ) : null;
 
