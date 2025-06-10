@@ -135,26 +135,13 @@ const ResultsView: React.FC<ResultsViewProps> = ({
 
   // Only show end message if not in favorites view
   if (!inFavoritesView && !isLoading && items.length > 0) {
-    if (viewType === "browse") {
-      endMessageElement = (
-        <p style={infoTextStyle}>
-          {totalResults && items.length === totalResults
-            ? `Showing all ${totalResults} results.`
-            : items.length > 0
-            ? `End of results.`
-            : ""}
-        </p>
-      );
-    } else {
-      // search view
-      endMessageElement = (
-        <p style={infoTextStyle}>
-          {totalResults && items.length === totalResults
-            ? `Showing all ${totalResults} results.`
-            : `End of results.`}
-        </p>
-      );
-    }
+    endMessageElement = (
+      <p style={infoTextStyle}>
+        {totalResults && items.length === totalResults
+          ? `--- End of results ---`
+          : `--- End of results ---`}
+      </p>
+    );
   }
 
   if (renderInitialLoaderFullPage && isLoading && items.length === 0) {
