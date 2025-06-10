@@ -6,7 +6,7 @@ import { Retailer } from "../../types/retailer";
 interface StoreFilterModalProps {
   isOpen: boolean;
   onClose: () => void;
-  retailers: Retailer[];
+  retailers: (Retailer & { logoPath: string })[];
   initialSelectedStoreIds: Set<number>;
   onConfirmSelections: (selectedIds: Set<number>) => void;
   getLogoPath: (name: string) => string; // To display logos in modal
@@ -114,7 +114,7 @@ const StoreFilterModal: React.FC<StoreFilterModalProps> = ({
             onChange={() => handleToggle(retailer.id)}
           />
           <img
-            src={getLogoPath(retailer.name)}
+            src={retailer.logoPath}
             alt={retailer.name}
             className="logo-image-small"
           />

@@ -36,8 +36,8 @@ interface MainContentProps {
   loadMoreResults: () => void;
 
   // Props for Browse Tab (some used by header, some by DefaultBrowseView/BrowseResultsView)
-  rawRetailers: Retailer[]; // For StoreFilterModal
-  verifiedRetailers: Retailer[]; // For StoreFilterModal & DefaultBrowseView
+  rawRetailers: Retailer[];
+  verifiedRetailers: (Retailer & { logoPath: string })[];
   isLoadingApiRetailers: boolean;
   isLoadingLogoVerification: boolean;
   retailerApiError: string | null;

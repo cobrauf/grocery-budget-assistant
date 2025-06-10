@@ -28,7 +28,7 @@ export const PRODUCT_CATEGORIES_WITH_ICONS: { name: string; icon: string }[] = [
 
 interface DefaultBrowseViewProps {
   rawRetailers: Retailer[];
-  verifiedRetailers: Retailer[];
+  verifiedRetailers: (Retailer & { logoPath: string })[];
   isLoadingApiRetailers: boolean;
   isLoadingLogoVerification: boolean;
   retailerApiError: string | null;
@@ -88,7 +88,7 @@ const DefaultBrowseView: React.FC<DefaultBrowseViewProps> = ({
                 onClick={() => onToggleStoreSelection(retailer.id)}
               >
                 <img
-                  src={getLogoPath(retailer.name)}
+                  src={retailer.logoPath}
                   alt={retailer.name}
                   className="logo-image"
                 />

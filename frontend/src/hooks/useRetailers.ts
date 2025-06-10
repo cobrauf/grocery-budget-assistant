@@ -11,7 +11,9 @@ export const useRetailers = (isSearchActive: boolean) => {
   const [rawRetailers, setRawRetailers] = useState<Retailer[]>(() => {
     return loadFromLocalStorage<Retailer[]>(LS_RETAILERS_CACHE, []);
   });
-  const [verifiedRetailers, setVerifiedRetailers] = useState<Retailer[]>([]);
+  const [verifiedRetailers, setVerifiedRetailers] = useState<
+    (Retailer & { logoPath: string })[]
+  >([]);
   const [isLoadingApiRetailers, setIsLoadingApiRetailers] =
     useState<boolean>(false);
   const [isLoadingLogoVerification, setIsLoadingLogoVerification] =
@@ -21,7 +23,7 @@ export const useRetailers = (isSearchActive: boolean) => {
   const getLogoPath = useCallback((retailerName: string): string => {
     const imageName =
       retailerName.replace(/\s+/g, "").replace(/&/g, "and") + ".png";
-    // console.log(`---/assets/logos/${imageName}`);
+    console.log(`---/assets/logos/${imageName}`);
     return `/assets/logos/${imageName}`; // Assuming public folder is root for assets
   }, []);
 
@@ -103,21 +105,27 @@ export const useRetailers = (isSearchActive: boolean) => {
     setIsLoadingLogoVerification(true);
     const verifyLogosAndSetRetailers = async () => {
       const promises = rawRetailers.map((retailer) => {
-        return new Promise<Retailer | null>((resolve) => {
-          const img = new Image();
-          const logoPath = getLogoPath(retailer.name);
-          img.onload = () => resolve(retailer);
-          img.onerror = () => {
-            // console.warn(`Logo not found for ${retailer.name} at ${logoPath}`);
-            resolve(null);
-          };
-          img.src = logoPath;
-        });
+        return new Promise<(Retailer & { logoPath: string }) | null>(
+          (resolve) => {
+            const img = new Image();
+            const logoPath = getLogoPath(retailer.name);
+            img.onload = () => resolve({ ...retailer, logoPath });
+            img.onerror = () => {
+              // console.warn(`Logo not found for ${retailer.name} at ${logoPath}`);
+              resolve(null);
+            };
+            img.src = logoPath;
+          }
+        );
       });
 
       try {
         const results = await Promise.all(promises);
-        setVerifiedRetailers(results.filter((r): r is Retailer => r !== null));
+        setVerifiedRetailers(
+          results.filter(
+            (r): r is Retailer & { logoPath: string } => r !== null
+          )
+        );
       } catch (error) {
         console.error("Error during bulk logo verification:", error);
         setVerifiedRetailers([]); // Fallback to empty or predefined if error
