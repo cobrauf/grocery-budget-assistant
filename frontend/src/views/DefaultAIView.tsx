@@ -72,6 +72,10 @@ const DefaultAIView: React.FC<DefaultAIViewProps> = ({
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
+  const scrollToBottomInstant = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "instant" });
+  };
+
   useEffect(() => {
     // Don't scroll on initial render
     if (isInitialMount.current) {
@@ -80,6 +84,13 @@ const DefaultAIView: React.FC<DefaultAIViewProps> = ({
     }
     scrollToBottom();
   }, [messages]);
+
+  // Scroll to bottom on mount if there are messages (when returning to this view)
+  useEffect(() => {
+    if (messages.length > 0) {
+      scrollToBottomInstant();
+    }
+  }, []); // Empty dependency array means this runs only on mount
 
   const handleSendOrStop = () => {
     if (isProcessing) {
