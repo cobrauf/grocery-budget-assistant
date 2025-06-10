@@ -46,7 +46,7 @@ export async function processUserQueryWithSemanticSearch(
       const retailer = p.retailer_name ? `, @${p.retailer_name}` : "";
       const truncatedName =
         p.name.length > 25 ? p.name.substring(0, 25) + "..." : p.name;
-      return `${truncatedName}\n>> $${price}${unit}${retailer}`;
+      return `${truncatedName}\n ⇨ $${price}${unit}${retailer}`;
     });
 
     const summary = `You might be interested in:\n\n${topProductsWithDetails.join(

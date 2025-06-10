@@ -5,12 +5,14 @@ interface DefaultSearchViewProps {
   searchHistory?: string[];
   onSearch: (query: string) => void;
   onRemoveSearchItem?: (query: string) => void;
+  onSetSearchInput?: (query: string) => void;
 }
 
 const DefaultSearchView: React.FC<DefaultSearchViewProps> = ({
   searchHistory = [],
   onSearch,
   onRemoveSearchItem,
+  onSetSearchInput,
 }) => {
   // Internal state to manage terms for display, allowing animation before actual removal from parent state
   const [displayedInternalTerms, setDisplayedInternalTerms] = useState<
@@ -74,6 +76,11 @@ const DefaultSearchView: React.FC<DefaultSearchViewProps> = ({
   ].slice(0, 50); // Limit total buttons
 
   const handleSearchClick = (term: string) => {
+    // Fill the search input with the term
+    if (onSetSearchInput) {
+      onSetSearchInput(term);
+    }
+    // Then perform the search
     onSearch(term);
   };
 

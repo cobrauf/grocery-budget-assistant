@@ -32,6 +32,7 @@ const DefaultAIView: React.FC<DefaultAIViewProps> = ({
   const [isClearModalOpen, setIsClearModalOpen] = useState(false);
   const [inputValue, setInputValue] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
+  const [isFocused, setIsFocused] = useState(false);
   const timeoutIdRef = useRef<NodeJS.Timeout | null>(null);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const isInitialMount = useRef(true);
@@ -229,10 +230,12 @@ const DefaultAIView: React.FC<DefaultAIViewProps> = ({
         <div className="chat-input-area">
           <textarea
             className="chat-input"
-            placeholder="Work in progress, not actual AI yet..."
+            placeholder={isFocused ? "" : "Find deals for a BBQ outing..."}
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
             onKeyDown={handleKeyPress}
+            onFocus={() => setIsFocused(true)}
+            onBlur={() => setIsFocused(false)}
           />
           <button
             className="send-button"
