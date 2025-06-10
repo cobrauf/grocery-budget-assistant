@@ -1,5 +1,10 @@
 import { api } from "./api";
 import { Product } from "../types/product";
+import { ChatMessage } from "../types/chatMessage";
+import {
+  loadFromLocalStorage,
+  LS_AI_CHAT_HISTORY,
+} from "../utils/localStorageUtils";
 import axios from "axios";
 
 interface AIServiceResponse {
@@ -8,6 +13,53 @@ interface AIServiceResponse {
   query: string;
   results_count: number;
   products: Product[];
+}
+
+function formatChatHistory(
+  messages: ChatMessage[],
+  maxMessages: number = 8
+): string {
+  if (!messages || messages.length === 0) {
+    return "";
+  }
+
+  // Get the last N messages, excluding the current user message being sent
+  const recentMessages = messages.slice(-maxMessages);
+
+  return recentMessages
+    .map((msg) => {
+      let messageContent = msg.text;
+
+      // For AI messages with products, extract only the conversational part
+      // by removing the product summary that starts with the product listing
+      if (
+        msg.sender === "ai" &&
+        msg.associatedProductList &&
+        msg.associatedProductList.length > 0
+      ) {
+        // Look for product summary markers and extract only the conversational part
+        const productMarkers = [
+          "\n\n", // Simple marker for where product summary starts
+          "(and more...)", // Our specific marker
+        ];
+
+        for (const marker of productMarkers) {
+          const markerIndex = messageContent.indexOf(marker);
+          if (markerIndex > 0) {
+            messageContent = messageContent.substring(0, markerIndex).trim();
+            break;
+          }
+        }
+
+        // Fallback: if message is still very long, truncate it
+        if (messageContent.length > 150) {
+          messageContent = messageContent.substring(0, 150) + "...";
+        }
+      }
+
+      return `${msg.sender.toUpperCase()}: ${messageContent}`;
+    })
+    .join("\n");
 }
 
 export async function processUserQueryWithSemanticSearch(
@@ -19,10 +71,19 @@ export async function processUserQueryWithSemanticSearch(
   products: Product[];
 } | null> {
   try {
+    // Retrieve and format recent chat history
+    const chatMessages = loadFromLocalStorage<ChatMessage[]>(
+      LS_AI_CHAT_HISTORY,
+      []
+    );
+    const chatHistoryString = formatChatHistory(chatMessages, 20);
+    console.log("----------chatHistoryString", chatHistoryString);
+
     const response = await api.post<AIServiceResponse>(
       "/data/test_similarity_query",
       {
         query: userMessage,
+        chat_history: chatHistoryString || undefined,
       },
       { signal }
     );
