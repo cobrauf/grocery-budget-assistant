@@ -7,31 +7,31 @@ export const availableFonts = [
     sans-serif`,
     style: "Modern & Clean",
   },
-  {
-    name: "Georgia Serif",
-    family: "Georgia, 'Times New Roman', Times, serif",
-    style: "Classic Serif",
-  },
-  {
-    name: "Palatino",
-    family: "'Palatino Linotype', 'Book Antiqua', Palatino, serif",
-    style: "Elegant Serif",
-  },
   // {
-  //   name: "Garamond",
-  //   family: "Garamond, serif",
-  //   style: "Traditional Serif",
+  //   name: "Georgia Serif",
+  //   family: "Georgia, 'Times New Roman', Times, serif",
+  //   style: "Classic Serif",
   // },
+  // {
+  //   name: "Palatino",
+  //   family: "'Palatino Linotype', 'Book Antiqua', Palatino, serif",
+  //   style: "Elegant Serif",
+  // },
+  {
+    name: "Garamond",
+    family: "Garamond, serif",
+    style: "Traditional Serif",
+  },
   // {
   //   name: "Modern Sans",
   //   family: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
   //   style: "Modern Sans-Serif",
   // },
-  {
-    name: "Arial",
-    family: "Arial, Helvetica, sans-serif",
-    style: "Clean Sans-Serif",
-  },
+  // {
+  //   name: "Arial",
+  //   family: "Arial, Helvetica, sans-serif",
+  //   style: "Clean Sans-Serif",
+  // },
   // {
   //   name: "Trebuchet",
   //   family:
@@ -48,11 +48,11 @@ export const availableFonts = [
     family: "'Courier New', Courier, monospace",
     style: "Technical",
   },
-  {
-    name: "Comic",
-    family: "'Comic Sans MS', 'Comic Sans', cursive",
-    style: "Casual & Fun",
-  },
+  // {
+  //   name: "Comic",
+  //   family: "'Comic Sans MS', 'Comic Sans', cursive",
+  //   style: "Casual & Fun",
+  // },
 ];
 
 // Current font in use - Change this variable to switch fonts
