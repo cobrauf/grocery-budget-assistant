@@ -35,17 +35,81 @@ export const useAppTab = () => {
     return INITIAL_TAB_STATE;
   });
 
-  // Log tab changes and save to localStorage
+  // Save to localStorage and scroll to top on tab/view changes
   useEffect(() => {
-    console.log("[useAppTab] Tab changed to:", currentTabState.activeTab);
-    console.log("[useAppTab] View mode:", currentTabState.viewMode);
-    // Save the current view state to localStorage whenever it changes
     saveToLocalStorage(LS_LAST_VIEW_STATE, currentTabState);
+
+    const attemptScroll = (attempt = 1) => {
+      // Special case: AI default view (chat) should scroll to bottom
+      const isAIChat =
+        currentTabState.activeTab === "ai" &&
+        currentTabState.viewMode.ai === "default";
+
+      let scrollableElement: HTMLElement | null = null;
+
+      if (
+        currentTabState.activeTab === "browse" &&
+        currentTabState.viewMode.browse === "results"
+      ) {
+        scrollableElement = document.getElementById("browseScrollableDiv");
+      } else if (
+        currentTabState.activeTab === "search" &&
+        currentTabState.viewMode.search === "results"
+      ) {
+        scrollableElement = document.getElementById("searchScrollableDiv");
+      } else if (
+        currentTabState.activeTab === "ai" &&
+        currentTabState.viewMode.ai === "results"
+      ) {
+        scrollableElement = document.getElementById("aiResultsScrollableDiv");
+      } else if (currentTabState.activeTab === "favorites") {
+        scrollableElement = document.getElementById("favoritesScrollableDiv");
+      }
+
+      if (scrollableElement) {
+        if (isAIChat) {
+          scrollableElement.scrollTop = scrollableElement.scrollHeight;
+        } else {
+          scrollableElement.scrollTop = 0;
+        }
+      }
+
+      // Also scroll window and document body to ensure we capture all scrollable areas
+      const windowScrollY = window.scrollY;
+      const documentScrollTop = document.documentElement.scrollTop;
+      const bodyScrollTop = document.body.scrollTop;
+
+      if (
+        !isAIChat &&
+        (windowScrollY > 0 || documentScrollTop > 0 || bodyScrollTop > 0)
+      ) {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+        document.documentElement.scrollTop = 0;
+        document.body.scrollTop = 0;
+      } else if (
+        isAIChat &&
+        windowScrollY <
+          document.documentElement.scrollHeight - window.innerHeight
+      ) {
+        window.scrollTo({
+          top: document.documentElement.scrollHeight,
+          behavior: "smooth",
+        });
+        document.documentElement.scrollTop =
+          document.documentElement.scrollHeight;
+        document.body.scrollTop = document.body.scrollHeight;
+      }
+
+      if (!scrollableElement && attempt < 3) {
+        setTimeout(() => attemptScroll(attempt + 1), 100 * attempt);
+      }
+    };
+
+    setTimeout(() => attemptScroll(), 50);
   }, [currentTabState.activeTab, currentTabState.viewMode]);
 
   const setActiveTab = useCallback((tab: AppTab) => {
     setCurrentTabState((prev) => {
-      // If clicking the same tab (browse, search, or ai) that's already active, toggle the view mode
       if (
         tab === prev.activeTab &&
         (tab === "browse" || tab === "search" || tab === "ai")
@@ -58,7 +122,6 @@ export const useAppTab = () => {
           },
         };
       }
-      // Otherwise, just change the active tab
       return {
         ...prev,
         activeTab: tab,
