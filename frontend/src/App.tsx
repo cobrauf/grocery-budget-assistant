@@ -475,14 +475,17 @@ function App() {
   const [isFrontPageOnly, setIsFrontPageOnly] = useState<boolean>(() => {
     return loadFromLocalStorage<boolean>(LS_FRONT_PAGE_ONLY_TOGGLE, false);
   });
+  const [isInitialLoad, setIsInitialLoad] = useState<boolean>(true);
 
   // Near other useEffects
   useEffect(() => {
     saveToLocalStorage(LS_FRONT_PAGE_ONLY_TOGGLE, isFrontPageOnly);
   }, [isFrontPageOnly]);
 
-  // Effect to load cached browse results on app init
+  // Effect to load cached browse results on app init ONLY
   useEffect(() => {
+    if (!isInitialLoad) return; // Only run on initial load
+
     const currentFilterKey = generateBrowseCacheKey(
       Array.from(selectedStoreIds).map(String),
       Array.from(selectedCategories),
@@ -513,7 +516,9 @@ function App() {
         );
       }
     }
-  }, [selectedStoreIds, selectedCategories, isFrontPageOnly]); // Dependencies to ensure it runs after LS hydration of filters
+
+    setIsInitialLoad(false); // Mark initial load as complete
+  }, [selectedStoreIds, selectedCategories, isFrontPageOnly, isInitialLoad]); // Dependencies to ensure it runs after LS hydration of filters
 
   const generateBrowseCacheKey = (
     storeIds: string[],

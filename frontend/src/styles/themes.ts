@@ -88,6 +88,81 @@ export const themes: Theme[] = [
     },
   },
   {
+    name: "Retro",
+    colors: {
+      background: "#d3d3d3", // Light Grey (Console body)
+      text: "#212121", // Dark Grey/Black (Controller, D-pad)
+      primary: "#00809D", // Red (A/B Buttons, highlights)
+      secondary: "#424242", // Dark Grey (Controller accents)
+
+      headerBackground: "#424242", // Dark Grey (Controller body color)
+      headerText: "#d3d3d3", // Light Grey (Console body color)
+
+      sidebarBackground: "#c0c0c0", // Medium Grey (Slightly darker console body)
+      sidebarText: "#212121", // Dark Grey/Black
+      sidebarHighlight: "#00809D", // Red
+      sidebarDivider: "#616161", // A darker dividing line
+
+      searchInputBackground: "#ffffff", // White/Off-white (Button text color)
+      searchInputText: "#212121", // Dark Grey/Black
+      searchInputPlaceholder: "#757575", // Medium Grey placeholder text
+      bottomNavBackground: "#2a2a2a", // Very dark gray
+      bottomNavTextInactive: "rgba(200, 200, 200, 0.7)", // Semi-transparent light gray
+      bottomNavTextActive: "#e0e0e0", // Light gray
+      bottomNavIndicatorActive: "#D91656", // Bright red
+      bottomNavItemActiveBackground: "#424242", // Matches headerBackground
+      // Retro Theme Sort Pill Colors
+      sortPillBackground: "#7d7d7d", // Medium-light grey
+      sortPillText: "#ffffff", // Dark text
+      sortPillBackgroundActive: "#00809D", // Red (primary accent)
+      sortPillTextActive: "#ffffff", // White text on active
+      // sortPillArrowColor: "#212121", // Dark arrow
+      // sortPillArrowColorActive: "#ffffff", // White arrow on active
+      marginBlockBackgroundGradientStart: "#D4C9BE", // Medium gray for margin blocks
+      marginBlockBackgroundGradientEnd: "#909090", // Slightly darker for gradient
+      warningBg: "#fff3cd",
+      warningText: "#856404",
+      infoBg: "#d1ecf1",
+      infoText: "#0c5460",
+    },
+  },
+  {
+    name: "Pastel",
+    colors: {
+      background: "#fdf6f0", // Creamy background
+      text: "#5d5d5d", // Dark grey text
+      primary: "#A4B465", // Soft pink primary
+      secondary: "#a0d2f2", // Soft blue secondary
+      headerBackground: "#f2bfa0", // Peachy header
+      headerText: "#ffffff", // Pure white
+      sidebarBackground: "#f0e2d2", // Light beige sidebar
+      sidebarText: "#5d5d5d", // Medium gray
+      sidebarHighlight: "#A4B465", // Soft pink
+      sidebarDivider: "#d3c1b1", // Light brown-beige
+      searchInputBackground: "#ffffff", // Pure white
+      searchInputText: "#5d5d5d", // Medium gray
+      searchInputPlaceholder: "#a0a0a0", // Light gray
+      bottomNavBackground: "#e0a9a0", // Muted peachy pink
+      bottomNavTextInactive: "rgba(255, 255, 255, 0.75)", // Semi-transparent white
+      bottomNavTextActive: "#ffffff", // Pure white
+      bottomNavIndicatorActive: "#ffffff", // Pure white
+      bottomNavItemActiveBackground: "#f2bfa0", // Matches headerBackground
+      // Pastel Theme Sort Pill Colors
+      sortPillBackground: "#7d7d7d", // Light beige, same as sidebar
+      sortPillText: "#ffffff", // Dark grey text
+      sortPillBackgroundActive: "#A4B465", // Soft pink primary
+      sortPillTextActive: "#ffffff", // White text on active
+      // sortPillArrowColor: "#5d5d5d", // Same as pill text
+      // sortPillArrowColorActive: "#ffffff", // Same as active pill text
+      marginBlockBackgroundGradientStart: "#E6B2BA", // Light desaturated warm color for margin blocks
+      marginBlockBackgroundGradientEnd: "#FBE4D6", // Subtly darker/desaturated for gradient
+      warningBg: "#fff3cd",
+      warningText: "#856404",
+      infoBg: "#d1ecf1",
+      infoText: "#0c5460",
+    },
+  },
+  {
     name: "Dark",
     colors: {
       background: "#1a1a1a", // Very dark gray
@@ -117,81 +192,6 @@ export const themes: Theme[] = [
       // sortPillArrowColorActive: "#1a1a1a", // Same as active pill text
       marginBlockBackgroundGradientStart: "#333446", // Very dark gray for margin blocks
       marginBlockBackgroundGradientEnd: "#1f1f1f", // Subtly lighter for gradient
-      warningBg: "#fff3cd",
-      warningText: "#856404",
-      infoBg: "#d1ecf1",
-      infoText: "#0c5460",
-    },
-  },
-  {
-    name: "Pastel",
-    colors: {
-      background: "#fdf6f0", // Creamy background
-      text: "#5d5d5d", // Dark grey text
-      primary: "#f2a2a0", // Soft pink primary
-      secondary: "#a0d2f2", // Soft blue secondary
-      headerBackground: "#f2bfa0", // Peachy header
-      headerText: "#ffffff", // Pure white
-      sidebarBackground: "#f0e2d2", // Light beige sidebar
-      sidebarText: "#5d5d5d", // Medium gray
-      sidebarHighlight: "#f2a2a0", // Soft pink
-      sidebarDivider: "#d3c1b1", // Light brown-beige
-      searchInputBackground: "#ffffff", // Pure white
-      searchInputText: "#5d5d5d", // Medium gray
-      searchInputPlaceholder: "#a0a0a0", // Light gray
-      bottomNavBackground: "#e0a9a0", // Muted peachy pink
-      bottomNavTextInactive: "rgba(255, 255, 255, 0.75)", // Semi-transparent white
-      bottomNavTextActive: "#ffffff", // Pure white
-      bottomNavIndicatorActive: "#ffffff", // Pure white
-      bottomNavItemActiveBackground: "#f2bfa0", // Matches headerBackground
-      // Pastel Theme Sort Pill Colors
-      sortPillBackground: "#7d7d7d", // Light beige, same as sidebar
-      sortPillText: "#ffffff", // Dark grey text
-      sortPillBackgroundActive: "#f2a2a0", // Soft pink primary
-      sortPillTextActive: "#ffffff", // White text on active
-      // sortPillArrowColor: "#5d5d5d", // Same as pill text
-      // sortPillArrowColorActive: "#ffffff", // Same as active pill text
-      marginBlockBackgroundGradientStart: "#E6B2BA", // Light desaturated warm color for margin blocks
-      marginBlockBackgroundGradientEnd: "#FBE4D6", // Subtly darker/desaturated for gradient
-      warningBg: "#fff3cd",
-      warningText: "#856404",
-      infoBg: "#d1ecf1",
-      infoText: "#0c5460",
-    },
-  },
-  {
-    name: "Retro",
-    colors: {
-      background: "#d3d3d3", // Light Grey (Console body)
-      text: "#212121", // Dark Grey/Black (Controller, D-pad)
-      primary: "#D91656", // Red (A/B Buttons, highlights)
-      secondary: "#424242", // Dark Grey (Controller accents)
-
-      headerBackground: "#424242", // Dark Grey (Controller body color)
-      headerText: "#d3d3d3", // Light Grey (Console body color)
-
-      sidebarBackground: "#c0c0c0", // Medium Grey (Slightly darker console body)
-      sidebarText: "#212121", // Dark Grey/Black
-      sidebarHighlight: "#D91656", // Red
-      sidebarDivider: "#616161", // A darker dividing line
-
-      searchInputBackground: "#ffffff", // White/Off-white (Button text color)
-      searchInputText: "#212121", // Dark Grey/Black
-      searchInputPlaceholder: "#757575", // Medium Grey placeholder text
-      bottomNavBackground: "#2a2a2a", // Very dark gray
-      bottomNavTextInactive: "rgba(200, 200, 200, 0.7)", // Semi-transparent light gray
-      bottomNavTextActive: "#e0e0e0", // Light gray
-      bottomNavIndicatorActive: "#D91656", // Bright red
-      bottomNavItemActiveBackground: "#424242", // Matches headerBackground
-      // Retro Theme Sort Pill Colors
-      sortPillBackground: "#7d7d7d", // Medium-light grey
-      sortPillText: "#ffffff", // Dark text
-      sortPillBackgroundActive: "#D91656", // Red (primary accent)
-      sortPillTextActive: "#ffffff", // White text on active
-      // sortPillArrowColor: "#212121", // Dark arrow
-      // sortPillArrowColorActive: "#ffffff", // White arrow on active
-      marginBlockBackgroundGradientStart: "#D4C9BE", // Medium gray for margin blocks
-      marginBlockBackgroundGradientEnd: "#909090", // Slightly darker for gradient
       warningBg: "#fff3cd",
       warningText: "#856404",
       infoBg: "#d1ecf1",
