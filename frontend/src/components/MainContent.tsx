@@ -436,7 +436,7 @@ const MainContent: React.FC<MainContentProps> = ({
         if (viewMode.ai === "results") {
           return (
             <>
-              <div className="filters-header">
+              {/* <div className="filters-header">
                 <button
                   onClick={handleBackToAiChat}
                   className="browse-nav-arrow back-arrow"
@@ -451,7 +451,7 @@ const MainContent: React.FC<MainContentProps> = ({
                     : aiQuery}
                   "
                 </span>
-              </div>
+              </div> */}
               <div className="sort-pills-bar-container">
                 <SortPillsBar {...sortProps} />
               </div>

@@ -75,6 +75,22 @@ const BottomNav: React.FC<BottomNavProps> = ({
           }`}
           onClick={() => setActiveTab(item.tab)}
         >
+          {/* Toggle indicator for browse, search, and ai tabs */}
+          {(item.tab === "browse" ||
+            item.tab === "search" ||
+            item.tab === "ai") && (
+            <div className="tab-toggle-indicator">
+              <div
+                className={`toggle-switch ${
+                  viewMode[item.tab] === "results"
+                    ? "toggle-right"
+                    : "toggle-left"
+                }`}
+              >
+                <div className="toggle-dot"></div>
+              </div>
+            </div>
+          )}
           {/* <span className="bottom-nav-icon">{item.icon}</span> */}
           <span className="bottom-nav-label">{item.label}</span>
         </button>
