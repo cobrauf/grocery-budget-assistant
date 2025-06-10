@@ -56,6 +56,8 @@ async def process_single_json_file_for_enhancement(filepath: Path) -> Optional[E
             "Don't reuse words from the existing attributes",
             "For food generally considered healthy (produce/fruits/meats/dairy), add 'healthy' to the attribute.",
             "For food generally considered high in protein (meats/fish/eggs/nuts/beans), add 'high protein' to the attribute.",
+            "For food generally considered ethnic (e.g., Hispanic, Asian, Italian, Indian, Middle Eastern), add 'ethnic' and the relevant region/cuisine (e.g., 'hispanic', 'asian', 'italian') to the attribute.",
+            "For food generally considered gluten-free/vegan/vegetarian, add the relevant term to the attribute.",
             "If the emoji field is a ? or 🫐 or some other non-emoji character, find a suitable emoji, if none are suitable, replace it with a 🛒 emoji.",
             
             "IMPORTANT: All other parts of the JSON structure and data MUST remain unchanged. Treat the input JSON as immutable except for the addition of the 'gen_terms' attribute to each product.",
