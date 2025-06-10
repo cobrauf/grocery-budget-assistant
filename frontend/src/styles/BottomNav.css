@@ -60,10 +60,10 @@
   left: 20%; /* Adjust to center the underline */
   right: 20%; /* Adjust to center the underline */
   height: 2px; /* Thickness of the underline */
-  background-color: var(
+  /* background-color: var(
     --theme-bottom-nav-indicator-active,
     #ffffff
-  ); /* White underline */
+  ); */
   /* border-radius: 2px; */
 }
 
@@ -84,7 +84,7 @@
 /* Toggle indicator styles */
 .tab-toggle-indicator {
   position: absolute;
-  top: 5px;
+  bottom: 7px;
   left: 50%;
   transform: translateX(-50%);
   z-index: 1;

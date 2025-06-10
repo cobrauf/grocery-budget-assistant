@@ -32,8 +32,8 @@ const BottomNav: React.FC<BottomNavProps> = ({
       label:
         activeTab === "browse"
           ? viewMode.browse === "results"
-            ? "< Browse"
-            : "Browse >"
+            ? "Browse"
+            : "Browse"
           : "Browse",
       tab: "browse",
       icon: "",
@@ -42,8 +42,8 @@ const BottomNav: React.FC<BottomNavProps> = ({
       label:
         activeTab === "search"
           ? viewMode.search === "results"
-            ? "< Search"
-            : "Search >"
+            ? "Search"
+            : "Search"
           : "Search",
       tab: "search",
       icon: "",
@@ -53,8 +53,8 @@ const BottomNav: React.FC<BottomNavProps> = ({
       label:
         activeTab === "ai"
           ? viewMode.ai === "results"
-            ? "< Chat AI"
-            : "Chat AI >"
+            ? "Chat AI"
+            : "Chat AI"
           : "Chat AI",
       tab: "ai",
       icon: "",
@@ -78,19 +78,20 @@ const BottomNav: React.FC<BottomNavProps> = ({
           {/* Toggle indicator for browse, search, and ai tabs */}
           {(item.tab === "browse" ||
             item.tab === "search" ||
-            item.tab === "ai") && (
-            <div className="tab-toggle-indicator">
-              <div
-                className={`toggle-switch ${
-                  viewMode[item.tab] === "results"
-                    ? "toggle-right"
-                    : "toggle-left"
-                }`}
-              >
-                <div className="toggle-dot"></div>
+            item.tab === "ai") &&
+            activeTab === item.tab && (
+              <div className="tab-toggle-indicator">
+                <div
+                  className={`toggle-switch ${
+                    viewMode[item.tab] === "results"
+                      ? "toggle-right"
+                      : "toggle-left"
+                  }`}
+                >
+                  <div className="toggle-dot"></div>
+                </div>
               </div>
-            </div>
-          )}
+            )}
           {/* <span className="bottom-nav-icon">{item.icon}</span> */}
           <span className="bottom-nav-label">{item.label}</span>
         </button>
