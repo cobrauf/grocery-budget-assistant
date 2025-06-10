@@ -23,8 +23,6 @@ export async function processUserQueryWithSemanticSearch(
       "/data/test_similarity_query",
       {
         query: userMessage,
-        limit: 20,
-        similarity_threshold: 0.5,
       },
       { signal }
     );
@@ -46,7 +44,7 @@ export async function processUserQueryWithSemanticSearch(
 
       // Add formatted product summary if there are products
       if (products && products.length > 0) {
-        const topProductsWithDetails = products.slice(0, 5).map((p) => {
+        const topProductsWithDetails = products.slice(0, 3).map((p) => {
           const price = p.price;
           const unit = p.unit ? `/${p.unit.toLowerCase()}` : "";
           const retailer = p.retailer_name ? `, @${p.retailer_name}` : "";
@@ -55,9 +53,11 @@ export async function processUserQueryWithSemanticSearch(
           return `${truncatedName}\n ⇨ $${price}${unit}${retailer}`;
         });
 
-        const productSummary = `\n\nYou might be interested in:\n\n${topProductsWithDetails.join(
+        const productSummary = `\n\n${topProductsWithDetails.join(
           "\n"
-        )}\n(and more...)\n`;
+          // const productSummary = `\n\nYou might be interested in:\n\n${topProductsWithDetails.join(
+          //   "\n"
+        )}\n(and more...)\n\n`;
 
         fullMessage += productSummary;
       } else {

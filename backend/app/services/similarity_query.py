@@ -47,6 +47,10 @@ if not GEMINI_EMBEDDINGS_MODEL:
 
 useExpandedQuery = True
 
+# Default search parameters - adjust these to control search behavior
+DEFAULT_SEARCH_LIMIT = 50
+DEFAULT_SIMILARITY_THRESHOLD = 0.5
+
 def _expand_query_with_llm(query_text: str) -> str:
     """
     Expands a user query using an LLM to get a more comprehensive list of items for semantic search,
@@ -168,8 +172,8 @@ async def similarity_search_products(
     db: Session,
     query: str,
     ad_period: str = "current",
-    limit: int = 20,
-    similarity_threshold: float = 0.3
+    limit: int = DEFAULT_SEARCH_LIMIT,
+    similarity_threshold: float = DEFAULT_SIMILARITY_THRESHOLD
 ) -> dict:
     """
     Performs similarity search on products using vector embeddings.
@@ -178,8 +182,8 @@ async def similarity_search_products(
         db: Database session
         query: Natural language query (e.g., "high protein sales")
         ad_period: Which ad period to search (default: "current")
-        limit: Maximum number of results to return (default: 20)
-        similarity_threshold: Minimum similarity score (0-1, default: 0.3)
+        limit: Maximum number of results to return
+        similarity_threshold: Minimum similarity score (0-1)
     
     Returns:
         Dictionary with keys: query_type, llm_message, query, results_count, products

@@ -9,6 +9,7 @@ from ..services import json_to_db_service
 from ..services import json_enhancement_service
 from ..services import batch_embedding_service
 from ..services import similarity_query
+from ..services.similarity_query import DEFAULT_SEARCH_LIMIT, DEFAULT_SIMILARITY_THRESHOLD
 from ..schemas.data_schemas import ProductWithDetails
 
 '''
@@ -66,8 +67,8 @@ async def trigger_batch_embedding( db: Session = Depends(get_db)):
 class SimilarityQueryRequest(BaseModel):
     query: str
     ad_period: str = "current"
-    limit: int = 20
-    similarity_threshold: float = 0.3
+    limit: int = DEFAULT_SEARCH_LIMIT
+    similarity_threshold: float = DEFAULT_SIMILARITY_THRESHOLD
 
 # Pydantic model for similarity query response
 class SimilarityQueryResponse(BaseModel):

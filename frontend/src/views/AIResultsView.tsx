@@ -64,22 +64,13 @@ const AIResultsView: React.FC<AIResultsViewProps> = ({
   const [hasMore, setHasMore] = useState(false);
 
   useEffect(() => {
-    setDisplayedItems(sortedItems.slice(0, 20));
-    setHasMore(sortedItems.length > 20);
+    setDisplayedItems(sortedItems);
+    setHasMore(false);
   }, [sortedItems]);
 
   const loadMore = useCallback(() => {
-    const currentLength = displayedItems.length;
-    if (currentLength >= sortedItems.length) {
-      setHasMore(false);
-      return;
-    }
-    const nextItems = sortedItems.slice(currentLength, currentLength + 20);
-    setDisplayedItems((prev) => [...prev, ...nextItems]);
-    if (displayedItems.length + nextItems.length >= sortedItems.length) {
-      setHasMore(false);
-    }
-  }, [displayedItems, sortedItems]);
+    // No pagination needed - backend controls the limit
+  }, []);
 
   if (initialProducts.length === 0) {
     return (

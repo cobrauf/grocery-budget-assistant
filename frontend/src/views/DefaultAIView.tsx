@@ -203,7 +203,7 @@ const DefaultAIView: React.FC<DefaultAIViewProps> = ({
                     )
                   }
                 >
-                  View Sale Items
+                  See all {msg.associatedProductList?.length || 0} sales
                 </button>
               )}
             </div>
