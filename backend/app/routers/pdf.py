@@ -36,7 +36,7 @@ async def run_processor_for_file(pdf_path: Path):
         print(f"Skipping {pdf_path.name} due to processor initialization failure.")
         return
 
-    print(f"Background task started for: {pdf_path.name}")
+    # print(f"Background task started for: {pdf_path.name}")
     result_path = await processor.process_pdf_to_json(pdf_path)
     if result_path:
         print(f"Background task SUCCESS for {pdf_path.name}. Output: {result_path}")

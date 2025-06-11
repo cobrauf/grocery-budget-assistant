@@ -44,7 +44,7 @@ class GroceryAdProcessor:
     def __init__(self):
         try:
             self.model = genai.GenerativeModel(GEMINI_MODEL)
-            print(f"Gemini model '{GEMINI_MODEL}' initialized.")
+            # print(f"Gemini model '{GEMINI_MODEL}' initialized.")
         except Exception as e:
             print(f"Failed to initialize Gemini model: {e}")
             self.model = None # Mark as unusable
@@ -62,11 +62,11 @@ class GroceryAdProcessor:
             return None
 
         output_json_path = EXTRACTIONS_DIR / f"{pdf_path.stem}.json"
-        print(f"Starting processing for: {pdf_path.name}")
+        # print(f"Starting processing for: {pdf_path.name}")
         
         # Check if the output JSON file already exists
         if output_json_path.exists():
-            print(f"=== Warning === : Output JSON file {output_json_path} already exists. Skipping processing for {pdf_path.name}.")
+            print(f"=== Output JSON exists. Skipping processing for {pdf_path.name}.")
             return None
 
         uploaded_file = None # To keep track for potential deletion
