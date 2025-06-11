@@ -23,7 +23,6 @@ function formatChatHistory(
     return "";
   }
 
-  // Get the last N messages, excluding the current user message being sent
   const recentMessages = messages.slice(-maxMessages);
 
   return recentMessages
@@ -31,15 +30,13 @@ function formatChatHistory(
       let messageContent = msg.text;
 
       // For AI messages with products, extract only the conversational part
-      // by removing the product summary that starts with the product listing
       if (
         msg.sender === "ai" &&
         msg.associatedProductList &&
         msg.associatedProductList.length > 0
       ) {
-        // Look for product summary markers and extract only the conversational part
         const productMarkers = [
-          "\n\n", // Simple marker for where product summary starts
+          "\n\n",
           "(and more...)", // Our specific marker
         ];
 
@@ -51,7 +48,6 @@ function formatChatHistory(
           }
         }
 
-        // Fallback: if message is still very long, truncate it
         if (messageContent.length > 150) {
           messageContent = messageContent.substring(0, 150) + "...";
         }
@@ -71,7 +67,6 @@ export async function processUserQueryWithSemanticSearch(
   products: Product[];
 } | null> {
   try {
-    // Retrieve and format recent chat history
     const chatMessages = loadFromLocalStorage<ChatMessage[]>(
       LS_AI_CHAT_HISTORY,
       []
@@ -103,7 +98,7 @@ export async function processUserQueryWithSemanticSearch(
       let fullMessage =
         response.data.llm_message || "I found some relevant products for you!";
 
-      // Add formatted product summary if there are products
+      // Add formatted product summary with highest similarity score
       if (products && products.length > 0) {
         const topProductsWithDetails = products.slice(0, 3).map((p) => {
           const price = p.price;
@@ -116,8 +111,6 @@ export async function processUserQueryWithSemanticSearch(
 
         const productSummary = `\n\n${topProductsWithDetails.join(
           "\n"
-          // const productSummary = `\n\nYou might be interested in:\n\n${topProductsWithDetails.join(
-          //   "\n"
         )}\n(and more...)\n\n`;
 
         fullMessage += productSummary;
