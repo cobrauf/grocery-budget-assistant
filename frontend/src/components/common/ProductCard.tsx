@@ -7,8 +7,8 @@ interface ProductCardProps {
   addFavorite?: (product: Product) => void;
   removeFavorite?: (productId: string, retailerId: number) => void;
   isFavorite: boolean;
-  inFavoritesView?: boolean; // Added to track if we're in favorites view
-  animationDelay?: number; // Delay in seconds for cascade animation
+  inFavoritesView?: boolean;
+  animationDelay?: number;
 }
 
 // Helper function to parse "YYYY-MM-DD" strings into local Date objects at midnight
@@ -16,12 +16,11 @@ const parseDateStringAsLocal = (dateString: string): Date | null => {
   const parts = dateString.split("-");
   if (parts.length === 3) {
     const year = parseInt(parts[0], 10);
-    const month = parseInt(parts[1], 10) - 1; // Month is 0-indexed in JavaScript Date
+    const month = parseInt(parts[1], 10) - 1;
     const day = parseInt(parts[2], 10);
     if (!isNaN(year) && !isNaN(month) && !isNaN(day)) {
       // This creates a date at 00:00:00 in the local timezone
       const d = new Date(year, month, day);
-      // Ensure time components are zeroed out, though Date(Y,M,D) usually does this
       d.setHours(0, 0, 0, 0);
       return d;
     }
@@ -44,16 +43,11 @@ const ProductCard: React.FC<ProductCardProps> = ({
   const [visuallyLiked, setVisuallyLiked] = useState(isFavorite);
   const [showAnimation, setShowAnimation] = useState(false);
   const [animationType, setAnimationType] = useState<"+" | "_">("+");
+  const [isDisappearing, setIsDisappearing] = useState(false);
 
-  // Use this ref to track if the card has been unfavorited while in favorites view
-  const hasBeenUnfavorited = useRef(false);
-
-  // Update visual state when props change
   useEffect(() => {
-    if (!inFavoritesView || !hasBeenUnfavorited.current) {
-      setVisuallyLiked(isFavorite);
-    }
-  }, [isFavorite, inFavoritesView]);
+    setVisuallyLiked(isFavorite);
+  }, [isFavorite]);
 
   const truncateText = (text: string, maxLength: number): string => {
     if (text.length <= maxLength) return text;
@@ -63,11 +57,11 @@ const ProductCard: React.FC<ProductCardProps> = ({
   const getRetailerLogoPath = (retailerName: string | undefined): string => {
     if (!retailerName) return "";
     const imageName = retailerName.replace(/\s+/g, "").replace(/&/g, "and");
-    return `/assets/logos/${imageName}.png`; // Adjusted path assuming assets are served from public root
+    return `/assets/logos/${imageName}.png`;
   };
 
   const formatDate = (date: Date): string => {
-    const month = date.getMonth() + 1; // getMonth() is zero-based
+    const month = date.getMonth() + 1;
     const day = date.getDate();
     return `${month}/${day}`;
   };
@@ -88,9 +82,9 @@ const ProductCard: React.FC<ProductCardProps> = ({
         if (today > dealLastValidDay) {
           return "Expired";
         }
-        return formatDate(dealLastValidDay); // Format the last valid day for display
+        return formatDate(dealLastValidDay);
       }
-      return null; // Invalid date string or parsing failed
+      return null;
     };
 
     // Prioritize product-specific promotion date
@@ -105,7 +99,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
       return expirationDisplay;
     }
 
-    return null; // No valid date found
+    return null;
   };
 
   const handleFavoriteClick = () => {
@@ -116,32 +110,26 @@ const ProductCard: React.FC<ProductCardProps> = ({
     }, 800);
 
     if (visuallyLiked) {
+      setVisuallyLiked(false);
       if (inFavoritesView) {
-        // In favorites view, just update visual state but keep card visible
-        setVisuallyLiked(false);
-        hasBeenUnfavorited.current = true;
+        setIsDisappearing(true);
+        setTimeout(() => {
+          removeFavorite && removeFavorite(product.id, product.retailer_id);
+        }, 500); // Match animation duration
+      } else {
+        removeFavorite && removeFavorite(product.id, product.retailer_id);
       }
-      // Still call removeFavorite to update global state
-      removeFavorite && removeFavorite(product.id, product.retailer_id);
     } else {
       setVisuallyLiked(true);
-      hasBeenUnfavorited.current = false;
       addFavorite && addFavorite(product);
     }
   };
-
-  // Don't show if it has been unfavorited in the favorites view and should be hidden
-  const shouldShowInFavoritesView = !inFavoritesView || visuallyLiked;
-
-  if (inFavoritesView && !shouldShowInFavoritesView) {
-    return null;
-  }
 
   const expirationDate = getExpirationDate();
 
   return (
     <div
-      className="product-card"
+      className={`product-card ${isDisappearing ? "removing" : ""}`}
       style={{ animationDelay: `${animationDelay}s` }}
     >
       <div className="product-card-image">
