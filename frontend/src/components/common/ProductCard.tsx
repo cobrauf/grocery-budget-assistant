@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { Product } from "../../types/product"; // Corrected path
 import "../../styles/ProductCard.css"; // Import the CSS file
 
@@ -44,6 +44,10 @@ const ProductCard: React.FC<ProductCardProps> = ({
   const [showAnimation, setShowAnimation] = useState(false);
   const [animationType, setAnimationType] = useState<"+" | "_">("+");
   const [isDisappearing, setIsDisappearing] = useState(false);
+
+  // Animation durations
+  const HEART_ANIMATION_DURATION = 800;
+  const DISAPPEAR_ANIMATION_DURATION = 500;
 
   useEffect(() => {
     setVisuallyLiked(isFavorite);
@@ -107,7 +111,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
     setShowAnimation(true);
     setTimeout(() => {
       setShowAnimation(false);
-    }, 800);
+    }, HEART_ANIMATION_DURATION);
 
     if (visuallyLiked) {
       setVisuallyLiked(false);
@@ -115,7 +119,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
         setIsDisappearing(true);
         setTimeout(() => {
           removeFavorite && removeFavorite(product.id, product.retailer_id);
-        }, 500); // Match animation duration
+        }, DISAPPEAR_ANIMATION_DURATION); // Match animation duration
       } else {
         removeFavorite && removeFavorite(product.id, product.retailer_id);
       }
