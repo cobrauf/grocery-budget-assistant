@@ -69,6 +69,7 @@ class SimilarityQueryRequest(BaseModel):
     ad_period: str = "current"
     limit: int = DEFAULT_SEARCH_LIMIT
     similarity_threshold: float = DEFAULT_SIMILARITY_THRESHOLD
+    chat_history: Optional[str] = None  
 
 # Pydantic model for similarity query response
 class SimilarityQueryResponse(BaseModel):
@@ -93,6 +94,7 @@ async def test_similarity_query(
         results_dict = await similarity_query.similarity_search_products(
             db=db,
             query=request.query,
+            chat_history=request.chat_history,
             ad_period=request.ad_period,
             limit=request.limit,
             similarity_threshold=request.similarity_threshold

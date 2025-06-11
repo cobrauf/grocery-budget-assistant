@@ -93,9 +93,9 @@ async def process_single_json_file_for_enhancement(filepath: Path) -> Optional[E
             if llm_output_json_string.endswith("```"):
                 llm_output_json_string = llm_output_json_string[:-len("```")].strip()
             
-            logging.info(f"--- LLM Raw Output for {filepath.name} ---") # Log the raw LLM output
-            logging.info(llm_output_json_string)
-            logging.info("--- End of LLM Raw Output ---")
+            # logging.info(f"--- LLM Raw Output for {filepath.name} ---") # Log the raw LLM output
+            # logging.info(llm_output_json_string)
+            # logging.info("--- End of LLM Raw Output ---")
             
             logging.debug(f"Raw LLM JSON output for {filepath.name}:\\n{llm_output_json_string}")
 
@@ -156,7 +156,7 @@ async def enhance_all_json_files():
         expected_enhanced_filepath = ENHANCED_JSON_DIR / expected_enhanced_filename
 
         if expected_enhanced_filepath.exists():
-            logging.info(f"Skipping '{filepath.name}' as its enhanced version '{expected_enhanced_filename}' already exists.")
+            logging.info(f"Skipping '{filepath.name}, already exists.")
             continue # Skip to the next file
         
         # If not skipped, add to list of files to process and create a task

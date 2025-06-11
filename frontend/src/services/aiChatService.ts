@@ -1,5 +1,10 @@
 import { api } from "./api";
 import { Product } from "../types/product";
+import { ChatMessage } from "../types/chatMessage";
+import {
+  loadFromLocalStorage,
+  LS_AI_CHAT_HISTORY,
+} from "../utils/localStorageUtils";
 import axios from "axios";
 
 interface AIServiceResponse {
@@ -8,6 +13,49 @@ interface AIServiceResponse {
   query: string;
   results_count: number;
   products: Product[];
+}
+
+function formatChatHistory(
+  messages: ChatMessage[],
+  maxMessages: number = 8
+): string {
+  if (!messages || messages.length === 0) {
+    return "";
+  }
+
+  const recentMessages = messages.slice(-maxMessages);
+
+  return recentMessages
+    .map((msg) => {
+      let messageContent = msg.text;
+
+      // For AI messages with products, extract only the conversational part
+      if (
+        msg.sender === "ai" &&
+        msg.associatedProductList &&
+        msg.associatedProductList.length > 0
+      ) {
+        const productMarkers = [
+          "\n\n",
+          "(and more...)", // Our specific marker
+        ];
+
+        for (const marker of productMarkers) {
+          const markerIndex = messageContent.indexOf(marker);
+          if (markerIndex > 0) {
+            messageContent = messageContent.substring(0, markerIndex).trim();
+            break;
+          }
+        }
+
+        if (messageContent.length > 150) {
+          messageContent = messageContent.substring(0, 150) + "...";
+        }
+      }
+
+      return `${msg.sender.toUpperCase()}: ${messageContent}`;
+    })
+    .join("\n");
 }
 
 export async function processUserQueryWithSemanticSearch(
@@ -19,10 +67,18 @@ export async function processUserQueryWithSemanticSearch(
   products: Product[];
 } | null> {
   try {
+    const chatMessages = loadFromLocalStorage<ChatMessage[]>(
+      LS_AI_CHAT_HISTORY,
+      []
+    );
+    const chatHistoryString = formatChatHistory(chatMessages, 20);
+    console.log("----------chatHistoryString", chatHistoryString);
+
     const response = await api.post<AIServiceResponse>(
       "/data/test_similarity_query",
       {
         query: userMessage,
+        chat_history: chatHistoryString || undefined,
       },
       { signal }
     );
@@ -42,7 +98,7 @@ export async function processUserQueryWithSemanticSearch(
       let fullMessage =
         response.data.llm_message || "I found some relevant products for you!";
 
-      // Add formatted product summary if there are products
+      // Add formatted product summary with highest similarity score
       if (products && products.length > 0) {
         const topProductsWithDetails = products.slice(0, 3).map((p) => {
           const price = p.price;
@@ -55,8 +111,6 @@ export async function processUserQueryWithSemanticSearch(
 
         const productSummary = `\n\n${topProductsWithDetails.join(
           "\n"
-          // const productSummary = `\n\nYou might be interested in:\n\n${topProductsWithDetails.join(
-          //   "\n"
         )}\n(and more...)\n\n`;
 
         fullMessage += productSummary;

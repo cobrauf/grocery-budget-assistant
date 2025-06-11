@@ -33,13 +33,12 @@ def validate_emoji(emoji: str) -> str:
     Validates that the emoji is exactly 1 character.
     If not, returns the default '❔' emoji.
     """
-    if emoji and len(emoji) == 1:
-        return emoji
-    logger.warning(f"emoji: {emoji}, character count: {len(emoji)}, did not change.")
-    return emoji
+    # if emoji and len(emoji) == 1:
+    #     return emoji
+    # logger.warning(f"emoji: {emoji}, character count: {len(emoji)}, did not change.")
+    # return emoji
 
 def process_single_json_file(db: Session, file_path: Path):
-    logger.info(f"Processing file: {file_path.name}")
     try:
         with open(file_path, 'r', encoding='utf-8') as f:
             data = json.load(f)
@@ -55,9 +54,11 @@ def process_single_json_file(db: Session, file_path: Path):
     # 1. Check for existing weekly ad by filename
     existing_ad = db.query(models.WeeklyAd).filter(models.WeeklyAd.filename == parsed_data.weekly_ad.filename).first()
     if existing_ad:
-        logger.info(f"Weekly ad with filename '{parsed_data.weekly_ad.filename}' already exists. Skipping {file_path.name}.")
+        logger.info(f"=== Weekly ad '{parsed_data.weekly_ad.filename}' exists. Skipping {file_path.name}.")
         return
 
+    logger.info(f"Processing file: {file_path.name}")
+    
     # 2. Get Retailer
     retailer_name = parsed_data.retailer
     db_retailer = db.query(models.Retailer).filter(models.Retailer.name == retailer_name).first()
@@ -66,7 +67,7 @@ def process_single_json_file(db: Session, file_path: Path):
         # Future: Consider creating the retailer if it doesn't exist or a different handling strategy.
         return
     
-    logger.info(f"Found retailer: {db_retailer.name} (ID: {db_retailer.id})")
+    # logger.info(f"Found retailer: {db_retailer.name} (ID: {db_retailer.id})")
 
     # 3. Update ad_period for existing ads of this retailer
     update_ad_periods(db, db_retailer.id)

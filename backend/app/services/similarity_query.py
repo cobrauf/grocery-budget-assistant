@@ -51,7 +51,7 @@ useExpandedQuery = True
 DEFAULT_SEARCH_LIMIT = 50
 DEFAULT_SIMILARITY_THRESHOLD = 0.5
 
-def _expand_query_with_llm(query_text: str) -> str:
+def _expand_query_with_llm(query_text: str, chat_history: Optional[str] = None) -> str:
     """
     Expands a user query using an LLM to get a more comprehensive list of items for semantic search,
     or returns a direct chat response if the query is not product-related.
@@ -65,6 +65,14 @@ def _expand_query_with_llm(query_text: str) -> str:
         return f"CHAT_RESPONSE: Sorry, the AI model is not available right now."
 
     try:
+        history_section = ""
+        if chat_history:
+            history_section = f"""
+PREVIOUS CHAT HISTORY (for additional context if needed):
+{chat_history}
+
+"""
+
         # The model is now initialized at the top level.
         prompt = f"""You are a helpful and friendly grocery shopping AI assistant. Your primary task is to assist users with their grocery shopping needs.
 
@@ -103,8 +111,14 @@ TERMS: bbq sauce, hot dogs, hamburgers, burger buns, corn on the cob, ribs, stea
 - Query: "what's 2 + 4?"
 - Response: `CHAT_RESPONSE: 2 + 4 = 6! That's a fun math problem, but I'm here to help you with your grocery shopping needs.`
 
----
+------Chat History------
+(Here's recent chat history for additional context if needed):
+{history_section}
+------End of Chat History------
+
 Now, process the following query:
+
+CURRENT USER QUERY:
 - Query: "{query_text}"
 - Response:
 """
@@ -112,7 +126,6 @@ Now, process the following query:
 
         if response.parts:
             llm_response = "".join(part.text for part in response.parts).strip()
-            # Make parsing more robust by stripping potential backticks from the response
             if llm_response.startswith('`') and llm_response.endswith('`'):
                 llm_response = llm_response[1:-1].strip()
 
@@ -121,11 +134,6 @@ Now, process the following query:
                     f"LLM Response for '{query_text}': '{llm_response}'"
                 )
                 return llm_response
-            elif "SEARCH_QUERY:" in llm_response:
-                # Handle legacy format by converting to new format
-                search_terms = llm_response.replace("SEARCH_QUERY:", "").strip()
-                logger.info(f"Converting legacy SEARCH_QUERY format to MESSAGE/TERMS")
-                return f'MESSAGE: I found some relevant products for you!\nTERMS: {search_terms}'
             else:
                 # If LLM fails to follow instructions, fallback to treating as search
                 logger.warning(f"LLM did not provide a prefixed response. Treating as search. Response: {llm_response}")
@@ -171,6 +179,7 @@ def _generate_query_embedding(query_text: str) -> Optional[List[float]]:
 async def similarity_search_products(
     db: Session,
     query: str,
+    chat_history: Optional[str] = None,
     ad_period: str = "current",
     limit: int = DEFAULT_SEARCH_LIMIT,
     similarity_threshold: float = DEFAULT_SIMILARITY_THRESHOLD
@@ -181,6 +190,7 @@ async def similarity_search_products(
     Args:
         db: Database session
         query: Natural language query (e.g., "high protein sales")
+        chat_history: Previous chat messages for context (optional)
         ad_period: Which ad period to search (default: "current")
         limit: Maximum number of results to return
         similarity_threshold: Minimum similarity score (0-1)
@@ -190,7 +200,7 @@ async def similarity_search_products(
     """
     logger.info(f"Starting similarity search for query: '{query}' with limit: {limit}")
 
-    llm_response_text = _expand_query_with_llm(query)
+    llm_response_text = _expand_query_with_llm(query, chat_history)
 
     if llm_response_text.startswith("CHAT_RESPONSE:"):
         chat_message = llm_response_text.replace("CHAT_RESPONSE:", "").strip()
@@ -231,9 +241,9 @@ async def similarity_search_products(
         
         logger.info(f"Extracted LLM message: '{llm_message_content}', terms: '{expanded_query_terms}'")
     else:
-        # Fallback for legacy or malformed responses
+        # Fallback for malformed responses
         llm_message_content = "I found some relevant products for you!"
-        expanded_query_terms = llm_response_text.replace("SEARCH_QUERY:", "").strip() if "SEARCH_QUERY:" in llm_response_text else query
+        expanded_query_terms = query
         logger.info(f"Using fallback LLM message: '{llm_message_content}', terms: '{expanded_query_terms}'")
     
     # Use expanded query for embedding if available, otherwise use original
