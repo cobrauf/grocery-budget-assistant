@@ -4,7 +4,7 @@ grocery-budget-assistant/
 │ │ ├── main.py ── Main FastAPI app entry point. Initializes app, includes routers.
 | | |=====================================\
 │ │ ├── routers/ Directory contains APIRouter modules grouping endpoints.
-│ │ │ ├── data.py ── Defines /data API endpoints for retrieving Postgres DB data (currently unused/placeholder).
+│ │ │ ├── data.py ── Defines /data API endpoints for retrieving Postgres DB data.
 │ │ │ ├── products.py ── Defines /products API endpoints for searching and managing product data.
 │ │ │ ├── retailers.py ── Defines /retailers API endpoints for managing retailer data.
 │ │ │ └── pdf.py ── Defines /pdf API endpoints managing PDF processing workflow.
@@ -30,7 +30,6 @@ grocery-budget-assistant/
 | | |=====================================\
 │ │ ├── database.py ── Configures, manages SQLAlchemy database connection. Provides session dependency.
 │ │ ├── models.py ── Defines SQLAlchemy ORM classes mapping Python objects to database tables.
-│ │ └── **init**.py ── Makes the 'app' directory a Python package.
 | |=====================================\
 │ ├── pdf/ ── Directory contains PDF-related data files.
 │ │ ├── uploads/ ── Directory is input location for PDF weekly ad files needing processing.
@@ -38,7 +37,6 @@ grocery-budget-assistant/
 │ │ ├── enhanced_json/ ── Directory stores enhanced JSON data after additional processing.
 │ │ ├── temp/ ── Directory for temporary files during PDF processing.
 │ │ └── archived/ ── Directory for storing processed PDF files and their extractions.
-│ ├── **init**.py ── Makes the 'backend' directory a Python package.
 │ ├── requirements.txt ── Lists Python dependencies required for backend service. Ensures reproducible environment.
 │ ├── runtime.txt ── Specifies the Python runtime version for deployment platforms.
 │ └── Procfile ── Configuration file for deployment platforms like Heroku, specifying process types.

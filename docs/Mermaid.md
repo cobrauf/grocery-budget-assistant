@@ -20,10 +20,16 @@ graph TD
         AppTSX --> SearchResultsView(src/views/SearchResultsView.tsx)
         AppTSX --> DefaultBrowseView(src/views/DefaultBrowseView.tsx)
         AppTSX --> BrowseResultsView(src/views/BrowseResultsView.tsx)
+        AppTSX --> DefaultAIView(src/views/DefaultAIView.tsx)
+        AppTSX --> AIResultsView(src/views/AIResultsView.tsx)
+        AppTSX --> DefaultFavItemsView(src/views/DefaultFavItemsView.tsx)
+        AppTSX --> FavItemsResultsView(src/views/FavItemsResultsView.tsx)
         AppTSX --> useThemeHook(src/hooks/useTheme.ts)
         AppTSX --> useSearchHook(src/hooks/useSearch.ts)
         AppTSX --> useRetailersHook(src/hooks/useRetailers.ts)
         AppTSX --> useAppTabHook(src/hooks/useAppTab.ts)
+        AppTSX --> useSortHook(src/hooks/useSort.ts)
+        AppTSX --> useViewHistoryHook(src/hooks/useViewHistory.ts)
         AppTSX --> apiService(src/services/api.ts)
         AppTSX --> localStorageUtils(src/utils/localStorageUtils.ts)
     end
@@ -63,6 +69,10 @@ graph TD
         SearchResultsView --> CommonProductCard_SearchRes(src/components/common/ProductCard.tsx)
         DefaultBrowseView
         BrowseResultsView --> CommonProductCard_BrowseRes(src/components/common/ProductCard.tsx)
+        DefaultAIView
+        AIResultsView --> CommonProductCard_AIRes(src/components/common/ProductCard.tsx)
+        DefaultFavItemsView
+        FavItemsResultsView --> CommonProductCard_FavRes(src/components/common/ProductCard.tsx)
     end
 
     subgraph HookLevel [Custom Hooks]
@@ -70,6 +80,8 @@ graph TD
         useThemeHook
         useRetailersHook
         useAppTabHook
+        useSortHook
+        useViewHistoryHook
     end
 
     subgraph ServiceLevel [Services]
@@ -94,9 +106,14 @@ graph TD
         ProductCardCSS(src/styles/ProductCard.css)
         ResultsViewCSS(src/styles/ResultsView.css)
         DefaultBrowseViewCSS(src/styles/DefaultBrowseView.css)
-        CommonBottomNavCSS(src/components/common/BottomNav.css)
-        CommonLoadingSpinnerCSS(src/components/common/LoadingSpinner.css)
-        CommonModalBaseCSS(src/components/common/ModalBase.css)
+        DefaultAIViewCSS(src/styles/DefaultAIView.css)
+        DefaultSearchViewCSS(src/styles/DefaultSearchView.css)
+        DefaultFavItemsViewCSS(src/styles/DefaultFavItemsView.css)
+        CommonBottomNavCSS(src/styles/BottomNav.css)
+        CommonLoadingSpinnerCSS(src/styles/LoadingSpinner.css)
+        CommonModalBaseCSS(src/styles/ModalBase.css)
+        FavItemBarCSS(src/styles/FavItemBar.css)
+        SortPillsBarCSS(src/styles/SortPillsBar.css)
     end
 
     %% Styling for subgraphs (optional)
@@ -127,8 +144,8 @@ graph TD
     AppTSX --> Modals_App(Modal Components Ref by App<br>src/components/modals/CategoryFilterModal.tsx<br>src/components/modals/StoreFilterModal.tsx)
     AppTSX --> SideBar(Sidebar<br>src/components/sidebar/SideBar.tsx)
     AppTSX --> PdfUpload(PDF Upload<br>src/components/pdf-upload/PdfUpload.tsx)
-    AppTSX --> Views(Views<br>src/views/DefaultSearchView.tsx<br>src/views/SearchResultsView.tsx<br>src/views/DefaultBrowseView.tsx<br>src/views/BrowseResultsView.tsx)
-    AppTSX --> Hooks(Hooks<br>src/hooks/useTheme.ts<br>src/hooks/useSearch.ts<br>src/hooks/useRetailers.ts<br>src/hooks/useAppTab.ts)
+    AppTSX --> Views(Views<br>src/views/DefaultSearchView.tsx<br>src/views/SearchResultsView.tsx<br>src/views/DefaultBrowseView.tsx<br>src/views/BrowseResultsView.tsx<br>src/views/DefaultAIView.tsx<br>src/views/AIResultsView.tsx<br>src/views/DefaultFavItemsView.tsx<br>src/views/FavItemsResultsView.tsx)
+    AppTSX --> Hooks(Hooks<br>src/hooks/useTheme.ts<br>src/hooks/useSearch.ts<br>src/hooks/useRetailers.ts<br>src/hooks/useAppTab.ts<br>src/hooks/useSort.ts<br>src/hooks/useViewHistory.ts)
     AppTSX --> Services(Services<br>src/services/api.ts)
     AppTSX --> Utils(Utils<br>src/utils/localStorageUtils.ts)
     AppTSX --> Types(Types<br>src/types/product.ts<br>src/types/retailer.ts)
@@ -158,10 +175,9 @@ graph TD
 
 <!-- (when updating, keep to this format consistency, ignore init files) -->
 
+```mermaid
 graph TD
-backend --> app
-backend --> pdf
-backend --> root_files(requirements.txt<br>Procfile<br>venv/)
+    backend --> app
 
     app --> routers
     app --> services
@@ -169,14 +185,11 @@ backend --> root_files(requirements.txt<br>Procfile<br>venv/)
     app --> utils
     app --> app_files(models.py<br>database.py<br>main.py)
 
-    pdf --> pdf_uploads(uploads/)
-    pdf --> pdf_extractions(extractions/)
-    pdf --> pdf_archived(archived/)
-
     routers --> routers_files(data.py<br>pdf.py<br>products.py<br>retailers.py)
-    services --> services_files(pdf_processor.py<br>pdf_prompts.py<br>json_to_db_service.py<br>product_service.py<br>retailer_service.py)
+    services --> services_files(pdf_processor.py<br>pdf_prompts.py<br>json_to_db_service.py<br>json_enhancement_service.py<br>batch_embedding_service.py<br>similarity_query.py<br>product_service.py<br>retailer_service.py)
     schemas --> schemas_files(base_schemas.py<br>data_schemas.py<br>pdf_schema.py)
     utils --> utils_files(utils.py<br>schema.sql)
+```
 
 ## Database Schema
 
@@ -212,6 +225,7 @@ erDiagram
         text promotion_details
         text original_text_snippet
         varchar image_url
+        vector embedding
         timestamptz created_at
         tsvector fts_vector
     }
@@ -227,19 +241,24 @@ flowchart LR
     subgraph Frontend
         A[PDF Upload Component] --> B[API Service]
         B --> C[Backend API]
+        D[AI Search Component] --> B
+        E[Sort/Filter Components] --> B
     end
 
     subgraph Backend
         C --> D[FastAPI Router]
         D --> E[CRUD Operations]
-        E --> F[Database Models]
-        F --> G[Supabase PostgreSQL]
+        D --> F[AI Services]
+        E --> G[Database Models]
+        F --> H[Embedding Services]
+        G --> I[Supabase PostgreSQL]
+        H --> I
     end
 
     subgraph Database
-        G --> H[retailers]
-        G --> I[weekly_ads]
-        G --> J[products]
+        I --> J[retailers]
+        I --> K[weekly_ads]
+        I --> L[products with embeddings]
     end
 ```
 
@@ -249,7 +268,11 @@ flowchart LR
 - Weekly Ad Management
 - Product Tracking
 - Full-text Search
+- AI-Powered Similarity Search
+- Product Embedding Generation
 - RESTful API Integration
+- Favorite Items Management
+- Advanced Sorting and Filtering
 
 ## PDF Processing Flow
 
@@ -262,6 +285,7 @@ sequenceDiagram
     participant GeminiAPI as Google Gemini API
     participant UploadsDir as Directory (uploads/)
     participant ExtractionsDir as Directory (extractions/)
+    participant EnhancedDir as Directory (enhanced_json/)
 
     Client->>+PDFRouter: POST /process-uploads
     PDFRouter->>UploadsDir: Scan for *.pdf files
@@ -282,6 +306,7 @@ sequenceDiagram
     alt Validation OK
         PDFProcessor->>ExtractionsDir: Write Validated JSON data
         ExtractionsDir-->>PDFProcessor: Success
+        PDFProcessor->>EnhancedDir: Write Enhanced JSON data
         PDFProcessor-->>-BackgroundTask: Return JSON path
     else Validation Fails
         PDFProcessor-->>-BackgroundTask: Return None (Error logged)
@@ -294,7 +319,9 @@ sequenceDiagram
 sequenceDiagram
     participant JService as JSON to DB Service
     participant ExtrDir as Extractions Directory
+    participant EnhancedDir as Enhanced JSON Directory
     participant Validator as Schema Validator
+    participant EmbeddingService as Batch Embedding Service
     participant DB as PostgreSQL DB
 
     JService->>ExtrDir: Scan for JSON files
@@ -314,6 +341,8 @@ sequenceDiagram
                 JService->>DB: Create new weekly ad (current)
                 JService->>DB: Batch create products
                 DB-->>JService: Success/Failure
+                JService->>EmbeddingService: Generate embeddings for products
+                EmbeddingService->>DB: Update products with embeddings
             end
         else Validation Fails
             JService->>JService: Log error & continue
@@ -328,6 +357,7 @@ sequenceDiagram
     participant Client
     participant DataRouter as FastAPI Router (/data)
     participant CRUD
+    participant SimilarityService as Similarity Query Service
     participant DB as PostgreSQL DB
 
     Client->>+DataRouter: POST /products/ (ProductCreate JSON)
@@ -346,12 +376,22 @@ sequenceDiagram
     CRUD-->>-DataRouter: Upserted Product Object
     DataRouter->>DB: COMMIT
     DataRouter-->>-Client: 200 OK (Product JSON)
+
+    Note over Client,DB: Alternative: Similarity Search Flow
+    Client->>+DataRouter: GET /products/similar?query=search_term
+    DataRouter->>+SimilarityService: find_similar_products(query, limit)
+    SimilarityService->>DB: Vector similarity search using embeddings
+    DB-->>SimilarityService: Similar products ranked by similarity
+    SimilarityService-->>-DataRouter: Ranked product list
+    DataRouter-->>-Client: 200 OK (Similar Products JSON)
 ```
 
 ## Technology Stack
 
-- Frontend: React + TypeScript + Vite + Tailwind CSS (Confirm primary UI lib)
+- Frontend: React + TypeScript + Vite + CSS3 (Custom styling)
 - Backend: FastAPI + SQLAlchemy + google-generativeai + aiofiles + asyncpg
-- Database: PostgreSQL (Supabase)
-- Testing: Cypress + Pytest (Confirm frontend testing setup)
-- Development Tools: uvicorn, python-dotenv
+- Database: PostgreSQL (Supabase) with vector embeddings support
+- AI/ML: Google Gemini API for PDF processing and text understanding
+- Testing: Cypress + Pytest (Frontend and Backend testing)
+- Development Tools: uvicorn, python-dotenv, ESLint
+- Deployment: Heroku-compatible (Procfile + runtime.txt)
