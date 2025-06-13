@@ -10,11 +10,14 @@ grocery-budget-assistant/
 │ │ │ └── pdf.py ── Defines /pdf API endpoints managing PDF processing workflow.
 | | |=====================================\
 │ │ ├── services/ Directory contains business logic, external service interactions.
+│ │ │ ├── batch_embedding_service.py ── Service for generating embeddings in batches for products and similarity search.
+│ │ │ ├── json_enhancement_service.py ── Service for enhancing extracted JSON data with additional processing.
+│ │ │ ├── json_to_db_service.py ── Processes extracted JSON files into Postgres DB tables.
 │ │ │ ├── pdf_processor.py ── PDF data extraction via Gemini, saves JSON output.
 │ │ │ ├── pdf_prompts.py ── Contains prompt templates and lists for Gemini PDF extraction.
-│ │ │ ├── json_to_db_service.py ── Processes extracted JSON files into Postgres DB tables.
 │ │ │ ├── product_service.py ── Business logic for product-related operations.
-│ │ │ └── retailer_service.py ── Business logic for retailer-related operations.
+│ │ │ ├── retailer_service.py ── Business logic for retailer-related operations.
+│ │ │ └── similarity_query.py ── Service for performing similarity queries and searches using embeddings.
 | | |=====================================\
 │ │ ├── schemas/ Directory contains Pydantic models for data validation, serialization.
 │ │ │ ├── base_schemas.py ── Defines base Pydantic schemas shared by other schema files.
@@ -32,9 +35,13 @@ grocery-budget-assistant/
 │ ├── pdf/ ── Directory contains PDF-related data files.
 │ │ ├── uploads/ ── Directory is input location for PDF weekly ad files needing processing.
 │ │ ├── extractions/ ── Directory saves structured JSON data extracted from PDFs by pdf_processor service.
+│ │ ├── enhanced_json/ ── Directory stores enhanced JSON data after additional processing.
+│ │ ├── temp/ ── Directory for temporary files during PDF processing.
 │ │ └── archived/ ── Directory for storing processed PDF files and their extractions.
+│ ├── **init**.py ── Makes the 'backend' directory a Python package.
 │ ├── requirements.txt ── Lists Python dependencies required for backend service. Ensures reproducible environment.
-│ ├── Procfile ── Configuration file for deployment platforms like Heroku, specifying process types.
+│ ├── runtime.txt ── Specifies the Python runtime version for deployment platforms.
+│ └── Procfile ── Configuration file for deployment platforms like Heroku, specifying process types.
 |---------------------------------------------------------------------------------------------
 ├── docs/ Directory contains documentation files.
 │ ├── PRD.md ── Product Requirements Document.
@@ -101,20 +108,29 @@ grocery-budget-assistant/
 │ │ │ ├── useAppTab.ts ── Hook for managing application tab state.
 │ │ │ ├── useRetailers.ts ── Hook managing retailer data fetching and state.
 │ │ │ ├── useSearch.ts ── Hook managing search state and API calls.
-│ │ │ └── useTheme.ts ── Hook managing application theme and font state.
+│ │ │ ├── useSort.ts ── Hook for managing sort functionality and state.
+│ │ │ ├── useTheme.ts ── Hook managing application theme and font state.
+│ │ │ └── useViewHistory.ts ── Hook for managing view history and navigation state.
 | | |=====================================\
 │ │ ├── services/ Contains modules related to external services like API communication.
 │ │ │ └── api.ts ── Configures Axios client for API requests to backend service.
 | | |=====================================\
 │ │ ├── styles/ ── Contains CSS files and style-related TypeScript modules.
 │ │ │ ├── App.css ── General application styles.
+│ │ │ ├── BottomNav.css ── Styles for BottomNav component.
+│ │ │ ├── DefaultAIView.css ── Styles for DefaultAIView component.
 │ │ │ ├── DefaultBrowseView.css ── Styles for DefaultBrowseView.
+│ │ │ ├── DefaultFavItemsView.css ── Styles for DefaultFavItemsView component.
+│ │ │ ├── DefaultSearchView.css ── Styles for DefaultSearchView component.
+│ │ │ ├── FavItemBar.css ── Styles for favorite items bar component.
 │ │ │ ├── fonts.ts ── Definitions for available application fonts.
 │ │ │ ├── index.css ── Global styles and resets.
 │ │ │ ├── LoadingSpinner.css ── Styles for the LoadingSpinner component.
+│ │ │ ├── ModalBase.css ── Styles for ModalBase component.
 │ │ │ ├── ProductCard.css ── Styles for ProductCard component.
 │ │ │ ├── ResultsView.css ── Styles for ResultsView component.
 │ │ │ ├── SideBar.css ── Styles for SideBar component.
+│ │ │ ├── SortPillsBar.css ── Styles for sort pills/filters bar.
 │ │ │ └── themes.ts ── Definitions for available application themes.
 | | |=====================================\
 │ │ ├── types/ ── Contains TypeScript type definitions.
@@ -125,9 +141,13 @@ grocery-budget-assistant/
 │ │ │ └── localStorageUtils.ts ── Utility functions for local storage.
 | | |=====================================\
 │ │ ├── views/ ── Contains components representing distinct application views/pages.
+│ │ │ ├── AIResultsView.tsx ── View for displaying AI-generated results.
 │ │ │ ├── BrowseResultsView.tsx ── View for displaying browse results.
+│ │ │ ├── DefaultAIView.tsx ── Default view for AI-powered features.
 │ │ │ ├── DefaultBrowseView.tsx ── Default view for browsing.
+│ │ │ ├── DefaultFavItemsView.tsx ── Default view for favorite items.
 │ │ │ ├── DefaultSearchView.tsx ── Default view for searching.
+│ │ │ ├── FavItemsResultsView.tsx ── View for displaying favorite items results.
 │ │ │ └── SearchResultsView.tsx ── View displaying search results.
 | | |=====================================\
 │ │ ├── App.tsx ── Root React component. Manages layout, routing logic, and global state context.
@@ -151,3 +171,6 @@ grocery-budget-assistant/
 │ ├── cypress.config.js ── Main configuration file for Cypress testing framework. (Consider renaming to .ts)
 │ ├── cypress.config.ts.bak ── Backup of Cypress configuration.
 │ └── eslint.config.js ── Configuration for ESLint, code linting and style enforcement.
+|---------------------------------------------------------------------------------------------
+├── .gitignore ── Git ignore file specifying files and directories to exclude from version control.
+└── README.md ── Main project README file with setup and usage information.
