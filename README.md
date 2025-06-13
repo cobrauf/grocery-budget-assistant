@@ -12,27 +12,32 @@ Grocery-Buddy is a full-stack web application designed to help users discover th
 
   - **Browse Deals:** View a comprehensive list of current grocery promotions.
     - Filter by retailers/categories; sort by price, etc.
-  - **Favorites:** Save your favorite deals for quick access.
   - **Search:** Search for specific products across all retailers.
-  - **Dynamic/Themeable UI:** Responsive and themeable user interface built with React.
+  - **Favorites:** Save your favorite deals for quick access.
+  - **CHAT with AI:** Vector embeddings enable semantic similarity search
 
 - **--Backend--**
 
-  - **PDF Processing:** Extracts deal information from uploaded PDF flyers.
-    - The backend receives uploaded PDF grocery flyers.
-    - An LLM (Large Language Model) extracts the PDF content into a structured JSON format.
-    - JSON extraction undergoes an enhancement process to improve data quality and consistency.
-    - The enhanced deal information is uploaded to a Supabase (PostgreSQL) database as a microservice.
+  - **PDF Processing:** Extraction of deal information from uploaded PDF flyers.
+    - Google Gemini AI extracts PDF content into structured JSON format
+    - JSON extraction undergoes enhancement processing for improved data quality, then stored in Supabase (PostgreSQL) database
+  - **AI-Powered Search:** Vector embeddings enable semantic similarity search
+    - Batch embedding generation for all products
+    - Intelligent product matching and recommendations
+  - **RESTful API:** Comprehensive endpoints for data retrieval and management
+    - Product search and filtering endpoints
+    - Retailer management
+    - Background task processing for CPU-intensive operations
 
-- **--AI Features-- (Coming soon)**
+- **--AI Features--**
 
-  - **Chat With AI:** Ask the app to curate a shopping list, optionally with a budget.
+  - **Chat With AI:** Ask it to curate a shopping list.
     - EG. "Put together a high-protein shopping list for $75."
     - Or, "Assemble a balanced meal plan with emphasis on produce for a family of 3 for $150."
 
 ## Tech Stack 🛠️
 
-This project leverages a modern tech stack:
+This project leverages a modern, AI-enhanced tech stack:
 
 - **Frontend:**
   - **React:**
@@ -49,19 +54,47 @@ This project leverages a modern tech stack:
 - **Version Control:**
   - **Git & GitHub:**
 
+## Project Structure 📁
+
+```
+grocery-budget-assistant/
+├── backend/                 # FastAPI backend application
+│   ├── app/                # Core application logic
+│   │   ├── routers/        # API route definitions
+│   │   ├── services/       # Business logic services
+│   │   ├── schemas/        # Pydantic data models
+│   │   └── utils/          # Utility functions
+│   └── pdf/                # PDF processing directories
+├── frontend/               # React frontend application
+│   ├── src/
+│   │   ├── components/     # Reusable UI components
+│   │   ├── views/          # Page-level components
+│   │   ├── hooks/          # Custom React hooks
+│   │   └── styles/         # CSS files and themes
+└── docs/                   # Project documentation
+```
+
+**Backend Structure:**
+<img src="./docs/media/backend_structure.PNG" width="400">
+
 ## Screenshots 📸
 
 <!-- **Main Deal Browse Interface:** -->
-<img src="./docs/media/1.jpg" width="400">
+<img src="./docs/media/1.jpg" width="200">
 
 <!-- **Favorites Management View:** -->
-<img src="./docs/media/2.jpg" width="400">
+<img src="./docs/media/2.jpg" width="200">
 
 <!-- **Filtering Options (Example):** -->
-<img src="./docs/media/3.jpg" width="400">
+<img src="./docs/media/3.jpg" width="200">
 
 <!-- **Dark Mode Theme:** -->
-<img src="./docs/media/4.jpg" width="400">
+<img src="./docs/media/4.jpg" width="200">
 
 <!-- **Mobile/Responsive View (Example):** -->
-<img src="./docs/media/5.jpg" width="400">
+<img src="./docs/media/5.jpg" width="200">
+
+## Documentation 📚
+
+- **[ProjectDoc.md](./docs/ProjectDoc.md)** - Comprehensive technical documentation
+- **[ProjectFiles.md](./docs/ProjectFiles.md)** - Detailed file structure and descriptions
