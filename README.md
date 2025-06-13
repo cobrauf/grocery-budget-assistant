@@ -1,10 +1,11 @@
 # Grocery-Buddy 🛒
 
-**Your smart companion for tracking grocery deals and managing your shopping budget.**
+**Your smart companion for tracking grocery deals.**
 
 ## Overview
 
 Grocery-Buddy is a full-stack web application designed to help users discover the best grocery deals from various retailers. Users can browse promotions, filter by store or category, save their favorite items, and get an overview of when deals expire. The goal is to make grocery shopping more efficient and budget-friendly.
+(This is a DEMO that currently shows grocery deals for a specific region only.)
 
 ## Key Features
 
@@ -21,38 +22,28 @@ Grocery-Buddy is a full-stack web application designed to help users discover th
   - **PDF Processing:** Extraction of deal information from uploaded PDF flyers.
     - Google Gemini AI extracts PDF content into structured JSON format
     - JSON extraction undergoes enhancement processing for improved data quality, then stored in Supabase (PostgreSQL) database
-  - **AI-Powered Search:** Vector embeddings enable semantic similarity search
+  - **AI-Powered RAG Chat:** Vector embeddings enable semantic similarity search
     - Batch embedding generation for all products
     - Intelligent product matching and recommendations
-  - **RESTful API:** Comprehensive endpoints for data retrieval and management
-    - Product search and filtering endpoints
-    - Retailer management
-    - Background task processing for CPU-intensive operations
-
-- **--AI Features--**
-
-  - **Chat With AI:** Ask it to curate a shopping list.
-    - EG. "Put together a high-protein shopping list for $75."
-    - Or, "Assemble a balanced meal plan with emphasis on produce for a family of 3 for $150."
 
 ## Tech Stack 🛠️
 
 This project leverages a modern, AI-enhanced tech stack:
 
 - **Frontend:**
-  - **React:**
-  - **TypeScript:**
-  - **Vite:**
-- **Backend:**
-  - **Python:**
-  - **FastAPI:**
-  - **SQLAlchemy:**
-  - **Pydantic:**
-  - **Large Language Models (LLMs):**
-- **Database & BaaS:**
-  - **Supabase (PostgreSQL):**
-- **Version Control:**
-  - **Git & GitHub:**
+  - **React**
+  - **TypeScript**
+  - **Vite**
+- **Backend**
+  - **Python**
+  - **FastAPI**
+  - **SQLAlchemy**
+  - **Pydantic**
+  - **Large Language Models (LLMs)**
+- **Database & BaaS**
+  - **Supabase (PostgreSQL)**
+- **Version Control**
+  - **Git & GitHub**
 
 ## Project Structure 📁
 
@@ -74,8 +65,12 @@ grocery-budget-assistant/
 └── docs/                   # Project documentation
 ```
 
-**Backend Structure:**
-<img src="./docs/media/backend_structure.PNG" width="400">
+<!-- **Backend Structure:** -->
+<img src="./docs/media/backend_structure.PNG" width="800">
+
+## Documentation 📚
+
+- **[ProjectDoc.md](./docs/ProjectDoc.md)** - Comprehensive technical documentation
 
 ## Screenshots 📸
 
@@ -93,8 +88,3 @@ grocery-budget-assistant/
 
 <!-- **Mobile/Responsive View (Example):** -->
 <img src="./docs/media/5.jpg" width="200">
-
-## Documentation 📚
-
-- **[ProjectDoc.md](./docs/ProjectDoc.md)** - Comprehensive technical documentation
-- **[ProjectFiles.md](./docs/ProjectFiles.md)** - Detailed file structure and descriptions
